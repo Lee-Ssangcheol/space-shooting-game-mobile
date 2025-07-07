@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>썬더볼트 슈팅게임</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="canvas-container">
+            <canvas id="gameCanvas" width="392" height="700"></canvas>
+        </div>
+        
+        <!-- 모바일 터치 컨트롤 -->
+        <div id="mobile-controls">
+            <div id="action-buttons">
+                <button id="btn-special" class="action-btn">특수무기</button>
+                <button id="btn-fire" class="action-btn">시작/재시작</button>
+                <button id="btn-pause" class="action-btn">일시정지</button>
+                <button id="btn-reset" class="action-btn">최고점수 리셋</button>
+            </div>
+            
+            <div id="control-pad">
+                <div class="control-row">
+                    <button id="btn-up" class="control-btn">↑</button>
+                </div>
+                <div class="control-row">
+                    <button id="btn-left" class="control-btn">←</button>
+                    <button id="btn-right" class="control-btn">→</button>
+                </div>
+                <div class="control-row">
+                    <button id="btn-down" class="control-btn">↓</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="sounds.js"></script>
+    <script src="game.js"></script>
+</body>
+</html> 
