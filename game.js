@@ -152,9 +152,9 @@ function setupMobileControls() {
         const x = touch.clientX - rect.left;
         const y = touch.clientY - rect.top;
         
-        // 플레이어 위치 업데이트 - 터치한 위치와 플레이어 중간 뒤쪽 부분이 일치하도록 조정
-        player.x = Math.max(0, Math.min(canvas.width - player.width, x - player.width * 0.3));
-        player.y = Math.max(0, Math.min(canvas.height - player.height, y - player.height * 0.7));
+        // 플레이어 위치 업데이트 - 터치한 위치와 플레이어가 접촉하도록 조정
+        player.x = Math.max(0, Math.min(canvas.width - player.width, x - player.width / 2));
+        player.y = Math.max(0, Math.min(canvas.height - player.height, y - player.height / 2));
         
         // 두 번째 비행기가 있으면 함께 이동
         if (hasSecondPlane) {
@@ -185,9 +185,9 @@ function setupMobileControls() {
         const x = touch.clientX - rect.left;
         const y = touch.clientY - rect.top;
         
-        // 플레이어 위치 업데이트 - 터치한 위치와 플레이어 중간 뒤쪽 부분이 일치하도록 조정
-        player.x = Math.max(0, Math.min(canvas.width - player.width, x - player.width * 0.3));
-        player.y = Math.max(0, Math.min(canvas.height - player.height, y - player.height * 0.7));
+        // 플레이어 위치 업데이트 - 터치한 위치와 플레이어가 접촉하도록 조정
+        player.x = Math.max(0, Math.min(canvas.width - player.width, x - player.width / 2));
+        player.y = Math.max(0, Math.min(canvas.height - player.height, y - player.height / 2));
         
         // 두 번째 비행기가 있으면 함께 이동
         if (hasSecondPlane) {
@@ -276,11 +276,30 @@ function setupMobileControls() {
                 console.log('ScoreManager를 통한 최고 점수 리셋 완료');
             }).catch(error => {
                 console.error('ScoreManager 리셋 실패:', error);
-                // 백업 리셋 방법
-                highScore = 0;
-                localStorage.clear();
-                sessionStorage.clear();
-                console.log('백업 방법으로 최고 점수 리셋');
+                // 백업 리셋 방법 - 모든 저장소 완전 클리어
+                try {
+                    highScore = 0;
+                    score = 0;
+                    levelScore = 0;
+                    scoreForSpread = 0;
+                    gameLevel = 1;
+                    
+                    // localStorage 완전 클리어
+                    localStorage.removeItem('highScore');
+                    localStorage.removeItem('highScore_backup');
+                    localStorage.removeItem('highScore_timestamp');
+                    localStorage.removeItem('gameScore');
+                    localStorage.removeItem('gameScore_backup');
+                    
+                    // sessionStorage 완전 클리어
+                    sessionStorage.removeItem('highScore');
+                    sessionStorage.removeItem('gameScore');
+                    sessionStorage.clear();
+                    
+                    console.log('백업 방법으로 모든 저장소 완전 리셋 완료');
+                } catch (e) {
+                    console.error('백업 리셋도 실패:', e);
+                }
             });
         }
     }, { passive: false });
@@ -297,11 +316,30 @@ function setupMobileControls() {
                 console.log('ScoreManager를 통한 최고 점수 리셋 완료');
             }).catch(error => {
                 console.error('ScoreManager 리셋 실패:', error);
-                // 백업 리셋 방법
-                highScore = 0;
-                localStorage.clear();
-                sessionStorage.clear();
-                console.log('백업 방법으로 최고 점수 리셋');
+                // 백업 리셋 방법 - 모든 저장소 완전 클리어
+                try {
+                    highScore = 0;
+                    score = 0;
+                    levelScore = 0;
+                    scoreForSpread = 0;
+                    gameLevel = 1;
+                    
+                    // localStorage 완전 클리어
+                    localStorage.removeItem('highScore');
+                    localStorage.removeItem('highScore_backup');
+                    localStorage.removeItem('highScore_timestamp');
+                    localStorage.removeItem('gameScore');
+                    localStorage.removeItem('gameScore_backup');
+                    
+                    // sessionStorage 완전 클리어
+                    sessionStorage.removeItem('highScore');
+                    sessionStorage.removeItem('gameScore');
+                    sessionStorage.clear();
+                    
+                    console.log('백업 방법으로 모든 저장소 완전 리셋 완료');
+                } catch (e) {
+                    console.error('백업 리셋도 실패:', e);
+                }
             });
         }
     });
@@ -824,18 +862,65 @@ const ScoreManager = {
 
     async reset() {
         try {
-            // Electron IPC를 통해 점수 초기화
-            await window.electron.ipcRenderer.invoke('reset-score');
+            console.log('ScoreManager 리셋 시작');
             
+            // 1. Electron IPC를 통해 점수 초기화
+            try {
+                await window.electron.ipcRenderer.invoke('reset-score');
+                console.log('ScoreManager Electron IPC 리셋 완료');
+            } catch (e) {
+                console.warn('ScoreManager Electron IPC 리셋 실패:', e);
+            }
+            
+            // 2. localStorage 완전 리셋
+            try {
+                localStorage.removeItem('highScore');
+                localStorage.removeItem('highScore_backup');
+                localStorage.removeItem('highScore_timestamp');
+                localStorage.removeItem('gameScore');
+                localStorage.removeItem('gameScore_backup');
+                console.log('ScoreManager localStorage 완전 리셋 완료');
+            } catch (e) {
+                console.warn('ScoreManager localStorage 리셋 실패:', e);
+            }
+            
+            // 3. sessionStorage 완전 리셋
+            try {
+                sessionStorage.removeItem('highScore');
+                sessionStorage.removeItem('gameScore');
+                sessionStorage.clear();
+                console.log('ScoreManager sessionStorage 완전 리셋 완료');
+            } catch (e) {
+                console.warn('ScoreManager sessionStorage 리셋 실패:', e);
+            }
+            
+            // 4. IndexedDB 리셋
+            try {
+                const db = await initDB();
+                const transaction = db.transaction(['scores'], 'readwrite');
+                const objectStore = transaction.objectStore('scores');
+                await objectStore.clear();
+                console.log('ScoreManager IndexedDB 리셋 완료');
+            } catch (e) {
+                console.warn('ScoreManager IndexedDB 리셋 실패:', e);
+            }
+            
+            // 5. 메모리 변수 리셋
             score = 0;
             levelScore = 0;
             scoreForSpread = 0;
             gameLevel = 1;
+            highScore = 0;
             
-            highScore = await this.getHighScore();
-            console.log('게임 리셋 - 현재 최고 점수:', highScore);
+            console.log('ScoreManager 모든 저장소 리셋 완료 - 현재 최고 점수:', highScore);
         } catch (error) {
-            console.error('게임 리셋 중 오류:', error);
+            console.error('ScoreManager 리셋 중 오류:', error);
+            // 최종 백업 리셋
+            highScore = 0;
+            score = 0;
+            levelScore = 0;
+            scoreForSpread = 0;
+            gameLevel = 1;
         }
     }
 };
@@ -1043,16 +1128,7 @@ async function initializeGame() {
         startGameLoop();
         console.log('게임 루프 시작됨');
         
-        // 모바일에서 3초 후에도 게임이 시작되지 않으면 강제 시작
-        if (isMobile) {
-            setTimeout(() => {
-                if (!gameStarted) {
-                    console.log('모바일 강제 게임 시작');
-                    isStartScreen = false;
-                    gameStarted = true;
-                }
-            }, 3000);
-        }
+        // 자동 시작 제거 - 사용자가 직접 시작하도록 함
 
     } catch (error) {
         console.error('게임 초기화 중 오류:', error);
@@ -4501,16 +4577,7 @@ async function initializeGame() {
         startGameLoop();
         console.log('게임 루프 시작됨');
         
-        // 모바일에서 3초 후에도 게임이 시작되지 않으면 강제 시작
-        if (isMobile) {
-            setTimeout(() => {
-                if (!gameStarted) {
-                    console.log('모바일 강제 게임 시작');
-                    isStartScreen = false;
-                    gameStarted = true;
-                }
-            }, 3000);
-        }
+        // 자동 시작 제거 - 사용자가 직접 시작하도록 함
 
     } catch (error) {
         console.error('게임 초기화 중 오류:', error);
