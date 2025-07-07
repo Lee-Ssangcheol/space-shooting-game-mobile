@@ -321,6 +321,9 @@ const snakeGroupInterval = 5000;  // 그룹 생성 간격 (5초)
 const maxSnakeGroups = 3;  // 최대 동시 그룹 수
 let gameVersion = '1.0.0-202506161826';  // 게임 버전
 
+// 게임 루프 실행 상태 변수 추가
+let gameLoopRunning = false;
+
 // 게임 상태 변수에 추가
 let bossActive = false;
 let bossHealth = 0;
@@ -963,6 +966,7 @@ async function initializeGame() {
         });
         
         // 게임 루프 시작
+        gameLoopRunning = true;
         requestAnimationFrame(gameLoop);
         console.log('게임 루프 시작됨');
         
@@ -1813,18 +1817,24 @@ function drawAirplane(x, y, width, height, color, isEnemy = false) {
 
 // 게임 루프 수정
 function gameLoop() {
+    if (!gameLoopRunning) return;
+    
     if (isPaused) {
-        requestAnimationFrame(gameLoop);
+        setTimeout(() => {
+            requestAnimationFrame(gameLoop);
+        }, 1000 / 30);
         return;
     }
 
-    // 화면 전체를 지우고 새로 그리기
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // 화면 전체를 검정색으로 채움 (캔버스 배경)
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     if (isStartScreen || !gameStarted) {
-        console.log('시작 화면 표시 중:', { isStartScreen, gameStarted, isMobile });
         drawStartScreen();
-        requestAnimationFrame(gameLoop);
+        setTimeout(() => {
+            requestAnimationFrame(gameLoop);
+        }, 1000 / 30);
         return;
     }
 
@@ -1873,7 +1883,9 @@ function gameLoop() {
                 ctx.fillText('또는 화면을 터치하여 재시작', canvas.width/2, canvas.height/2 + 110);
             }
         }
-        requestAnimationFrame(gameLoop);
+        setTimeout(() => {
+            requestAnimationFrame(gameLoop);
+        }, 1000 / 30);
         return;
     }
 
@@ -1903,12 +1915,6 @@ function gameLoop() {
             const timeSinceLastBoss = currentTime - lastBossSpawnTime;
             
             if (timeSinceLastBoss >= BOSS_SETTINGS.SPAWN_INTERVAL) {
-                console.log('보스 생성 조건 만족:', {
-                    currentTime,
-                    lastBossSpawnTime,
-                    timeSinceLastBoss,
-                    interval: BOSS_SETTINGS.SPAWN_INTERVAL
-                });
                 createBoss();
             }
         } else {
@@ -1921,7 +1927,6 @@ function gameLoop() {
                 bossActive = false;
                 bossHealth = 0;
                 bossDestroyed = false;  // 보스 파괴 상태 초기화
-                console.log('보스가 제거되어 상태 초기화');
             }
         }
 
@@ -1949,11 +1954,14 @@ function gameLoop() {
         // UI 그리기
         drawUI();
 
-        // 다음 프레임 요청
-        requestAnimationFrame(gameLoop);
+        // 프레임 레이트 제한 (30 FPS)
+        setTimeout(() => {
+            requestAnimationFrame(gameLoop);
+        }, 1000 / 30);
     } catch (error) {
         console.error('게임 루프 실행 중 오류:', error);
-        requestAnimationFrame(gameLoop);
+        // 오류 발생 시 게임 오버 처리
+        handleGameOver();
     }
 }
 
@@ -4396,6 +4404,7 @@ async function initializeGame() {
         });
         
         // 게임 루프 시작
+        gameLoopRunning = true;
         requestAnimationFrame(gameLoop);
         console.log('게임 루프 시작됨');
         
