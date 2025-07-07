@@ -152,9 +152,9 @@ function setupMobileControls() {
         const x = touch.clientX - rect.left;
         const y = touch.clientY - rect.top;
         
-        // 플레이어 위치 업데이트
-        player.x = Math.max(0, Math.min(canvas.width - player.width, x - player.width/2));
-        player.y = Math.max(0, Math.min(canvas.height - player.height, y - player.height/2));
+        // 플레이어 위치 업데이트 - 터치한 위치와 플레이어 중간 뒤쪽 부분이 일치하도록 조정
+        player.x = Math.max(0, Math.min(canvas.width - player.width, x - player.width * 0.3));
+        player.y = Math.max(0, Math.min(canvas.height - player.height, y - player.height * 0.7));
         
         // 두 번째 비행기가 있으면 함께 이동
         if (hasSecondPlane) {
@@ -163,7 +163,7 @@ function setupMobileControls() {
         }
         
         // 게임이 시작되지 않았다면 시작
-        if (isStartScreen || !gameStarted) {
+        if (isStartScreen) {
             // 오디오 초기화
             initAudio();
             isStartScreen = false;
@@ -185,9 +185,9 @@ function setupMobileControls() {
         const x = touch.clientX - rect.left;
         const y = touch.clientY - rect.top;
         
-        // 플레이어 위치 업데이트
-        player.x = Math.max(0, Math.min(canvas.width - player.width, x - player.width/2));
-        player.y = Math.max(0, Math.min(canvas.height - player.height, y - player.height/2));
+        // 플레이어 위치 업데이트 - 터치한 위치와 플레이어 중간 뒤쪽 부분이 일치하도록 조정
+        player.x = Math.max(0, Math.min(canvas.width - player.width, x - player.width * 0.3));
+        player.y = Math.max(0, Math.min(canvas.height - player.height, y - player.height * 0.7));
         
         // 두 번째 비행기가 있으면 함께 이동
         if (hasSecondPlane) {
@@ -270,10 +270,41 @@ function setupMobileControls() {
         e.stopPropagation();
         console.log('최고점수 리셋 버튼 터치');
         
-        if (confirm('정말로 최고점수를 초기화하시겠습니까?')) {
-            resetAllHighScores();
+        // 최고 점수 리셋 확인
+        if (confirm('최고 점수를 리셋하시겠습니까?')) {
+            ScoreManager.reset().then(() => {
+                console.log('ScoreManager를 통한 최고 점수 리셋 완료');
+            }).catch(error => {
+                console.error('ScoreManager 리셋 실패:', error);
+                // 백업 리셋 방법
+                highScore = 0;
+                localStorage.clear();
+                sessionStorage.clear();
+                console.log('백업 방법으로 최고 점수 리셋');
+            });
         }
     }, { passive: false });
+    
+    // 클릭 이벤트도 추가 (데스크탑용)
+    mobileControls.btnReset.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('최고점수 리셋 버튼 클릭');
+        
+        // 최고 점수 리셋 확인
+        if (confirm('최고 점수를 리셋하시겠습니까?')) {
+            ScoreManager.reset().then(() => {
+                console.log('ScoreManager를 통한 최고 점수 리셋 완료');
+            }).catch(error => {
+                console.error('ScoreManager 리셋 실패:', error);
+                // 백업 리셋 방법
+                highScore = 0;
+                localStorage.clear();
+                sessionStorage.clear();
+                console.log('백업 방법으로 최고 점수 리셋');
+            });
+        }
+    });
     
     console.log('모바일 컨트롤 설정 완료');
 }
@@ -4687,7 +4718,7 @@ function setupTouchDragControls() {
         const deltaX = touchX - touchStartX;
         const deltaY = touchY - touchStartY;
         
-        // 새로운 위치 계산
+        // 새로운 위치 계산 - 터치한 위치와 플레이어 중간 뒤쪽 부분이 일치하도록 조정
         let newX = playerStartX + deltaX;
         let newY = playerStartY + deltaY;
         
@@ -4698,7 +4729,7 @@ function setupTouchDragControls() {
         newX = Math.max(-player.width / 2.5, Math.min(canvas.width - player.width / 1.5, newX));
         newY = Math.max(margin, Math.min(maxY, newY));
         
-        // 플레이어 위치 업데이트
+        // 플레이어 위치 업데이트 - 터치한 위치와 플레이어 중간 뒤쪽 부분이 일치하도록 조정
         player.x = newX;
         player.y = newY;
         
