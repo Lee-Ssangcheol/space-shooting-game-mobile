@@ -156,9 +156,9 @@ function setupMobileControls() {
         const x = (touch.clientX - rect.left) * scaleX;
         const y = (touch.clientY - rect.top) * scaleY;
         
-        // 플레이어 위치 업데이트 - 터치한 위치와 플레이어 중심이 일치하도록 조정
-        player.x = Math.max(0, Math.min(canvas.width - player.width, x - player.width / 2));
-        player.y = Math.max(0, Math.min(canvas.height - player.height, y - player.height / 2));
+        // 플레이어 위치 업데이트 - 터치한 위치보다 플레이어가 앞쪽에 오도록 조정 (2/3 앞쪽)
+        player.x = Math.max(0, Math.min(canvas.width - player.width, x - player.width * (2/3)));
+        player.y = Math.max(0, Math.min(canvas.height - player.height, y - player.height * (2/3)));
         
         // 두 번째 비행기가 있으면 함께 이동
         if (hasSecondPlane) {
@@ -193,9 +193,9 @@ function setupMobileControls() {
         const x = (touch.clientX - rect.left) * scaleX;
         const y = (touch.clientY - rect.top) * scaleY;
         
-        // 플레이어 위치 업데이트 - 터치한 위치와 플레이어 중심이 일치하도록 조정
-        player.x = Math.max(0, Math.min(canvas.width - player.width, x - player.width / 2));
-        player.y = Math.max(0, Math.min(canvas.height - player.height, y - player.height / 2));
+        // 플레이어 위치 업데이트 - 터치한 위치보다 플레이어가 앞쪽에 오도록 조정 (2/3 앞쪽)
+        player.x = Math.max(0, Math.min(canvas.width - player.width, x - player.width * (2/3)));
+        player.y = Math.max(0, Math.min(canvas.height - player.height, y - player.height * (2/3)));
         
         // 두 번째 비행기가 있으면 함께 이동
         if (hasSecondPlane) {
