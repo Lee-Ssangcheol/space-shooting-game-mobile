@@ -62,10 +62,6 @@ const ctx = canvas.getContext('2d');
 
 // 모바일 터치 컨트롤 요소들
 const mobileControls = {
-    btnUp: document.getElementById('btn-up'),
-    btnDown: document.getElementById('btn-down'),
-    btnLeft: document.getElementById('btn-left'),
-    btnRight: document.getElementById('btn-right'),
     btnFire: document.getElementById('btn-fire'),
     btnSpecial: document.getElementById('btn-special'),
     btnPause: document.getElementById('btn-pause'),
@@ -103,41 +99,54 @@ function setupMobileControls() {
         return;
     }
     
-    // 방향키 터치 이벤트
-    mobileControls.btnUp.addEventListener('touchstart', (e) => {
+    // 캔버스 터치 이벤트 (플레이어 이동용)
+    canvas.addEventListener('touchstart', (e) => {
         e.preventDefault();
-        keys.ArrowUp = true;
-    }, { passive: false });
-    mobileControls.btnUp.addEventListener('touchend', (e) => {
-        e.preventDefault();
-        keys.ArrowUp = false;
+        const touch = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        const x = touch.clientX - rect.left;
+        const y = touch.clientY - rect.top;
+        
+        // 플레이어 위치 업데이트
+        player.x = Math.max(0, Math.min(canvas.width - player.width, x - player.width/2));
+        player.y = Math.max(0, Math.min(canvas.height - player.height, y - player.height/2));
+        
+        // 두 번째 비행기가 있으면 함께 이동
+        if (hasSecondPlane) {
+            secondPlane.x = player.x - 60;
+            secondPlane.y = player.y;
+        }
+        
+        // 게임이 시작되지 않았다면 시작
+        if (isStartScreen) {
+            isStartScreen = false;
+            gameStarted = true;
+            console.log('모바일 터치로 게임 시작');
+        }
+        
+        // 게임 오버 상태에서 재시작
+        if (isGameOver) {
+            restartGame();
+            return;
+        }
     }, { passive: false });
     
-    mobileControls.btnDown.addEventListener('touchstart', (e) => {
+    canvas.addEventListener('touchmove', (e) => {
         e.preventDefault();
-        keys.ArrowDown = true;
-    }, { passive: false });
-    mobileControls.btnDown.addEventListener('touchend', (e) => {
-        e.preventDefault();
-        keys.ArrowDown = false;
-    }, { passive: false });
-    
-    mobileControls.btnLeft.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        keys.ArrowLeft = true;
-    }, { passive: false });
-    mobileControls.btnLeft.addEventListener('touchend', (e) => {
-        e.preventDefault();
-        keys.ArrowLeft = false;
-    }, { passive: false });
-    
-    mobileControls.btnRight.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        keys.ArrowRight = true;
-    }, { passive: false });
-    mobileControls.btnRight.addEventListener('touchend', (e) => {
-        e.preventDefault();
-        keys.ArrowRight = false;
+        const touch = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        const x = touch.clientX - rect.left;
+        const y = touch.clientY - rect.top;
+        
+        // 플레이어 위치 업데이트
+        player.x = Math.max(0, Math.min(canvas.width - player.width, x - player.width/2));
+        player.y = Math.max(0, Math.min(canvas.height - player.height, y - player.height/2));
+        
+        // 두 번째 비행기가 있으면 함께 이동
+        if (hasSecondPlane) {
+            secondPlane.x = player.x - 60;
+            secondPlane.y = player.y;
+        }
     }, { passive: false });
     
     // 시작/재시작 버튼 터치 이벤트
@@ -1830,6 +1839,7 @@ function gameLoop() {
                 ctx.fillText(`충돌 횟수: ${collisionCount}`, canvas.width/2, canvas.height/2 + 30);
                 ctx.font = 'bold 20px Arial';
                 ctx.fillText('시작/재시작 버튼을 눌러 게임 재시작', canvas.width/2, canvas.height/2 + 80);
+                ctx.fillText('또는 화면을 터치하여 재시작', canvas.width/2, canvas.height/2 + 110);
             }
         }
         requestAnimationFrame(gameLoop);
@@ -3884,9 +3894,9 @@ function drawStartScreen() {
     ctx.font = '18px Arial';
     ctx.fillStyle = '#ffffff';
     ctx.textAlign = 'left';
-    ctx.fillText('플레이어 비행기를 손가락으로 터치하면', 50, canvas.height - 150);
-    ctx.fillText('총알이 자동발사 되고 드래그하여', 50, canvas.height - 120);
-    ctx.fillText('상하좌우로 움직일 수 있습니다.', 50, canvas.height - 90);
+    ctx.fillText('화면을 터치하고 드래그하여', 50, canvas.height - 150);
+    ctx.fillText('플레이어 비행기를 움직이세요.', 50, canvas.height - 120);
+    ctx.fillText('총알은 자동으로 발사됩니다.', 50, canvas.height - 90);
 }
 
 // 폭탄 생성 함수 추가
