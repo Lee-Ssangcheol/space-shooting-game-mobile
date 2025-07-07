@@ -102,6 +102,9 @@ function setupMobileControls() {
     // 캔버스 터치 이벤트 (플레이어 이동용)
     canvas.addEventListener('touchstart', (e) => {
         e.preventDefault();
+        e.stopPropagation();
+        console.log('모바일 터치 시작');
+        
         const touch = e.touches[0];
         const rect = canvas.getBoundingClientRect();
         const x = touch.clientX - rect.left;
@@ -1795,7 +1798,7 @@ function gameLoop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     if (isStartScreen || !gameStarted) {
-        console.log('시작 화면 표시 중:', { isStartScreen, gameStarted });
+        console.log('시작 화면 표시 중:', { isStartScreen, gameStarted, isMobile });
         drawStartScreen();
         requestAnimationFrame(gameLoop);
         return;
@@ -4191,6 +4194,19 @@ async function initializeGame() {
         
         // 모바일 전체화면 모드 활성화
         enableFullscreen();
+        
+        // 모바일에서는 자동으로 게임 시작 (터치 이벤트 대기)
+        if (isMobile) {
+            console.log('모바일 환경 감지, 게임 자동 시작 준비');
+            // 1초 후 자동으로 게임 시작
+            setTimeout(() => {
+                if (!gameStarted) {
+                    isStartScreen = false;
+                    gameStarted = true;
+                    console.log('모바일 자동 게임 시작:', { isStartScreen, gameStarted });
+                }
+            }, 1000);
+        }
         
         // 최고 점수 로드
         highScore = await loadHighScore();
