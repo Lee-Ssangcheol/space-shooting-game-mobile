@@ -290,11 +290,17 @@ function setupMobileControls() {
                     localStorage.removeItem('highScore_timestamp');
                     localStorage.removeItem('gameScore');
                     localStorage.removeItem('gameScore_backup');
+                    // 리셋 완료 표시
+                    localStorage.setItem('scoreResetComplete', 'true');
+                    localStorage.setItem('resetTimestamp', Date.now().toString());
                     
                     // sessionStorage 완전 클리어
                     sessionStorage.removeItem('highScore');
                     sessionStorage.removeItem('gameScore');
                     sessionStorage.clear();
+                    // 리셋 완료 표시
+                    sessionStorage.setItem('scoreResetComplete', 'true');
+                    sessionStorage.setItem('resetTimestamp', Date.now().toString());
                     
                     console.log('백업 방법으로 모든 저장소 완전 리셋 완료');
                 } catch (e) {
@@ -330,11 +336,17 @@ function setupMobileControls() {
                     localStorage.removeItem('highScore_timestamp');
                     localStorage.removeItem('gameScore');
                     localStorage.removeItem('gameScore_backup');
+                    // 리셋 완료 표시
+                    localStorage.setItem('scoreResetComplete', 'true');
+                    localStorage.setItem('resetTimestamp', Date.now().toString());
                     
                     // sessionStorage 완전 클리어
                     sessionStorage.removeItem('highScore');
                     sessionStorage.removeItem('gameScore');
                     sessionStorage.clear();
+                    // 리셋 완료 표시
+                    sessionStorage.setItem('scoreResetComplete', 'true');
+                    sessionStorage.setItem('resetTimestamp', Date.now().toString());
                     
                     console.log('백업 방법으로 모든 저장소 완전 리셋 완료');
                 } catch (e) {
@@ -879,6 +891,9 @@ const ScoreManager = {
                 localStorage.removeItem('highScore_timestamp');
                 localStorage.removeItem('gameScore');
                 localStorage.removeItem('gameScore_backup');
+                // 리셋 완료 표시
+                localStorage.setItem('scoreResetComplete', 'true');
+                localStorage.setItem('resetTimestamp', Date.now().toString());
                 console.log('ScoreManager localStorage 완전 리셋 완료');
             } catch (e) {
                 console.warn('ScoreManager localStorage 리셋 실패:', e);
@@ -889,6 +904,9 @@ const ScoreManager = {
                 sessionStorage.removeItem('highScore');
                 sessionStorage.removeItem('gameScore');
                 sessionStorage.clear();
+                // 리셋 완료 표시
+                sessionStorage.setItem('scoreResetComplete', 'true');
+                sessionStorage.setItem('resetTimestamp', Date.now().toString());
                 console.log('ScoreManager sessionStorage 완전 리셋 완료');
             } catch (e) {
                 console.warn('ScoreManager sessionStorage 리셋 실패:', e);
@@ -927,6 +945,16 @@ const ScoreManager = {
 
 // 자동 저장 기능 수정
 setInterval(async () => {
+    // 리셋 후에는 자동 저장하지 않음
+    const resetComplete = localStorage.getItem('scoreResetComplete') === 'true';
+    const resetTimestamp = parseInt(localStorage.getItem('resetTimestamp') || '0');
+    const timeSinceReset = Date.now() - resetTimestamp;
+    
+    // 리셋 후 10초 이내에는 자동 저장하지 않음
+    if (resetComplete && timeSinceReset < 10000) {
+        return;
+    }
+    
     if (score > 0 || highScore > 0) {
         const currentMax = Math.max(score, highScore);
         await saveHighScoreDirectly(currentMax, 'AutoSave');
@@ -4781,22 +4809,11 @@ function setupTouchDragControls() {
         const touchX = touch.clientX - rect.left;
         const touchY = touch.clientY - rect.top;
         
-        // 플레이어 위치 계산
-        const deltaX = touchX - touchStartX;
-        const deltaY = touchY - touchStartY;
+        // 플레이어 위치 계산 - 터치한 위치와 플레이어가 접촉하도록 조정
+        const newX = Math.max(0, Math.min(canvas.width - player.width, touchX - player.width / 2));
+        const newY = Math.max(0, Math.min(canvas.height - player.height, touchY - player.height / 2));
         
-        // 새로운 위치 계산 - 터치한 위치와 플레이어 중간 뒤쪽 부분이 일치하도록 조정
-        let newX = playerStartX + deltaX;
-        let newY = playerStartY + deltaY;
-        
-        // 경계 제한
-        const margin = 10;
-        const maxY = canvas.height - 100;
-        
-        newX = Math.max(-player.width / 2.5, Math.min(canvas.width - player.width / 1.5, newX));
-        newY = Math.max(margin, Math.min(maxY, newY));
-        
-        // 플레이어 위치 업데이트 - 터치한 위치와 플레이어 중간 뒤쪽 부분이 일치하도록 조정
+        // 플레이어 위치 업데이트
         player.x = newX;
         player.y = newY;
         
