@@ -178,7 +178,7 @@ function setupMobileControls() {
         
         // 플레이어 위치 업데이트 - Y축에서 터치점과 플레이어 중심점이 일치하고, 터치점이 꼬리에서 10픽셀 아래에 오도록 조정
         player.x = Math.max(-player.width/2, Math.min(canvas.width + player.width/2, x - player.width));
-        player.y = Math.max(0, Math.min(canvas.height - player.height, y - 10));
+        player.y = Math.max(0, Math.min(canvas.height - player.height, y + 20));
         
         // 두 번째 비행기가 있으면 함께 이동
         if (hasSecondPlane) {
@@ -215,7 +215,7 @@ function setupMobileControls() {
         
         // 플레이어 위치 업데이트 - Y축에서 터치점과 플레이어 중심점이 일치하고, 터치점이 꼬리에서 10픽셀 아래에 오도록 조정
         player.x = Math.max(-player.width/2, Math.min(canvas.width + player.width/2, x - player.width));
-        player.y = Math.max(0, Math.min(canvas.height - player.height, y - 10));
+        player.y = Math.max(0, Math.min(canvas.height - player.height, y + 20));
         
         // 두 번째 비행기가 있으면 함께 이동
         if (hasSecondPlane) {
