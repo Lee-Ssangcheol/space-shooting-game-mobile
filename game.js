@@ -183,6 +183,14 @@ function setupMobileControls() {
         player.x = Math.max(-player.width/2, Math.min(canvas.width + player.width/2, x - player.width));
         player.y = Math.max(0, Math.min(canvas.height - player.height, y - 50));
         
+        console.log('플레이어 위치 설정:', {
+            touchY: y,
+            calculatedY: y - 50,
+            finalY: player.y,
+            playerHeight: player.height,
+            canvasHeight: canvas.height
+        });
+        
         // 두 번째 비행기가 있으면 함께 이동
         if (hasSecondPlane) {
             secondPlane.x = player.x - 60;
@@ -2861,6 +2869,7 @@ function handleExplosions() {
 // UI 그리기 함수 수정
 function drawUI() {
     // 플레이어 비행기 그리기
+    console.log('플레이어 그리기:', { x: player.x, y: player.y, width: player.width, height: player.height });
     drawAirplane(player.x, player.y, player.width, player.height, 'white');
     if (hasSecondPlane) {
         drawAirplane(secondPlane.x, secondPlane.y, secondPlane.width, secondPlane.height, 'white');
