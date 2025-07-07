@@ -179,8 +179,9 @@ function setupMobileControls() {
         
 
         
-        // 플레이어 위치 업데이트 - Y축에서 터치점과 플레이어 중심점이 일치하고, 터치점이 꼬리에서 10픽셀 아래에 오도록 조정
+        // 플레이어 위치 업데이트 - 터치점이 플레이어 꼬리에서 10픽셀 아래에 오도록 조정
         const tailOffset = player.height / 2;
+        player.x = Math.max(-player.width/2, Math.min(canvas.width + player.width/2, x - player.width));
         player.y = Math.max(0, Math.min(canvas.height - player.height, y - player.height - tailOffset + 10));
         
         // 디버깅 정보를 화면에 표시하기 위한 전역 변수
@@ -227,8 +228,9 @@ function setupMobileControls() {
         const x = (touch.clientX - rect.left) * scaleX;
         const y = (touch.clientY - rect.top) * scaleY;
         
-        // 플레이어 위치 업데이트 - Y축에서 터치점과 플레이어 중심점이 일치하고, 터치점이 꼬리에서 10픽셀 아래에 오도록 조정
+        // 플레이어 위치 업데이트 - 터치점이 플레이어 꼬리에서 10픽셀 아래에 오도록 조정
         const tailOffset = player.height / 2;
+        player.x = Math.max(-player.width/2, Math.min(canvas.width + player.width/2, x - player.width));
         player.y = Math.max(0, Math.min(canvas.height - player.height, y - player.height - tailOffset + 10));
         
         // 두 번째 비행기가 있으면 함께 이동
