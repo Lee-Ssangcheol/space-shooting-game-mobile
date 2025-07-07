@@ -176,9 +176,9 @@ function setupMobileControls() {
         
 
         
-        // 플레이어 위치 업데이트 - 터치한 부분이 비행기 꼬리 끝에서 몸통 길이만큼 더 뒤쪽에 오도록 조정
-        player.x = Math.max(0, Math.min(canvas.width - player.width, x + player.width));
-        player.y = Math.max(0, Math.min(canvas.height - player.height, y + player.height));
+        // 플레이어 위치 업데이트 - 터치한 부분이 비행기 꼬리 끝 지점과 10픽셀 아래에 일치하도록 조정
+        player.x = Math.max(0, Math.min(canvas.width - player.width, x - player.width));
+        player.y = Math.max(0, Math.min(canvas.height - player.height, y - 10));
         
         // 두 번째 비행기가 있으면 함께 이동
         if (hasSecondPlane) {
@@ -4848,9 +4848,9 @@ function setupTouchDragControls() {
         const touchX = (touch.clientX - rect.left) * scaleX;
         const touchY = (touch.clientY - rect.top) * scaleY;
         
-        // 플레이어 위치 계산 - 터치한 위치보다 플레이어가 앞쪽에 오도록 조정 (3/4 앞쪽)
-        const newX = Math.max(0, Math.min(canvas.width - player.width, touchX - player.width * (3/4)));
-        const newY = Math.max(0, Math.min(canvas.height - player.height, touchY - player.height * (3/4)));
+        // 플레이어 위치 계산 - 터치한 위치가 꼬리 끝과 10픽셀 아래에 오도록 조정
+        const newX = Math.max(0, Math.min(canvas.width - player.width, touchX - player.width));
+        const newY = Math.max(0, Math.min(canvas.height - player.height, touchY - 10));
         
         // 플레이어 위치 업데이트
         player.x = newX;
