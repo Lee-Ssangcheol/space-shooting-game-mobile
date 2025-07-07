@@ -327,6 +327,7 @@ let gameLoopRunning = false;
 // 게임 상태 변수에 추가
 let bossActive = false;
 let bossHealth = 0;
+let bossDestroyed = false;  // 보스 파괴 상태
 let bossPattern = 0;
 let specialWeaponCharged = false;
 let specialWeaponCharge = 0;
@@ -1830,7 +1831,7 @@ function gameLoop() {
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    if (isStartScreen || !gameStarted) {
+    if (isStartScreen && !gameStarted) {
         drawStartScreen();
         setTimeout(() => {
             requestAnimationFrame(gameLoop);
@@ -1890,6 +1891,15 @@ function gameLoop() {
     }
 
     try {
+        // 게임이 시작되지 않았으면 시작 화면 표시
+        if (!gameStarted) {
+            drawStartScreen();
+            setTimeout(() => {
+                requestAnimationFrame(gameLoop);
+            }, 1000 / 30);
+            return;
+        }
+        
         // 깜박임 효과 처리
         if (flashTimer > 0) {
             ctx.fillStyle = 'rgba(255, 0, 0, 0.3)';
@@ -3861,6 +3871,8 @@ function applyPowerUp(type) {
 }
 
 // 게임 상태 변수에 추가
+let bombs = [];  // 폭탄 배열
+let dynamites = [];  // 다이나마이트 배열
 let powerUps = [];
 let hasSpreadShot = false;
 let hasShield = false;
@@ -4285,14 +4297,14 @@ async function initializeGame() {
         // 모바일에서는 자동으로 게임 시작 (터치 이벤트 대기)
         if (isMobile) {
             console.log('모바일 환경 감지, 게임 자동 시작 준비');
-            // 1초 후 자동으로 게임 시작
+            // 0.5초 후 자동으로 게임 시작
             setTimeout(() => {
                 if (!gameStarted) {
                     isStartScreen = false;
                     gameStarted = true;
                     console.log('모바일 자동 게임 시작:', { isStartScreen, gameStarted });
                 }
-            }, 1000);
+            }, 500);
         }
         
         // 최고 점수 로드
