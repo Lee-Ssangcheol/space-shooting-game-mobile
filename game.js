@@ -1329,7 +1329,7 @@ function createEnemy() {
         patternChance: 1.0,
         maxEnemies: 20 + (gameLevel - 5) * 2,
         bossHealth: 2000 + (gameLevel - 5) * 500,
-        bossSpawnInterval: Math.max(10000, 20000 - (gameLevel - 5) * 1000),
+        bossSpawnInterval: 10000, // 10초로 고정
         powerUpChance: 0.3,
         bombDropChance: 0.3,
         dynamiteDropChance: 0.25
@@ -2221,7 +2221,7 @@ function handleEnemies() {
         patternChance: 1.0,
         maxEnemies: 20 + (gameLevel - 5) * 2,
         bossHealth: 2000 + (gameLevel - 5) * 500,
-        bossSpawnInterval: Math.max(10000, 20000 - (gameLevel - 5) * 1000),
+        bossSpawnInterval: 10000, // 10초로 고정
         powerUpChance: 0.3,
         bombDropChance: 0.3,
         dynamiteDropChance: 0.25
@@ -3889,7 +3889,7 @@ function checkLevelUp() {
             patternChance: 1.0,
             maxEnemies: 20 + (gameLevel - 5) * 2,
             bossHealth: 2000 + (gameLevel - 5) * 500,
-            bossSpawnInterval: Math.max(10000, 20000 - (gameLevel - 5) * 1000),
+            bossSpawnInterval: 10000, // 10초로 고정
             powerUpChance: 0.3,
             bombDropChance: 0.3,
             dynamiteDropChance: 0.25
