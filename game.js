@@ -4899,7 +4899,7 @@ function setupTouchDragControls() {
         
         // 플레이어 위치 계산 - 터치점이 플레이어 꼬리에서 10픽셀 아래에 오도록 조정
         const tailLength = player.height / 2;
-        const newX = Math.max(0, Math.min(canvas.width - player.width, touchX - player.width));
+        const newX = Math.max(0, Math.min(canvas.width - player.width, touchX - player.width / 2));
         const newY = Math.max(0, Math.min(canvas.height - player.height, touchY - player.height - tailLength));
         
         // 플레이어 위치 업데이트
