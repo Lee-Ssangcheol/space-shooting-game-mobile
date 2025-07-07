@@ -118,10 +118,10 @@ function setupMobileControls() {
         }
         
         // 게임이 시작되지 않았다면 시작
-        if (isStartScreen) {
+        if (isStartScreen || !gameStarted) {
             isStartScreen = false;
             gameStarted = true;
-            console.log('모바일 터치로 게임 시작');
+            console.log('모바일 터치로 게임 시작:', { isStartScreen, gameStarted });
         }
         
         // 게임 오버 상태에서 재시작
@@ -156,10 +156,10 @@ function setupMobileControls() {
         console.log('시작/재시작 버튼 터치');
         
         // 시작 화면에서 버튼을 누르면 게임 시작
-        if (isStartScreen) {
+        if (isStartScreen || !gameStarted) {
             isStartScreen = false;
             gameStarted = true;
-            console.log('모바일에서 게임 시작');
+            console.log('모바일 버튼으로 게임 시작:', { isStartScreen, gameStarted });
         }
         
         // 게임 오버 상태에서 재시작
@@ -181,10 +181,10 @@ function setupMobileControls() {
         e.stopPropagation();
         console.log('시작/재시작 버튼 클릭');
         
-        if (isStartScreen) {
+        if (isStartScreen || !gameStarted) {
             isStartScreen = false;
             gameStarted = true;
-            console.log('모바일에서 게임 시작');
+            console.log('모바일 클릭으로 게임 시작:', { isStartScreen, gameStarted });
         }
         
         // 게임 오버 상태에서 재시작
@@ -1795,6 +1795,7 @@ function gameLoop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     if (isStartScreen || !gameStarted) {
+        console.log('시작 화면 표시 중:', { isStartScreen, gameStarted });
         drawStartScreen();
         requestAnimationFrame(gameLoop);
         return;
@@ -4190,6 +4191,10 @@ async function initializeGame() {
         // 최고 점수 로드
         highScore = await loadHighScore();
         console.log('초기화된 최고 점수:', highScore);
+        
+        // 시작 화면 초기화
+        initStartScreen();
+        gameStarted = false;  // 게임 시작 상태 초기화
         
         // === 모든 게임 요소 완전 초기화 ===
         
