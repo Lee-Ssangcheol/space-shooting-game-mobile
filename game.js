@@ -3,8 +3,11 @@ const SPECIAL_WEAPON_MAX_CHARGE = 1000;  // 특수무기 최대 충전량
 const SPECIAL_WEAPON_CHARGE_RATE = 10;   // 특수무기 충전 속도
 const TOP_EFFECT_ZONE = 20;  // 상단 효과 무시 영역 (픽셀)
 
-// 모바일 디바이스 감지
-const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+// 모바일 디바이스 감지 (더 정확한 감지)
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                 (window.innerWidth <= 768 && window.innerHeight <= 1024) ||
+                 ('ontouchstart' in window) ||
+                 (navigator.maxTouchPoints > 0);
 
 // 모바일 전체화면 모드 활성화
 function enableFullscreen() {
@@ -93,6 +96,13 @@ function showMobileControlStatus() {
 function setupMobileControls() {
     console.log('모바일 컨트롤 설정 시작');
     console.log('isMobile:', isMobile);
+    console.log('모바일 감지 상세:', {
+        userAgent: navigator.userAgent,
+        innerWidth: window.innerWidth,
+        innerHeight: window.innerHeight,
+        ontouchstart: 'ontouchstart' in window,
+        maxTouchPoints: navigator.maxTouchPoints
+    });
     
     if (!isMobile) {
         console.log('데스크탑 환경이므로 모바일 컨트롤 설정 건너뜀');
@@ -971,6 +981,17 @@ async function initializeGame() {
         requestAnimationFrame(gameLoop);
         console.log('게임 루프 시작됨');
         
+        // 모바일에서 3초 후에도 게임이 시작되지 않으면 강제 시작
+        if (isMobile) {
+            setTimeout(() => {
+                if (!gameStarted) {
+                    console.log('모바일 강제 게임 시작');
+                    isStartScreen = false;
+                    gameStarted = true;
+                }
+            }, 3000);
+        }
+
     } catch (error) {
         console.error('게임 초기화 중 오류:', error);
     }
@@ -1893,6 +1914,7 @@ function gameLoop() {
     try {
         // 게임이 시작되지 않았으면 시작 화면 표시
         if (!gameStarted) {
+            console.log('게임 시작 대기 중:', { isStartScreen, gameStarted, isMobile });
             drawStartScreen();
             setTimeout(() => {
                 requestAnimationFrame(gameLoop);
@@ -4297,14 +4319,27 @@ async function initializeGame() {
         // 모바일에서는 자동으로 게임 시작 (터치 이벤트 대기)
         if (isMobile) {
             console.log('모바일 환경 감지, 게임 자동 시작 준비');
-            // 0.5초 후 자동으로 게임 시작
+            console.log('모바일 감지 세부사항:', {
+                userAgent: navigator.userAgent,
+                innerWidth: window.innerWidth,
+                innerHeight: window.innerHeight,
+                ontouchstart: 'ontouchstart' in window,
+                maxTouchPoints: navigator.maxTouchPoints
+            });
+            
+            // 즉시 게임 시작
+            isStartScreen = false;
+            gameStarted = true;
+            console.log('모바일 즉시 게임 시작:', { isStartScreen, gameStarted });
+            
+            // 추가로 1초 후에도 확인
             setTimeout(() => {
                 if (!gameStarted) {
                     isStartScreen = false;
                     gameStarted = true;
-                    console.log('모바일 자동 게임 시작:', { isStartScreen, gameStarted });
+                    console.log('모바일 지연 게임 시작:', { isStartScreen, gameStarted });
                 }
-            }, 500);
+            }, 1000);
         }
         
         // 최고 점수 로드
@@ -4420,6 +4455,17 @@ async function initializeGame() {
         requestAnimationFrame(gameLoop);
         console.log('게임 루프 시작됨');
         
+        // 모바일에서 3초 후에도 게임이 시작되지 않으면 강제 시작
+        if (isMobile) {
+            setTimeout(() => {
+                if (!gameStarted) {
+                    console.log('모바일 강제 게임 시작');
+                    isStartScreen = false;
+                    gameStarted = true;
+                }
+            }, 3000);
+        }
+
     } catch (error) {
         console.error('게임 초기화 중 오류:', error);
     }
