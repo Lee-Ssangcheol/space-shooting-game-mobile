@@ -171,6 +171,18 @@ function setupMobileControls() {
             calculatedY: y - player.height * 2
         });
         
+        // 화면에 디버깅 정보 표시
+        debugInfo = {
+            touchX: Math.round(touch.clientX),
+            touchY: Math.round(touch.clientY),
+            canvasX: Math.round(x),
+            canvasY: Math.round(y),
+            playerX: Math.round(x - player.width * 2),
+            playerY: Math.round(y - player.height * 2),
+            playerWidth: Math.round(player.width),
+            playerHeight: Math.round(player.height)
+        };
+        
         // 플레이어 위치 업데이트 - 터치한 부분이 비행기 꼬리 끝에서 몸통 길이만큼 더 뒤쪽에 오도록 조정
         player.x = Math.max(0, Math.min(canvas.width - player.width, x - player.width * 2));
         player.y = Math.max(0, Math.min(canvas.height - player.height, y - player.height * 2));
@@ -2883,7 +2895,18 @@ function drawUI() {
     ctx.fillStyle = 'white';
     ctx.font = '16px Arial';
     ctx.textAlign = 'right';
-    ctx.fillText('제작/저작권자:Lee.SS.C', canvas.width - 20, canvas.height - 20); 
+    ctx.fillText('제작/저작권자:Lee.SS.C', canvas.width - 20, canvas.height - 20);
+    
+    // 디버깅 정보 표시 (터치 위치 계산 확인용)
+    if (debugInfo) {
+        ctx.fillStyle = 'yellow';
+        ctx.font = '12px Arial';
+        ctx.textAlign = 'left';
+        ctx.fillText(`터치: (${debugInfo.touchX}, ${debugInfo.touchY})`, 10, canvas.height - 80);
+        ctx.fillText(`캔버스: (${debugInfo.canvasX}, ${debugInfo.canvasY})`, 10, canvas.height - 65);
+        ctx.fillText(`플레이어: (${debugInfo.playerX}, ${debugInfo.playerY})`, 10, canvas.height - 50);
+        ctx.fillText(`크기: ${debugInfo.playerWidth} x ${debugInfo.playerHeight}`, 10, canvas.height - 35);
+    } 
 
     
     // 특수 무기 게이지 표시
