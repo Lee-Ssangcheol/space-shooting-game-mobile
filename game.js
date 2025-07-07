@@ -2045,6 +2045,13 @@ function drawAirplane(x, y, width, height, color, isEnemy = false) {
     ctx.stroke();
 
     ctx.restore();
+    // 외곽선(디버깅용)
+    ctx.save();
+    ctx.translate(x + width/2, y + height/2);
+    ctx.strokeStyle = 'yellow';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(-width/2, -height/2, width, height);
+    ctx.restore();
 }
 
 // 게임 루프 수정
@@ -3019,30 +3026,7 @@ function drawUI() {
     // 모바일 컨트롤 상태 표시
     showMobileControlStatus();
     
-    // 디버깅 정보 표시 (모바일용)
-    if (window.debugInfo) {
-        // 터치 위치에 빨간 점 표시
-        ctx.fillStyle = 'red';
-        ctx.beginPath();
-        ctx.arc(window.debugInfo.touchX, window.debugInfo.touchY, 5, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // 계산된 위치에 파란 점 표시
-        ctx.fillStyle = 'blue';
-        ctx.beginPath();
-        ctx.arc(window.debugInfo.touchX, window.debugInfo.calculatedY, 3, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // 텍스트 정보
-        ctx.fillStyle = 'yellow';
-        ctx.font = '12px Arial';
-        ctx.textAlign = 'left';
-        ctx.fillText(`터치Y: ${window.debugInfo.touchY}`, 10, canvas.height - 80);
-        ctx.fillText(`계산Y: ${window.debugInfo.calculatedY}`, 10, canvas.height - 65);
-        ctx.fillText(`최종Y: ${window.debugInfo.finalY}`, 10, canvas.height - 50);
-        ctx.fillText(`플레이어H: ${window.debugInfo.playerHeight}`, 10, canvas.height - 35);
-        ctx.fillText(`캔버스H: ${window.debugInfo.canvasHeight}`, 10, canvas.height - 20);
-    }
+
     
 
 }
