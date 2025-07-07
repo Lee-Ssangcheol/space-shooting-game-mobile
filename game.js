@@ -180,7 +180,7 @@ function setupMobileControls() {
 
         
         // 플레이어 위치 업데이트 - 터치점이 플레이어 꼬리 끝에 정확히 오도록 조정
-        const tailLength = player.height / 2;
+        const tailLength = player.height;
         player.x = Math.max(-player.width/2, Math.min(canvas.width + player.width/2, x - player.width));
         player.y = Math.max(0, Math.min(canvas.height - player.height, y - player.height - tailLength));
         
@@ -229,7 +229,7 @@ function setupMobileControls() {
         const y = (touch.clientY - rect.top) * scaleY;
         
         // 플레이어 위치 업데이트 - 터치점이 플레이어 꼬리 끝에 정확히 오도록 조정
-        const tailLength = player.height / 2;
+        const tailLength = player.height;
         player.x = Math.max(-player.width/2, Math.min(canvas.width + player.width/2, x - player.width));
         player.y = Math.max(0, Math.min(canvas.height - player.height, y - player.height - tailLength));
         
