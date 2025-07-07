@@ -2546,7 +2546,6 @@ function handleSpecialWeapon() {
         specialWeaponCharge = 0;
         
         // 특수 무기 발사 효과음
-        applyGlobalVolume();
         shootSound.currentTime = 0;
         shootSound.play().catch(error => {
             console.log('오디오 재생 실패:', error);
@@ -2947,7 +2946,6 @@ function handleSpreadShot() {
                 bullets.push(secondMissile);
             }
         }
-        applyGlobalVolume();
         shootSound.currentTime = 0;
         shootSound.play().catch(error => {
             console.log('오디오 재생 실패:', error);
@@ -3269,7 +3267,6 @@ function handleBossPattern(boss) {
             ));
         }
         // 보스 파괴 시 폭발음 재생
-        applyGlobalVolume();
         explosionSound.currentTime = 0;
         explosionSound.play().catch(error => {
             console.log('오디오 재생 실패:', error);
