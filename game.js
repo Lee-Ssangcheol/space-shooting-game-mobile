@@ -149,10 +149,14 @@ function setupMobileControls() {
         
         const touch = e.touches[0];
         const rect = canvas.getBoundingClientRect();
-        const x = touch.clientX - rect.left;
-        const y = touch.clientY - rect.top;
         
-        // 플레이어 위치 업데이트 - 터치한 위치와 플레이어가 접촉하도록 조정
+        // 캔버스 좌표계로 변환 (CSS 크기와 실제 캔버스 크기의 비율 고려)
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const x = (touch.clientX - rect.left) * scaleX;
+        const y = (touch.clientY - rect.top) * scaleY;
+        
+        // 플레이어 위치 업데이트 - 터치한 위치와 플레이어 중심이 일치하도록 조정
         player.x = Math.max(0, Math.min(canvas.width - player.width, x - player.width / 2));
         player.y = Math.max(0, Math.min(canvas.height - player.height, y - player.height / 2));
         
@@ -182,10 +186,14 @@ function setupMobileControls() {
         e.preventDefault();
         const touch = e.touches[0];
         const rect = canvas.getBoundingClientRect();
-        const x = touch.clientX - rect.left;
-        const y = touch.clientY - rect.top;
         
-        // 플레이어 위치 업데이트 - 터치한 위치와 플레이어가 접촉하도록 조정
+        // 캔버스 좌표계로 변환 (CSS 크기와 실제 캔버스 크기의 비율 고려)
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const x = (touch.clientX - rect.left) * scaleX;
+        const y = (touch.clientY - rect.top) * scaleY;
+        
+        // 플레이어 위치 업데이트 - 터치한 위치와 플레이어 중심이 일치하도록 조정
         player.x = Math.max(0, Math.min(canvas.width - player.width, x - player.width / 2));
         player.y = Math.max(0, Math.min(canvas.height - player.height, y - player.height / 2));
         
@@ -4772,8 +4780,12 @@ function setupTouchDragControls() {
         e.preventDefault();
         const touch = e.touches[0];
         const rect = canvas.getBoundingClientRect();
-        touchStartX = touch.clientX - rect.left;
-        touchStartY = touch.clientY - rect.top;
+        
+        // 캔버스 좌표계로 변환 (CSS 크기와 실제 캔버스 크기의 비율 고려)
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        touchStartX = (touch.clientX - rect.left) * scaleX;
+        touchStartY = (touch.clientY - rect.top) * scaleY;
         playerStartX = player.x;
         playerStartY = player.y;
         isDragging = true;
@@ -4806,10 +4818,14 @@ function setupTouchDragControls() {
         
         const touch = e.touches[0];
         const rect = canvas.getBoundingClientRect();
-        const touchX = touch.clientX - rect.left;
-        const touchY = touch.clientY - rect.top;
         
-        // 플레이어 위치 계산 - 터치한 위치와 플레이어가 접촉하도록 조정
+        // 캔버스 좌표계로 변환 (CSS 크기와 실제 캔버스 크기의 비율 고려)
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const touchX = (touch.clientX - rect.left) * scaleX;
+        const touchY = (touch.clientY - rect.top) * scaleY;
+        
+        // 플레이어 위치 계산 - 터치한 위치와 플레이어 중심이 일치하도록 조정
         const newX = Math.max(0, Math.min(canvas.width - player.width, touchX - player.width / 2));
         const newY = Math.max(0, Math.min(canvas.height - player.height, touchY - player.height / 2));
         
