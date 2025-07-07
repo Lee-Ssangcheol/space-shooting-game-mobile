@@ -156,6 +156,21 @@ function setupMobileControls() {
         const x = (touch.clientX - rect.left) * scaleX;
         const y = (touch.clientY - rect.top) * scaleY;
         
+        console.log('터치 위치 계산:', {
+            touchX: touch.clientX,
+            touchY: touch.clientY,
+            rectLeft: rect.left,
+            rectTop: rect.top,
+            scaleX: scaleX,
+            scaleY: scaleY,
+            canvasX: x,
+            canvasY: y,
+            playerWidth: player.width,
+            playerHeight: player.height,
+            calculatedX: x - player.width * 2,
+            calculatedY: y - player.height * 2
+        });
+        
         // 플레이어 위치 업데이트 - 터치한 부분이 비행기 꼬리 끝에서 몸통 길이만큼 더 뒤쪽에 오도록 조정
         player.x = Math.max(0, Math.min(canvas.width - player.width, x - player.width * 2));
         player.y = Math.max(0, Math.min(canvas.height - player.height, y - player.height * 2));
