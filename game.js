@@ -2881,7 +2881,6 @@ function handleExplosions() {
 // UI 그리기 함수 수정
 function drawUI() {
     // 플레이어 비행기 그리기
-    console.log('플레이어 그리기:', { x: player.x, y: player.y, width: player.width, height: player.height });
     drawAirplane(player.x, player.y, player.width, player.height, 'white');
     if (hasSecondPlane) {
         drawAirplane(secondPlane.x, secondPlane.y, secondPlane.width, secondPlane.height, 'white');
