@@ -521,7 +521,7 @@ const difficultySettings = {
         patternChance: 0.2,
         maxEnemies: 5,
         bossHealth: 800,
-        bossSpawnInterval: 60000, // 1분
+        bossSpawnInterval: 10000, // 10초
         powerUpChance: 0.1,
         bombDropChance: 0.1,
         dynamiteDropChance: 0.05
@@ -533,7 +533,7 @@ const difficultySettings = {
         patternChance: 0.4,
         maxEnemies: 8,
         bossHealth: 1000,
-        bossSpawnInterval: 45000, // 45초
+        bossSpawnInterval: 10000, // 10초
         powerUpChance: 0.15,
         bombDropChance: 0.15,
         dynamiteDropChance: 0.1
@@ -545,7 +545,7 @@ const difficultySettings = {
         patternChance: 0.6,
         maxEnemies: 12,
         bossHealth: 1200,
-        bossSpawnInterval: 30000, // 30초
+        bossSpawnInterval: 10000, // 10초
         powerUpChance: 0.2,
         bombDropChance: 0.2,
         dynamiteDropChance: 0.15
@@ -557,7 +557,7 @@ const difficultySettings = {
         patternChance: 0.8,
         maxEnemies: 15,
         bossHealth: 1500,
-        bossSpawnInterval: 25000, // 25초
+        bossSpawnInterval: 10000, // 10초
         powerUpChance: 0.25,
         bombDropChance: 0.25,
         dynamiteDropChance: 0.2
@@ -569,7 +569,7 @@ const difficultySettings = {
         patternChance: 1.0,
         maxEnemies: 20,
         bossHealth: 2000,
-        bossSpawnInterval: 20000, // 20초
+        bossSpawnInterval: 10000, // 10초
         powerUpChance: 0.3,
         bombDropChance: 0.3,
         dynamiteDropChance: 0.25
@@ -3430,7 +3430,7 @@ const BOSS_SETTINGS = {
     SPEED: 2 * mobileSpeedMultiplier,           // 보스 이동 속도
     BULLET_SPEED: 5 * mobileSpeedMultiplier,    // 보스 총알 속도
     PATTERN_INTERVAL: 2000, // 패턴 변경 간격
-    SPAWN_INTERVAL: 30000,  // 보스 출현 간격 (30초)
+    SPAWN_INTERVAL: 10000,  // 보스 출현 간격 (10초)
     BONUS_SCORE: 500,    // 보스 처치 보너스 점수를 500으로 설정
     PHASE_THRESHOLDS: [  // 페이즈 전환 체력 임계값
         { health: 750, speed: 2.5 * mobileSpeedMultiplier, bulletSpeed: 6 * mobileSpeedMultiplier },
