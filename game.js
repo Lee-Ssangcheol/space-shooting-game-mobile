@@ -6,6 +6,9 @@ const TOP_EFFECT_ZONE = 20;  // 상단 효과 무시 영역 (픽셀)
 // 모바일 디바이스 감지 (종이비행기용과 동일하게)
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
+// 모바일 속도 조절 (80% 속도)
+const mobileSpeedMultiplier = isMobile ? 0.8 : 1.0;
+
 // 모바일 전체화면 모드 활성화
 function enableFullscreen() {
     if (isMobile) {
@@ -428,7 +431,7 @@ const player = {
     y: canvas.height - 50,
     width: 40,
     height: 40,
-    speed: 8
+    speed: 8 * mobileSpeedMultiplier
 };
 
 // 두 번째 비행기
@@ -437,7 +440,7 @@ const secondPlane = {
     y: canvas.height - 50,
     width: 40,
     height: 40,
-    speed: 8
+    speed: 8 * mobileSpeedMultiplier
 };
 
 // 게임 상태 변수 설정
@@ -512,9 +515,9 @@ const keys = {
 // 난이도 설정
 const difficultySettings = {
     1: { // 초급
-        enemySpeed: 2,
+        enemySpeed: 2 * mobileSpeedMultiplier,
         enemySpawnRate: 0.02,
-        horizontalSpeedRange: 2,
+        horizontalSpeedRange: 2 * mobileSpeedMultiplier,
         patternChance: 0.2,
         maxEnemies: 5,
         bossHealth: 800,
@@ -524,9 +527,9 @@ const difficultySettings = {
         dynamiteDropChance: 0.05
     },
     2: { // 중급
-        enemySpeed: 3,
+        enemySpeed: 3 * mobileSpeedMultiplier,
         enemySpawnRate: 0.03,
-        horizontalSpeedRange: 3,
+        horizontalSpeedRange: 3 * mobileSpeedMultiplier,
         patternChance: 0.4,
         maxEnemies: 8,
         bossHealth: 1000,
@@ -536,9 +539,9 @@ const difficultySettings = {
         dynamiteDropChance: 0.1
     },
     3: { // 고급
-        enemySpeed: 4,
+        enemySpeed: 4 * mobileSpeedMultiplier,
         enemySpawnRate: 0.04,
-        horizontalSpeedRange: 4,
+        horizontalSpeedRange: 4 * mobileSpeedMultiplier,
         patternChance: 0.6,
         maxEnemies: 12,
         bossHealth: 1200,
@@ -548,9 +551,9 @@ const difficultySettings = {
         dynamiteDropChance: 0.15
     },
     4: { // 전문가
-        enemySpeed: 5,
+        enemySpeed: 5 * mobileSpeedMultiplier,
         enemySpawnRate: 0.05,
-        horizontalSpeedRange: 5,
+        horizontalSpeedRange: 5 * mobileSpeedMultiplier,
         patternChance: 0.8,
         maxEnemies: 15,
         bossHealth: 1500,
@@ -560,9 +563,9 @@ const difficultySettings = {
         dynamiteDropChance: 0.2
     },
     5: { // 마스터
-        enemySpeed: 6,
+        enemySpeed: 6 * mobileSpeedMultiplier,
         enemySpawnRate: 0.06,
-        horizontalSpeedRange: 6,
+        horizontalSpeedRange: 6 * mobileSpeedMultiplier,
         patternChance: 1.0,
         maxEnemies: 20,
         bossHealth: 2000,
@@ -1138,7 +1141,7 @@ async function initializeGame() {
         spacePressTime = 0;
         fireDelay = 600;
         continuousFireDelay = 50;
-        bulletSpeed = 12;
+        bulletSpeed = 12 * mobileSpeedMultiplier;
         baseBulletSize = 4.5;
         isContinuousFire = false;
         canFire = true;
@@ -1268,7 +1271,7 @@ function restartGame() {
     spacePressTime = 0;
     fireDelay = 600;
     continuousFireDelay = 50;
-    bulletSpeed = 12;
+    bulletSpeed = 12 * mobileSpeedMultiplier;
     baseBulletSize = 4.5;
     isContinuousFire = false;
     canFire = true;
@@ -3424,15 +3427,15 @@ function handleBullets() {
 const BOSS_SETTINGS = {
     HEALTH: 1000,        // 기본 체력
     DAMAGE: 50,          // 보스 총알 데미지
-    SPEED: 2,           // 보스 이동 속도
-    BULLET_SPEED: 5,    // 보스 총알 속도
+    SPEED: 2 * mobileSpeedMultiplier,           // 보스 이동 속도
+    BULLET_SPEED: 5 * mobileSpeedMultiplier,    // 보스 총알 속도
     PATTERN_INTERVAL: 2000, // 패턴 변경 간격
     SPAWN_INTERVAL: 30000,  // 보스 출현 간격 (30초)
     BONUS_SCORE: 500,    // 보스 처치 보너스 점수를 500으로 설정
     PHASE_THRESHOLDS: [  // 페이즈 전환 체력 임계값
-        { health: 750, speed: 2.5, bulletSpeed: 6 },
-        { health: 500, speed: 3, bulletSpeed: 7 },
-        { health: 250, speed: 3.5, bulletSpeed: 8 }
+        { health: 750, speed: 2.5 * mobileSpeedMultiplier, bulletSpeed: 6 * mobileSpeedMultiplier },
+        { health: 500, speed: 3 * mobileSpeedMultiplier, bulletSpeed: 7 * mobileSpeedMultiplier },
+        { health: 250, speed: 3.5 * mobileSpeedMultiplier, bulletSpeed: 8 * mobileSpeedMultiplier }
     ]
 };
 
@@ -3999,7 +4002,7 @@ function createPowerUp() {
         y: -30,
         width: 30,
         height: 30,
-        speed: 3,
+        speed: 3 * mobileSpeedMultiplier,
         type: type,
         active: true,
         duration: 10000, // 10초 지속
@@ -4091,7 +4094,7 @@ let isSpacePressed = false;  // 스페이스바 누름 상태
 let spacePressTime = 0;  // 스페이스바를 처음 누른 시간
 let fireDelay = 600;  // 기본 발사 딜레이 (끊어서 발사할 때 - 더 느리게)
 let continuousFireDelay = 50;  // 연속 발사 딜레이 (빠르게)
-let bulletSpeed = 12;  // 총알 속도
+let bulletSpeed = 12 * mobileSpeedMultiplier;  // 총알 속도
 let baseBulletSize = 4.5;  // 기본 총알 크기 (1.5배 증가)
 let isContinuousFire = false;  // 연속 발사 상태
 let canFire = true;  // 발사 가능 상태 추가
@@ -4224,7 +4227,7 @@ function createBomb(enemy) {
         y: enemy.y + enemy.height,
         width: 15,
         height: 15,
-        speed: 5,
+        speed: 5 * mobileSpeedMultiplier,
         rotation: 0,
         rotationSpeed: 0.1,
         trail: []  // 폭탄 꼬리 효과를 위한 배열
@@ -4284,7 +4287,7 @@ function createDynamite(enemy) {
         y: enemy.y + enemy.height,
         width: 20,
         height: 30,
-        speed: 4,
+        speed: 4 * mobileSpeedMultiplier,
         rotation: 0,
         rotationSpeed: 0.05,
         flameParticles: [],  // 불꽃 파티클 배열
@@ -4590,7 +4593,7 @@ async function initializeGame() {
         spacePressTime = 0;
         fireDelay = 600;
         continuousFireDelay = 50;
-        bulletSpeed = 12;
+        bulletSpeed = 12 * mobileSpeedMultiplier;
         baseBulletSize = 4.5;
         isContinuousFire = false;
         canFire = true;
@@ -4742,7 +4745,7 @@ function restartGame() {
     spacePressTime = 0;
     fireDelay = 600;
     continuousFireDelay = 50;
-    bulletSpeed = 12;
+    bulletSpeed = 12 * mobileSpeedMultiplier;
     baseBulletSize = 4.5;
     isContinuousFire = false;
     canFire = true;
