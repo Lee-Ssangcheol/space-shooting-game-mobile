@@ -11,9 +11,12 @@ function enableFullscreen() {
     if (isMobile) {
         // iOS Safari 전체화면 모드
         if (document.documentElement.requestFullscreen) {
-            document.documentElement.requestFullscreen().catch(err => {
-                console.log('전체화면 모드 실패:', err);
-            });
+            const fullscreenPromise = document.documentElement.requestFullscreen();
+            if (fullscreenPromise && typeof fullscreenPromise.catch === 'function') {
+                fullscreenPromise.catch(err => {
+                    console.log('전체화면 모드 실패:', err);
+                });
+            }
         }
         
         // iOS Safari에서 주소창 숨김
@@ -27,16 +30,22 @@ function enableFullscreen() {
         
         // Android Chrome 전체화면 모드
         if (document.documentElement.webkitRequestFullscreen) {
-            document.documentElement.webkitRequestFullscreen().catch(err => {
-                console.log('webkit 전체화면 모드 실패:', err);
-            });
+            const webkitPromise = document.documentElement.webkitRequestFullscreen();
+            if (webkitPromise && typeof webkitPromise.catch === 'function') {
+                webkitPromise.catch(err => {
+                    console.log('webkit 전체화면 모드 실패:', err);
+                });
+            }
         }
         
         // 화면 방향 고정 (세로 모드)
         if (screen.orientation && screen.orientation.lock) {
-            screen.orientation.lock('portrait').catch(err => {
-                console.log('화면 방향 고정 실패:', err);
-            });
+            const orientationPromise = screen.orientation.lock('portrait');
+            if (orientationPromise && typeof orientationPromise.catch === 'function') {
+                orientationPromise.catch(err => {
+                    console.log('화면 방향 고정 실패:', err);
+                });
+            }
         }
         
         console.log('모바일 전체화면 모드 활성화 시도');
