@@ -194,7 +194,7 @@ function setupMobileControls() {
         console.log('시작/재시작 버튼 터치');
         
         // 시작 화면에서 버튼을 누르면 게임 시작
-        if (isStartScreen || !gameStarted) {
+        if (isStartScreen) {
             // 오디오 초기화
             initAudio();
             isStartScreen = false;
@@ -221,7 +221,7 @@ function setupMobileControls() {
         e.stopPropagation();
         console.log('시작/재시작 버튼 클릭');
         
-        if (isStartScreen || !gameStarted) {
+        if (isStartScreen) {
             // 오디오 초기화
             initAudio();
             isStartScreen = false;
@@ -1874,7 +1874,7 @@ function gameLoop() {
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    if (isStartScreen && !gameStarted) {
+    if (isStartScreen) {
         drawStartScreen();
         if (gameLoopRunning) {
             requestAnimationFrame(gameLoop);
@@ -1934,15 +1934,7 @@ function gameLoop() {
     }
 
     try {
-        // 게임이 시작되지 않았으면 시작 화면 표시
-        if (!gameStarted) {
-            console.log('게임 시작 대기 중:', { isStartScreen, gameStarted, isMobile });
-            drawStartScreen();
-            if (gameLoopRunning) {
-                requestAnimationFrame(gameLoop);
-            }
-            return;
-        }
+
         
         // 깜박임 효과 처리
         if (flashTimer > 0) {
@@ -2864,6 +2856,7 @@ window.addEventListener('load', async () => {
         // 시작 화면 초기화
         initStartScreen();
         gameStarted = false;  // 게임 시작 상태 초기화
+        isStartScreen = true;  // 시작 화면 상태 초기화
         
         // IndexedDB 초기화 및 최고 점수 로드
         await initDB();
@@ -2908,7 +2901,7 @@ document.addEventListener('keydown', (e) => {
         keys[e.code] = true;
         
         // 시작 화면이나 게임 오버 상태에서 스페이스바를 누르면 게임 시작/재시작
-        if ((isStartScreen || isGameOver || !gameStarted) && e.code === 'Space') {
+        if ((isStartScreen || isGameOver) && e.code === 'Space') {
             if (isGameOver) {
                 restartGame();
             } else {
@@ -2958,7 +2951,7 @@ document.addEventListener('keydown', (e) => {
     }
 
     // 시작 화면에서 Enter를 누르면 게임 시작
-    if ((isStartScreen || !gameStarted) && e.code === 'Enter') {
+    if (isStartScreen && e.code === 'Enter') {
         // 오디오 초기화
         initAudio();
         isStartScreen = false;
@@ -4362,6 +4355,7 @@ async function initializeGame() {
         // 시작 화면 초기화
         initStartScreen();
         gameStarted = false;  // 게임 시작 상태 초기화
+        isStartScreen = true;  // 시작 화면 상태 초기화
         
         // === 모든 게임 요소 완전 초기화 ===
         
@@ -4659,7 +4653,7 @@ function setupTouchDragControls() {
         }
         
         // 게임이 시작되지 않았다면 시작
-        if (isStartScreen || !gameStarted) {
+        if (isStartScreen) {
             // 오디오 초기화
             initAudio();
             isStartScreen = false;
