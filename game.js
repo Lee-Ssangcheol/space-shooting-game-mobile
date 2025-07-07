@@ -177,8 +177,8 @@ function setupMobileControls() {
 
         
         // 플레이어 위치 업데이트 - 터치한 부분이 플레이어 비행기 꼬리 끝보다 10픽셀 아래에 오도록 조정
-        player.x = Math.max(0, Math.min(canvas.width - player.width, x - player.width));
-        player.y = Math.max(0, Math.min(canvas.height - player.height, y + 10));
+        player.x = Math.max(-player.width/2, Math.min(canvas.width - player.width/2, x - player.width));
+        player.y = Math.max(0, Math.min(canvas.height - player.height, y - 10));
         
         // 두 번째 비행기가 있으면 함께 이동
         if (hasSecondPlane) {
@@ -214,8 +214,8 @@ function setupMobileControls() {
         const y = (touch.clientY - rect.top) * scaleY;
         
         // 플레이어 위치 업데이트 - 터치한 부분이 플레이어 비행기 꼬리 끝보다 10픽셀 아래에 오도록 조정
-        player.x = Math.max(0, Math.min(canvas.width - player.width, x - player.width));
-        player.y = Math.max(0, Math.min(canvas.height - player.height, y + 10));
+        player.x = Math.max(-player.width/2, Math.min(canvas.width - player.width/2, x - player.width));
+        player.y = Math.max(0, Math.min(canvas.height - player.height, y - 10));
         
         // 두 번째 비행기가 있으면 함께 이동
         if (hasSecondPlane) {
@@ -2185,13 +2185,13 @@ function gameLoop() {
 
 // 플레이어 이동 처리 함수
 function handlePlayerMovement() {
-    if (keys.ArrowLeft && player.x > 0) {
+    if (keys.ArrowLeft && player.x > -player.width/2) {
         player.x -= player.speed * 0.5;
         if (hasSecondPlane) {
             secondPlane.x -= player.speed * 0.5;
         }
     }
-    if (keys.ArrowRight && player.x < canvas.width - player.width) {
+    if (keys.ArrowRight && player.x < canvas.width - player.width/2) {
         player.x += player.speed * 0.5;
         if (hasSecondPlane) {
             secondPlane.x += player.speed * 0.5;
@@ -4848,9 +4848,9 @@ function setupTouchDragControls() {
         const touchX = (touch.clientX - rect.left) * scaleX;
         const touchY = (touch.clientY - rect.top) * scaleY;
         
-        // 플레이어 위치 계산 - 터치한 위치가 꼬리 끝과 10픽셀 아래에 오도록 조정
-        const newX = Math.max(0, Math.min(canvas.width - player.width, touchX - player.width));
-        const newY = Math.max(0, Math.min(canvas.height - player.height, touchY + 10));
+        // 플레이어 위치 계산 - 터치한 위치가 꼬리 끝보다 10픽셀 아래에 오도록 조정
+        const newX = Math.max(-player.width/2, Math.min(canvas.width - player.width/2, touchX - player.width));
+        const newY = Math.max(0, Math.min(canvas.height - player.height, touchY - 10));
         
         // 플레이어 위치 업데이트
         player.x = newX;
