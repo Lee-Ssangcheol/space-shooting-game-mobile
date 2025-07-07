@@ -1,3 +1,6 @@
+// game.js 파일 맨 위에 추가
+console.log('게임 파일 수정됨:', new Date().toLocaleString());
+
 // 게임 상수 정의
 const SPECIAL_WEAPON_MAX_CHARGE = 1000;  // 특수무기 최대 충전량
 const SPECIAL_WEAPON_CHARGE_RATE = 10;   // 특수무기 충전 속도
