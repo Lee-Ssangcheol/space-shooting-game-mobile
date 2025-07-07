@@ -2043,6 +2043,13 @@ function drawAirplane(x, y, width, height, color, isEnemy = false) {
     ctx.stroke();
 
     ctx.restore();
+    // 외곽선(디버깅용)
+    ctx.save();
+    ctx.translate(x + width/2, y + height/2);
+    ctx.strokeStyle = 'yellow';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(-width/2, -height/2, width, height);
+    ctx.restore();
 }
 
 // 게임 루프 수정
