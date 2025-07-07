@@ -181,7 +181,7 @@ function setupMobileControls() {
         
         // 플레이어 위치 업데이트 - 터치점이 플레이어 꼬리 끝에 정확히 오도록 조정
         const tailLength = player.height;
-        player.x = Math.max(-player.width/2, Math.min(canvas.width + player.width/2, x - player.width));
+        player.x = Math.max(0, Math.min(canvas.width - player.width, x - player.width / 2));
         player.y = Math.max(0, Math.min(canvas.height - player.height, y - player.height - tailLength));
         
         // 디버깅 정보를 화면에 표시하기 위한 전역 변수
@@ -230,7 +230,7 @@ function setupMobileControls() {
         
         // 플레이어 위치 업데이트 - 터치점이 플레이어 꼬리 끝에 정확히 오도록 조정
         const tailLength = player.height;
-        player.x = Math.max(-player.width/2, Math.min(canvas.width + player.width/2, x - player.width));
+        player.x = Math.max(0, Math.min(canvas.width - player.width, x - player.width / 2));
         player.y = Math.max(0, Math.min(canvas.height - player.height, y - player.height - tailLength));
         
         // 두 번째 비행기가 있으면 함께 이동
@@ -4899,7 +4899,7 @@ function setupTouchDragControls() {
         
         // 플레이어 위치 계산 - 터치점이 플레이어 꼬리에서 10픽셀 아래에 오도록 조정
         const tailLength = player.height / 2;
-        const newX = Math.max(-player.width/2, Math.min(canvas.width + player.width/2, touchX - player.width));
+        const newX = Math.max(0, Math.min(canvas.width - player.width, touchX - player.width));
         const newY = Math.max(0, Math.min(canvas.height - player.height, touchY - player.height - tailLength));
         
         // 플레이어 위치 업데이트
