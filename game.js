@@ -6,6 +6,9 @@ const TOP_EFFECT_ZONE = 20;  // 상단 효과 무시 영역 (픽셀)
 // 모바일 디바이스 감지 (종이비행기용과 동일하게)
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
+// 디버깅 정보를 위한 전역 변수
+let debugInfo = null;
+
 // 모바일 전체화면 모드 활성화
 function enableFullscreen() {
     if (isMobile) {
@@ -72,7 +75,7 @@ function resizeCanvas() {
     const container = document.getElementById('canvas-container');
     if (container) {
         // 컨테이너 스타일 조정
-        container.style.height = 'calc(100vh - 80px)';  // 모바일 컨트롤 높이만큼 제외
+        container.style.height = 'calc(100vh - 70px)';  // 모바일 컨트롤 높이만큼 제외
         container.style.position = 'relative';
         container.style.overflow = 'hidden';
         
