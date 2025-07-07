@@ -1055,6 +1055,9 @@ function restartGame() {
         document.getElementById('gameCanvas').focus();
     }, 100);
     
+    // 16. 게임 시작 상태 설정
+    gameStarted = true;
+    
     console.log('게임 재시작 완료 - 모든 요소 초기화됨');
     console.log('현재 최고 점수:', highScore);
     console.log('초기화된 상태:', {
@@ -1791,7 +1794,7 @@ function gameLoop() {
     // 화면 전체를 지우고 새로 그리기
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    if (isStartScreen) {
+    if (isStartScreen || !gameStarted) {
         drawStartScreen();
         requestAnimationFrame(gameLoop);
         return;
@@ -2746,6 +2749,7 @@ window.addEventListener('load', async () => {
         
         // 시작 화면 초기화
         initStartScreen();
+        gameStarted = false;  // 게임 시작 상태 초기화
         
         // IndexedDB 초기화 및 최고 점수 로드
         await initDB();
@@ -3811,6 +3815,7 @@ const MIN_ENEMY_SPAWN_INTERVAL = 500; // 최소 적 생성 간격 (밀리초)
 
 // 게임 상태 변수에 추가
 let isStartScreen = true;  // 시작 화면 상태
+let gameStarted = false;  // 게임 시작 상태
 let startScreenAnimation = 0;  // 시작 화면 애니메이션 변수
 let titleY = -100;  // 제목 Y 위치
 let subtitleY = canvas.height + 100;  // 부제목 Y 위치
@@ -4427,6 +4432,9 @@ function restartGame() {
     setTimeout(() => {
         document.getElementById('gameCanvas').focus();
     }, 100);
+    
+    // 16. 게임 시작 상태 설정
+    gameStarted = true;
     
     console.log('게임 재시작 완료 - 모든 요소 초기화됨');
     console.log('현재 최고 점수:', highScore);
