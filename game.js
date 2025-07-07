@@ -3,11 +3,8 @@ const SPECIAL_WEAPON_MAX_CHARGE = 1000;  // 특수무기 최대 충전량
 const SPECIAL_WEAPON_CHARGE_RATE = 10;   // 특수무기 충전 속도
 const TOP_EFFECT_ZONE = 20;  // 상단 효과 무시 영역 (픽셀)
 
-// 모바일 디바이스 감지 (더 정확한 감지)
-const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
-                 (window.innerWidth <= 768 && window.innerHeight <= 1024) ||
-                 ('ontouchstart' in window) ||
-                 (navigator.maxTouchPoints > 0);
+// 모바일 디바이스 감지 (종이비행기용과 동일하게)
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
 // 모바일 전체화면 모드 활성화
 function enableFullscreen() {
@@ -59,9 +56,35 @@ let isMobileFirePressed = false;
 let mobileContinuousFireInterval = null;
 // 캔버스 설정
 const canvas = document.getElementById('gameCanvas');
-canvas.width = 392;
-canvas.height = 700;
 const ctx = canvas.getContext('2d');
+
+// 캔버스 크기 설정
+function resizeCanvas() {
+    const container = document.getElementById('canvas-container');
+    if (container) {
+        // 컨테이너 스타일 조정
+        container.style.height = 'calc(100vh - 80px)';  // 모바일 컨트롤 높이만큼 제외
+        container.style.position = 'relative';
+        container.style.overflow = 'hidden';
+        
+        // 캔버스 스타일 조정
+        canvas.style.borderRadius = '0';  // 모서리를 각지게
+        
+        // 캔버스 크기를 모바일 비율에 맞게 설정 (일관성 유지)
+        canvas.width = 392;  // 모바일 비율에 맞춘 가로 크기
+        canvas.height = 700;  // 모바일 비율에 맞춘 세로 크기
+        
+        // CSS에서 설정한 크기와 일치하도록 스타일 설정
+        canvas.style.width = '392px';
+        canvas.style.height = '700px';
+    }
+}
+
+// 창 크기 변경 시 캔버스 크기 조정
+window.addEventListener('resize', resizeCanvas);
+
+// 초기 캔버스 크기 설정
+resizeCanvas();
 
 // 모바일 터치 컨트롤 요소들
 const mobileControls = {
@@ -977,8 +1000,7 @@ async function initializeGame() {
         });
         
         // 게임 루프 시작
-        gameLoopRunning = true;
-        requestAnimationFrame(gameLoop);
+        startGameLoop();
         console.log('게임 루프 시작됨');
         
         // 모바일에서 3초 후에도 게임이 시작되지 않으면 강제 시작
@@ -1842,9 +1864,9 @@ function gameLoop() {
     if (!gameLoopRunning) return;
     
     if (isPaused) {
-        setTimeout(() => {
+        if (gameLoopRunning) {
             requestAnimationFrame(gameLoop);
-        }, 1000 / 30);
+        }
         return;
     }
 
@@ -1854,9 +1876,9 @@ function gameLoop() {
 
     if (isStartScreen && !gameStarted) {
         drawStartScreen();
-        setTimeout(() => {
+        if (gameLoopRunning) {
             requestAnimationFrame(gameLoop);
-        }, 1000 / 30);
+        }
         return;
     }
 
@@ -1905,9 +1927,9 @@ function gameLoop() {
                 ctx.fillText('또는 화면을 터치하여 재시작', canvas.width/2, canvas.height/2 + 110);
             }
         }
-        setTimeout(() => {
+        if (gameLoopRunning) {
             requestAnimationFrame(gameLoop);
-        }, 1000 / 30);
+        }
         return;
     }
 
@@ -1916,9 +1938,9 @@ function gameLoop() {
         if (!gameStarted) {
             console.log('게임 시작 대기 중:', { isStartScreen, gameStarted, isMobile });
             drawStartScreen();
-            setTimeout(() => {
+            if (gameLoopRunning) {
                 requestAnimationFrame(gameLoop);
-            }, 1000 / 30);
+            }
             return;
         }
         
@@ -1987,9 +2009,9 @@ function gameLoop() {
         drawUI();
 
         // 프레임 레이트 제한 (30 FPS)
-        setTimeout(() => {
+        if (gameLoopRunning) {
             requestAnimationFrame(gameLoop);
-        }, 1000 / 30);
+        }
     } catch (error) {
         console.error('게임 루프 실행 중 오류:', error);
         // 오류 발생 시 게임 오버 처리
@@ -4307,18 +4329,23 @@ async function initializeGame() {
         // 종료 이벤트 핸들러 설정
         setupExitHandlers();
         
-        // 모바일 컨트롤 설정
-        setupMobileControls();
-        
-        // 모바일 전체화면 모드 활성화
-        enableFullscreen();
+            // 모바일 컨트롤 설정
+    setupMobileControls();
+    
+    // 모바일에서 터치 드래그 컨트롤 설정
+    if (isMobile) {
+        setupTouchDragControls();
+    }
+    
+    // 모바일 전체화면 모드 활성화
+    enableFullscreen();
         
         // 오디오 초기화 (사용자 상호작용 후)
         initAudio();
         
-        // 모바일에서는 자동으로 게임 시작 (터치 이벤트 대기)
+        // 모바일에서는 터치 이벤트로 게임 시작
         if (isMobile) {
-            console.log('모바일 환경 감지, 게임 자동 시작 준비');
+            console.log('모바일 환경 감지, 터치 이벤트 대기');
             console.log('모바일 감지 세부사항:', {
                 userAgent: navigator.userAgent,
                 innerWidth: window.innerWidth,
@@ -4326,20 +4353,6 @@ async function initializeGame() {
                 ontouchstart: 'ontouchstart' in window,
                 maxTouchPoints: navigator.maxTouchPoints
             });
-            
-            // 즉시 게임 시작
-            isStartScreen = false;
-            gameStarted = true;
-            console.log('모바일 즉시 게임 시작:', { isStartScreen, gameStarted });
-            
-            // 추가로 1초 후에도 확인
-            setTimeout(() => {
-                if (!gameStarted) {
-                    isStartScreen = false;
-                    gameStarted = true;
-                    console.log('모바일 지연 게임 시작:', { isStartScreen, gameStarted });
-                }
-            }, 1000);
         }
         
         // 최고 점수 로드
@@ -4451,8 +4464,7 @@ async function initializeGame() {
         });
         
         // 게임 루프 시작
-        gameLoopRunning = true;
-        requestAnimationFrame(gameLoop);
+        startGameLoop();
         console.log('게임 루프 시작됨');
         
         // 모바일에서 3초 후에도 게임이 시작되지 않으면 강제 시작
@@ -4620,6 +4632,108 @@ function restartGame() {
         bossActive: bossActive,
         isSnakePatternActive: isSnakePatternActive
     });
+}
+
+// 터치 드래그 컨트롤 설정
+function setupTouchDragControls() {
+    console.log('터치 드래그 컨트롤 설정');
+    
+    // 터치 시작
+    canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        touchStartX = touch.clientX - rect.left;
+        touchStartY = touch.clientY - rect.top;
+        playerStartX = player.x;
+        playerStartY = player.y;
+        isDragging = true;
+        
+        // 드래그 시작 시 자동 연속발사 시작
+        if (!isGameOver && !isStartScreen) {
+            keys.Space = true;
+            isSpacePressed = true;
+            spacePressTime = Date.now();
+            isContinuousFire = true;
+            console.log('드래그 연속발사 시작');
+        }
+        
+        // 게임이 시작되지 않았다면 시작
+        if (isStartScreen || !gameStarted) {
+            // 오디오 초기화
+            initAudio();
+            isStartScreen = false;
+            gameStarted = true;
+            console.log('터치 드래그로 게임 시작:', { isStartScreen, gameStarted });
+        }
+        
+        console.log('터치 드래그 시작');
+    }, { passive: false });
+    
+    // 터치 이동
+    canvas.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        if (!isDragging) return;
+        
+        const touch = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        const touchX = touch.clientX - rect.left;
+        const touchY = touch.clientY - rect.top;
+        
+        // 플레이어 위치 계산
+        const deltaX = touchX - touchStartX;
+        const deltaY = touchY - touchStartY;
+        
+        // 새로운 위치 계산
+        let newX = playerStartX + deltaX;
+        let newY = playerStartY + deltaY;
+        
+        // 경계 제한
+        const margin = 10;
+        const maxY = canvas.height - 100;
+        
+        newX = Math.max(-player.width / 2.5, Math.min(canvas.width - player.width / 1.5, newX));
+        newY = Math.max(margin, Math.min(maxY, newY));
+        
+        // 플레이어 위치 업데이트
+        player.x = newX;
+        player.y = newY;
+        
+        // 두 번째 비행기도 함께 이동
+        if (hasSecondPlane) {
+            secondPlane.x = newX - 60;
+            secondPlane.y = newY;
+        }
+        
+    }, { passive: false });
+    
+    // 터치 종료
+    canvas.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        isDragging = false;
+        
+        // 드래그 종료 시 연속발사 중지
+        if (!isGameOver && !isStartScreen) {
+            keys.Space = false;
+            isSpacePressed = false;
+            lastReleaseTime = Date.now();
+            isContinuousFire = false;
+            console.log('드래그 연속발사 중지');
+        }
+        
+        console.log('터치 드래그 종료');
+    }, { passive: false });
+}
+
+// 게임 루프 시작 함수
+function startGameLoop() {
+    if (!gameLoopRunning) {
+        gameLoopRunning = true;
+        console.log('게임 루프 시작');
+        gameLoop();
+    } else {
+        console.log('게임 루프가 이미 실행 중입니다');
+    }
 }
 
 // 사운드 컨트롤 이벤트 핸들러 추가
