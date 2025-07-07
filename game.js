@@ -2105,8 +2105,8 @@ function gameLoop() {
                 ctx.fillText(`최종 점수: ${score}`, canvas.width/2, canvas.height/2);
                 ctx.fillText(`충돌 횟수: ${collisionCount}`, canvas.width/2, canvas.height/2 + 30);
                 ctx.font = 'bold 20px Arial';
-                ctx.fillText('시작/재시작 버튼을 눌러 게임 재시작', canvas.width/2, canvas.height/2 + 80);
-                ctx.fillText('또는 화면을 터치하여 재시작', canvas.width/2, canvas.height/2 + 110);
+                ctx.fillText('화면을 터치하거나', canvas.width/2, canvas.height/2 + 80);
+                ctx.fillText('시작/재시작 버튼을 눌러 게임 재시작', canvas.width/2, canvas.height/2 + 110);
             }
         }
         if (gameLoopRunning) {
@@ -4226,7 +4226,8 @@ function drawStartScreen() {
     if (isVisible) {
         ctx.font = 'bold 20px Arial';
         ctx.fillStyle = '#ffff00';
-        ctx.fillText('시작/재시작 버튼을 눌러 게임 시작', canvas.width/2, subtitleY);
+        ctx.fillText('화면을 터치하거나', canvas.width/2, subtitleY);
+        ctx.fillText('시작/재시작 버튼을 눌러 게임 시작', canvas.width/2, subtitleY + 30);
     }
 
     // 조작법 안내
