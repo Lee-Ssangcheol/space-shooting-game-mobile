@@ -2795,17 +2795,19 @@ document.addEventListener('keydown', (e) => {
         keys[e.code] = true;
         
         // 시작 화면이나 게임 오버 상태에서 스페이스바를 누르면 게임 시작/재시작
-        if ((isStartScreen || isGameOver) && e.code === 'Space') {
+        if ((isStartScreen || isGameOver || !gameStarted) && e.code === 'Space') {
             if (isGameOver) {
                 restartGame();
             } else {
                 isStartScreen = false;
+                gameStarted = true;
+                console.log('데스크탑 스페이스바로 게임 시작:', { isStartScreen, gameStarted });
             }
             return;
         }
         
         // 스페이스바를 처음 누를 때
-        if (e.code === 'Space' && !isSpacePressed && !isGameOver) {
+        if (e.code === 'Space' && !isSpacePressed && !isGameOver && gameStarted) {
             const currentTime = Date.now();
             // 마지막 해제 후 일정 시간이 지났을 때만 연속 발사 상태 초기화
             if (currentTime - lastReleaseTime > 500) {
@@ -2841,8 +2843,10 @@ document.addEventListener('keydown', (e) => {
     }
 
     // 시작 화면에서 Enter를 누르면 게임 시작
-    if (isStartScreen && e.code === 'Enter') {
+    if ((isStartScreen || !gameStarted) && e.code === 'Enter') {
         isStartScreen = false;
+        gameStarted = true;
+        console.log('데스크탑 Enter키로 게임 시작:', { isStartScreen, gameStarted });
         return;
     }
 });
