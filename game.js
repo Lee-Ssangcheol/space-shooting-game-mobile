@@ -122,6 +122,8 @@ function setupMobileControls() {
         
         // 게임이 시작되지 않았다면 시작
         if (isStartScreen || !gameStarted) {
+            // 오디오 초기화
+            initAudio();
             isStartScreen = false;
             gameStarted = true;
             console.log('모바일 터치로 게임 시작:', { isStartScreen, gameStarted });
@@ -160,6 +162,8 @@ function setupMobileControls() {
         
         // 시작 화면에서 버튼을 누르면 게임 시작
         if (isStartScreen || !gameStarted) {
+            // 오디오 초기화
+            initAudio();
             isStartScreen = false;
             gameStarted = true;
             console.log('모바일 버튼으로 게임 시작:', { isStartScreen, gameStarted });
@@ -185,6 +189,8 @@ function setupMobileControls() {
         console.log('시작/재시작 버튼 클릭');
         
         if (isStartScreen || !gameStarted) {
+            // 오디오 초기화
+            initAudio();
             isStartScreen = false;
             gameStarted = true;
             console.log('모바일 클릭으로 게임 시작:', { isStartScreen, gameStarted });
@@ -230,25 +236,43 @@ function setupMobileControls() {
     console.log('모바일 컨트롤 설정 완료');
 }
 
-// 오디오 요소 생성 (동적으로)
-const shootSound = new Audio('sounds/shoot.mp3');
-const explosionSound = new Audio('sounds/explosion.mp3');
-const collisionSound = new Audio('sounds/collision.mp3');
+// 오디오 요소 생성 (안전하게)
+let shootSound, explosionSound, collisionSound;
+let audioInitialized = false;
 
-// 사운드 설정
-shootSound.volume = 0.4;  // 발사음 볼륨 증가
-explosionSound.volume = 0.6;  // 폭발음 볼륨 조정
-collisionSound.volume = 0.5;  // 충돌음 볼륨 조정
+// 사운드 초기화 함수
+function initAudio() {
+    try {
+        if (!audioInitialized) {
+            shootSound = new Audio('sounds/shoot.mp3');
+            explosionSound = new Audio('sounds/explosion.mp3');
+            collisionSound = new Audio('sounds/collision.mp3');
+
+            // 사운드 설정
+            shootSound.volume = 0.4;
+            explosionSound.volume = 0.6;
+            collisionSound.volume = 0.5;
+
+            // 충돌 사운드 길이 제어
+            collisionSound.addEventListener('loadedmetadata', () => {
+                collisionSound.duration = Math.min(collisionSound.duration, 0.8);
+            });
+
+            audioInitialized = true;
+            console.log('오디오 초기화 완료');
+        }
+    } catch (error) {
+        console.warn('오디오 초기화 실패:', error);
+        // 오디오 실패 시 더미 객체 생성
+        shootSound = { play: () => Promise.resolve(), currentTime: 0 };
+        explosionSound = { play: () => Promise.resolve(), currentTime: 0 };
+        collisionSound = { play: () => Promise.resolve(), currentTime: 0 };
+    }
+}
 
 // 충돌 사운드 재생 시간 제어를 위한 변수 추가
 let lastCollisionTime = 0;
 const collisionSoundCooldown = 300;  // 충돌음 쿨다운 시간 증가
-
-// 충돌 사운드 길이 제어
-collisionSound.addEventListener('loadedmetadata', () => {
-    // 사운드 길이를 0.8초로 제한
-    collisionSound.duration = Math.min(collisionSound.duration, 0.8);
-});
 
 // 플레이어 우주선
 const player = {
@@ -2313,10 +2337,16 @@ function checkEnemyCollisions(enemy) {
                 bossHealth = enemy.health;
                 
                 // 보스 피격음 재생
-                collisionSound.currentTime = 0;
-                collisionSound.play().catch(error => {
-                    console.log('오디오 재생 실패:', error);
-                });
+                if (collisionSound && audioInitialized) {
+                    try {
+                        collisionSound.currentTime = 0;
+                        collisionSound.play().catch(error => {
+                            console.log('오디오 재생 실패:', error);
+                        });
+                    } catch (error) {
+                        console.warn('충돌음 재생 중 오류:', error);
+                    }
+                }
                 
                 // 피격 시간이 전체 출현 시간의 50%를 넘으면 파괴
                 const totalTime = currentTime - enemy.lastUpdateTime;
@@ -2356,10 +2386,16 @@ function checkEnemyCollisions(enemy) {
                     }
                     
                     // 보스 파괴 시 폭발음 재생
-                    explosionSound.currentTime = 0;
-                    explosionSound.play().catch(error => {
-                        console.log('오디오 재생 실패:', error);
-                    });
+                    if (explosionSound && audioInitialized) {
+                        try {
+                            explosionSound.currentTime = 0;
+                            explosionSound.play().catch(error => {
+                                console.log('오디오 재생 실패:', error);
+                            });
+                        } catch (error) {
+                            console.warn('폭발음 재생 중 오류:', error);
+                        }
+                    }
                     
                     bossActive = false;
                     return false;
@@ -2378,10 +2414,16 @@ function checkEnemyCollisions(enemy) {
             }
             
             // 적을 맞췄을 때 효과음 재생
-            shootSound.currentTime = 0;
-            shootSound.play().catch(error => {
-                console.log('오디오 재생 실패:', error);
-            });
+            if (shootSound && audioInitialized) {
+                try {
+                    shootSound.currentTime = 0;
+                    shootSound.play().catch(error => {
+                        console.log('오디오 재생 실패:', error);
+                    });
+                } catch (error) {
+                    console.warn('사운드 재생 중 오류:', error);
+                }
+            }
             
             isHit = true;
             return false;
@@ -2563,10 +2605,16 @@ function handleSpecialWeapon() {
         specialWeaponCharge = 0;
         
         // 특수 무기 발사 효과음
-        shootSound.currentTime = 0;
-        shootSound.play().catch(error => {
-            console.log('오디오 재생 실패:', error);
-        });
+        if (shootSound && audioInitialized) {
+            try {
+                shootSound.currentTime = 0;
+                shootSound.play().catch(error => {
+                    console.log('오디오 재생 실패:', error);
+                });
+            } catch (error) {
+                console.warn('사운드 재생 중 오류:', error);
+            }
+        }
         
         // F키 상태 초기화
         keys.KeyB = false;
@@ -2802,6 +2850,8 @@ document.addEventListener('keydown', (e) => {
             if (isGameOver) {
                 restartGame();
             } else {
+                // 오디오 초기화
+                initAudio();
                 isStartScreen = false;
                 gameStarted = true;
                 console.log('데스크탑 스페이스바로 게임 시작:', { isStartScreen, gameStarted });
@@ -2847,6 +2897,8 @@ document.addEventListener('keydown', (e) => {
 
     // 시작 화면에서 Enter를 누르면 게임 시작
     if ((isStartScreen || !gameStarted) && e.code === 'Enter') {
+        // 오디오 초기화
+        initAudio();
         isStartScreen = false;
         gameStarted = true;
         console.log('데스크탑 Enter키로 게임 시작:', { isStartScreen, gameStarted });
@@ -2968,10 +3020,16 @@ function handleSpreadShot() {
                 bullets.push(secondMissile);
             }
         }
-        shootSound.currentTime = 0;
-        shootSound.play().catch(error => {
-            console.log('오디오 재생 실패:', error);
-        });
+        if (shootSound && audioInitialized) {
+            try {
+                shootSound.currentTime = 0;
+                shootSound.play().catch(error => {
+                    console.log('오디오 재생 실패:', error);
+                });
+            } catch (error) {
+                console.warn('사운드 재생 중 오류:', error);
+            }
+        }
         scoreForSpread = 0;
     }
 }
@@ -3094,10 +3152,16 @@ function handleBullets() {
                 // 폭탄 폭발
                 explosions.push(new Explosion(bomb.x, bomb.y, true));
                 // 폭발음 재생
-                explosionSound.currentTime = 0;
-                explosionSound.play().catch(error => {
-                    console.log('오디오 재생 실패:', error);
-                });
+                if (explosionSound && audioInitialized) {
+                    try {
+                        explosionSound.currentTime = 0;
+                        explosionSound.play().catch(error => {
+                            console.log('오디오 재생 실패:', error);
+                        });
+                    } catch (error) {
+                        console.warn('폭발음 재생 중 오류:', error);
+                    }
+                }
                 return false;
             }
             return true;
@@ -3109,10 +3173,16 @@ function handleBullets() {
                 // 다이나마이트 폭발
                 explosions.push(new Explosion(dynamite.x, dynamite.y, true));
                 // 폭발음 재생
-                explosionSound.currentTime = 0;
-                explosionSound.play().catch(error => {
-                    console.log('오디오 재생 실패:', error);
-                });
+                if (explosionSound && audioInitialized) {
+                    try {
+                        explosionSound.currentTime = 0;
+                        explosionSound.play().catch(error => {
+                            console.log('오디오 재생 실패:', error);
+                        });
+                    } catch (error) {
+                        console.warn('폭발음 재생 중 오류:', error);
+                    }
+                }
                 return false;
             }
             return true;
@@ -3289,10 +3359,16 @@ function handleBossPattern(boss) {
             ));
         }
         // 보스 파괴 시 폭발음 재생
-        explosionSound.currentTime = 0;
-        explosionSound.play().catch(error => {
-            console.log('오디오 재생 실패:', error);
-        });
+        if (explosionSound && audioInitialized) {
+            try {
+                explosionSound.currentTime = 0;
+                explosionSound.play().catch(error => {
+                    console.log('오디오 재생 실패:', error);
+                });
+            } catch (error) {
+                console.warn('폭발음 재생 중 오류:', error);
+            }
+        }
         
         // 보스 파괴 시 목숨 1개 추가
         maxLives++; // 최대 목숨 증가
@@ -4194,6 +4270,9 @@ async function initializeGame() {
         
         // 모바일 전체화면 모드 활성화
         enableFullscreen();
+        
+        // 오디오 초기화 (사용자 상호작용 후)
+        initAudio();
         
         // 모바일에서는 자동으로 게임 시작 (터치 이벤트 대기)
         if (isMobile) {
