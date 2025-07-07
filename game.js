@@ -4929,3 +4929,6 @@ let levelBossPatterns = {
         BOSS_PATTERNS.BURST_SHOT
     ]
 };
+
+// game.js 파일 맨 위에 추가 (임시)
+console.log('게임 파일 로드됨 - 버전:', Date.now());
