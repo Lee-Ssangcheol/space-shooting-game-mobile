@@ -501,19 +501,19 @@ function initAudio() {
 let lastCollisionTime = 0;
 const collisionSoundCooldown = 300;  // 충돌음 쿨다운 시간 증가
 
-// 플레이어 우주선
+// 플레이어 우주선 (캔버스 초기화 후에 정의)
 const player = {
-    x: canvas.width / 2,
-    y: canvas.height - 50,
+    x: 196, // canvas.width / 2
+    y: 650, // canvas.height - 50
     width: 40,
     height: 40,
     speed: 8 * mobileSpeedMultiplier
 };
 
-// 두 번째 비행기
+// 두 번째 비행기 (캔버스 초기화 후에 정의)
 const secondPlane = {
-    x: canvas.width / 2 - 60,
-    y: canvas.height - 50,
+    x: 136, // canvas.width / 2 - 60
+    y: 650, // canvas.height - 50
     width: 40,
     height: 40,
     speed: 8 * mobileSpeedMultiplier
@@ -549,7 +549,7 @@ const maxSnakeGroups = 3;  // 최대 동시 그룹 수
 let gameVersion = '1.0.0-202506161826';  // 게임 버전
 
 // 게임 루프 실행 상태 변수 추가
-let gameLoopRunning = false;
+let gameLoopRunning = true; // true로 변경하여 게임 루프가 시작되도록 함
 
 // 게임 상태 변수에 추가
 let bossActive = false;
@@ -3115,6 +3115,15 @@ window.addEventListener('load', async () => {
         
         // 게임 초기화 실행
         await initializeGame();
+        
+        // 게임 루프 즉시 시작
+        if (!gameLoopRunning) {
+            startGameLoop();
+        }
+        console.log('게임 루프 시작됨');
+        
+        // 자동 시작 제거 - 사용자가 직접 시작하도록 함
+
     } catch (error) {
         console.error('게임 시작 중 오류:', error);
         // 오류 발생 시 localStorage에서 점수 로드 시도
@@ -3126,10 +3135,22 @@ window.addEventListener('load', async () => {
             
             // 게임 초기화 재시도
             await initializeGame();
+            
+            // 게임 루프 즉시 시작
+            if (!gameLoopRunning) {
+                startGameLoop();
+            }
+            console.log('게임 루프 시작됨');
         } catch (e) {
             console.error('localStorage 로드도 실패:', e);
             highScore = 0;
             await initializeGame();
+            
+            // 게임 루프 즉시 시작
+            if (!gameLoopRunning) {
+                startGameLoop();
+            }
+            console.log('게임 루프 시작됨');
         }
     }
 });
