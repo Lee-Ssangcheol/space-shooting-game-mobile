@@ -103,6 +103,10 @@ resizeCanvas();
 
 // 모바일 터치 컨트롤 요소들
 const mobileControls = {
+    btnUp: document.getElementById('btn-up'),
+    btnDown: document.getElementById('btn-down'),
+    btnLeft: document.getElementById('btn-left'),
+    btnRight: document.getElementById('btn-right'),
     btnFire: document.getElementById('btn-fire'),
     btnSpecial: document.getElementById('btn-special'),
     btnPause: document.getElementById('btn-pause'),
@@ -146,6 +150,43 @@ function setupMobileControls() {
         console.log('데스크탑 환경이므로 모바일 컨트롤 설정 건너뜀');
         return;
     }
+    
+    // 방향키 터치 이벤트
+    mobileControls.btnUp.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        keys.ArrowUp = true;
+    }, { passive: false });
+    mobileControls.btnUp.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        keys.ArrowUp = false;
+    }, { passive: false });
+    
+    mobileControls.btnDown.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        keys.ArrowDown = true;
+    }, { passive: false });
+    mobileControls.btnDown.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        keys.ArrowDown = false;
+    }, { passive: false });
+    
+    mobileControls.btnLeft.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        keys.ArrowLeft = true;
+    }, { passive: false });
+    mobileControls.btnLeft.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        keys.ArrowLeft = false;
+    }, { passive: false });
+    
+    mobileControls.btnRight.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        keys.ArrowRight = true;
+    }, { passive: false });
+    mobileControls.btnRight.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        keys.ArrowRight = false;
+    }, { passive: false });
     
     // 캔버스 터치 이벤트 (플레이어 이동용)
     canvas.addEventListener('touchstart', (e) => {
