@@ -1,3 +1,6 @@
+// game.js 파일 맨 위에 추가
+console.log('게임 파일 수정됨:', new Date().toLocaleString());
+
 // 게임 상수 정의
 const SPECIAL_WEAPON_MAX_CHARGE = 1000;  // 특수무기 최대 충전량
 const SPECIAL_WEAPON_CHARGE_RATE = 10;   // 특수무기 충전 속도
@@ -14,9 +17,12 @@ function enableFullscreen() {
     if (isMobile) {
         // iOS Safari 전체화면 모드
         if (document.documentElement.requestFullscreen) {
-            document.documentElement.requestFullscreen().catch(err => {
-                console.log('전체화면 모드 실패:', err);
-            });
+            const fullscreenPromise = document.documentElement.requestFullscreen();
+            if (fullscreenPromise && typeof fullscreenPromise.catch === 'function') {
+                fullscreenPromise.catch(err => {
+                    console.log('전체화면 모드 실패:', err);
+                });
+            }
         }
         
         // iOS Safari에서 주소창 숨김
@@ -30,31 +36,35 @@ function enableFullscreen() {
         
         // Android Chrome 전체화면 모드
         if (document.documentElement.webkitRequestFullscreen) {
-            document.documentElement.webkitRequestFullscreen().catch(err => {
-                console.log('webkit 전체화면 모드 실패:', err);
-            });
+            const webkitPromise = document.documentElement.webkitRequestFullscreen();
+            if (webkitPromise && typeof webkitPromise.catch === 'function') {
+                webkitPromise.catch(err => {
+                    console.log('webkit 전체화면 모드 실패:', err);
+                });
+            }
         }
-
+        
         // 화면 방향 고정 (세로 모드)
         if (screen.orientation && screen.orientation.lock) {
-            screen.orientation.lock('portrait').catch(err => {
-                console.log('화면 방향 고정 실패:', err);
-            });
+            const orientationPromise = screen.orientation.lock('portrait');
+            if (orientationPromise && typeof orientationPromise.catch === 'function') {
+                orientationPromise.catch(err => {
+                    console.log('화면 방향 고정 실패:', err);
+                });
+            }
         }
         
         console.log('모바일 전체화면 모드 활성화 시도');
     }
 }
 
-// 터치 위치 이동 관련 변수 (향후 확장을 위해 유지)
-let touchStartX = 0;
-let touchStartY = 0;
+// 터치 드래그 관련 변수
+
 
 // 모바일 연속 발사 관련 변수
 let mobileFireStartTime = 0;
 let isMobileFirePressed = false;
 let mobileContinuousFireInterval = null;
-
 // 캔버스 설정
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
@@ -501,19 +511,19 @@ function initAudio() {
 let lastCollisionTime = 0;
 const collisionSoundCooldown = 300;  // 충돌음 쿨다운 시간 증가
 
-// 플레이어 우주선 (캔버스 초기화 후에 정의)
+// 플레이어 우주선
 const player = {
-    x: 196, // canvas.width / 2
-    y: 650, // canvas.height - 50
+    x: canvas.width / 2,
+    y: canvas.height - 50,
     width: 40,
     height: 40,
     speed: 8 * mobileSpeedMultiplier
 };
 
-// 두 번째 비행기 (캔버스 초기화 후에 정의)
+// 두 번째 비행기
 const secondPlane = {
-    x: 136, // canvas.width / 2 - 60
-    y: 650, // canvas.height - 50
+    x: canvas.width / 2 - 60,
+    y: canvas.height - 50,
     width: 40,
     height: 40,
     speed: 8 * mobileSpeedMultiplier
@@ -549,7 +559,7 @@ const maxSnakeGroups = 3;  // 최대 동시 그룹 수
 let gameVersion = '1.0.0-202506161826';  // 게임 버전
 
 // 게임 루프 실행 상태 변수 추가
-let gameLoopRunning = true; // true로 변경하여 게임 루프가 시작되도록 함
+let gameLoopRunning = false;
 
 // 게임 상태 변수에 추가
 let bossActive = false;
@@ -2112,23 +2122,6 @@ function drawAirplane(x, y, width, height, color, isEnemy = false) {
 function gameLoop() {
     if (!gameLoopRunning) return;
     
-    // 모바일에서만 더 자세한 로그 출력 (성능을 위해 제한)
-    if (isMobile && !window.lastMobileLog) {
-        window.lastMobileLog = Date.now();
-        console.log('모바일 게임 루프 실행 중...', { 
-            isStartScreen, 
-            isGameOver, 
-            isPaused, 
-            gameLoopRunning,
-            canvas: !!canvas,
-            ctx: !!ctx,
-            timestamp: Date.now()
-        });
-    } else if (isMobile && Date.now() - window.lastMobileLog > 1000) {
-        window.lastMobileLog = Date.now();
-        console.log('모바일 게임 루프 계속 실행 중...', { isStartScreen, isGameOver, isPaused });
-    }
-    
     if (isPaused) {
         if (gameLoopRunning) {
             requestAnimationFrame(gameLoop);
@@ -2141,21 +2134,9 @@ function gameLoop() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     if (isStartScreen) {
-        console.log('시작 화면 그리기 중...', { titleY, subtitleY, starsLength: stars.length });
-        if (isMobile) {
-            console.log('모바일 시작 화면 그리기 시작');
-        }
         drawStartScreen();
-        if (isMobile) {
-            console.log('모바일 시작 화면 그리기 완료');
-        }
         if (gameLoopRunning) {
-            // 모바일에서는 requestAnimationFrame 대신 setTimeout 사용
-            if (isMobile) {
-                setTimeout(() => gameLoop(), 16); // 약 60fps
-            } else {
-                requestAnimationFrame(gameLoop);
-            }
+            requestAnimationFrame(gameLoop);
         }
         return;
     }
@@ -2281,12 +2262,7 @@ function gameLoop() {
 
         // 프레임 레이트 제한 (30 FPS)
         if (gameLoopRunning) {
-            // 모바일에서는 requestAnimationFrame 대신 setTimeout 사용
-            if (isMobile) {
-                setTimeout(() => gameLoop(), 16); // 약 60fps
-            } else {
-                requestAnimationFrame(gameLoop);
-            }
+            requestAnimationFrame(gameLoop);
         }
     } catch (error) {
         console.error('게임 루프 실행 중 오류:', error);
@@ -3116,9 +3092,9 @@ function drawUI() {
     showMobileControlStatus();
 }
 
-// 게임 시작 함수 (모바일 대응)
-const startGame = async () => {
-    console.log('게임 시작 함수 호출됨');
+// 게임 시작 이벤트 리스너 수정
+window.addEventListener('load', async () => {
+    console.log('페이지 로드 완료');
     
     try {
         // 버전 정보 로드 - Electron 환경에서는 package.json 접근이 제한적이므로 기본값 사용
@@ -3149,12 +3125,6 @@ const startGame = async () => {
         
         // 게임 초기화 실행
         await initializeGame();
-        
-        // 게임 루프는 window.addEventListener('load')에서 처리하므로 여기서는 호출하지 않음
-        console.log('게임 초기화 완료 - 게임 루프는 별도로 시작됨');
-        
-        // 자동 시작 제거 - 사용자가 직접 시작하도록 함
-
     } catch (error) {
         console.error('게임 시작 중 오류:', error);
         // 오류 발생 시 localStorage에서 점수 로드 시도
@@ -3166,25 +3136,13 @@ const startGame = async () => {
             
             // 게임 초기화 재시도
             await initializeGame();
-            
-            // 게임 루프 즉시 시작
-            if (!gameLoopRunning) {
-                startGameLoop();
-            }
-            console.log('게임 루프 시작됨');
         } catch (e) {
             console.error('localStorage 로드도 실패:', e);
             highScore = 0;
             await initializeGame();
-            
-            // 게임 루프 즉시 시작
-            if (!gameLoopRunning) {
-                startGameLoop();
-            }
-            console.log('게임 루프 시작됨');
         }
     }
-};
+});
 
 // 난이도 이름 반환 함수
 function getDifficultyName(level) {
@@ -4261,15 +4219,11 @@ let isStartScreen = true;  // 시작 화면 상태
 let gameStarted = false;  // 게임 시작 상태
 let startScreenAnimation = 0;  // 시작 화면 애니메이션 변수
 let titleY = -100;  // 제목 Y 위치
-let subtitleY = 800;  // 부제목 Y 위치 (canvas.height + 100 대신 고정값 사용)
+let subtitleY = canvas.height + 100;  // 부제목 Y 위치
 let stars = [];  // 배경 별들
 
 // 시작 화면 초기화 함수
 function initStartScreen() {
-    // 제목과 부제목 위치 초기화
-    titleY = -100;
-    subtitleY = canvas.height + 100;
-    
     // 배경 별들 생성
     stars = [];
     for (let i = 0; i < 100; i++) {
@@ -4285,45 +4239,14 @@ function initStartScreen() {
 
 // 시작 화면 그리기 함수
 function drawStartScreen() {
-    try {
-        // 모바일에서 디버깅 정보 추가
-        if (isMobile) {
-            console.log('drawStartScreen 시작', { 
-                stars: stars?.length, 
-                canvas: !!canvas, 
-                ctx: !!ctx,
-                canvasWidth: canvas?.width,
-                canvasHeight: canvas?.height
-            });
-        }
-        
-        // 안전장치: stars 배열이 없으면 초기화
-        if (!stars || stars.length === 0) {
-            console.log('stars 배열 초기화 필요');
-            initStartScreen();
-        }
-    
-            // 배경 그라데이션
-        const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        gradient.addColorStop(0, '#000033');
-        gradient.addColorStop(1, '#000066');
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        // 모바일에서 캔버스 테스트용 빨간색 사각형
-        if (isMobile) {
-            ctx.fillStyle = '#ff0000';
-            ctx.fillRect(10, 130, 100, 50);
-        }
-        
-        if (isMobile) {
-            console.log('모바일 배경 그라데이션 완료', { canvasWidth: canvas.width, canvasHeight: canvas.height });
-        }
+    // 배경 그라데이션
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, '#000033');
+    gradient.addColorStop(1, '#000066');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // 별들 그리기
-    if (isMobile) {
-        console.log('모바일 별들 그리기 시작', { starsCount: stars.length });
-    }
     stars.forEach(star => {
         star.y += star.speed;
         if (star.y > canvas.height) {
@@ -4335,9 +4258,6 @@ function drawStartScreen() {
         ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
         ctx.fill();
     });
-    if (isMobile) {
-        console.log('모바일 별들 그리기 완료');
-    }
 
     // 제목 그라데이션
     const titleGradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
@@ -4356,10 +4276,6 @@ function drawStartScreen() {
     ctx.fillStyle = titleGradient;
     ctx.textAlign = 'center';
     ctx.fillText('SPACE SHOOTER', canvas.width/2, titleY);
-    
-    if (isMobile) {
-        console.log('모바일 제목 그리기 완료', { titleY, canvasWidth: canvas.width });
-    }
 
     // 시작 화면 애니메이션
     if (titleY < canvas.height/2 - 100) {
@@ -4387,26 +4303,6 @@ function drawStartScreen() {
     ctx.fillText('화면을 터치하고 드래그하여', 50, canvas.height - 150);
     ctx.fillText('플레이어 비행기를 움직이세요.', 50, canvas.height - 120);
     ctx.fillText('총알은 자동으로 발사됩니다.', 50, canvas.height - 90);
-    
-    // 모바일 디버깅 정보를 화면에 표시
-    if (isMobile) {
-        ctx.font = '12px Arial';
-        ctx.fillStyle = '#00ff00';
-        ctx.textAlign = 'left';
-        ctx.fillText(`Canvas: ${canvas.width}x${canvas.height}`, 10, 20);
-        ctx.fillText(`Stars: ${stars.length}`, 10, 35);
-        ctx.fillText(`TitleY: ${titleY}`, 10, 50);
-        ctx.fillText(`SubtitleY: ${subtitleY}`, 10, 65);
-        ctx.fillText(`GameLoop: ${gameLoopRunning}`, 10, 80);
-        ctx.fillText(`StartScreen: ${isStartScreen}`, 10, 95);
-        ctx.fillText(`Time: ${Date.now()}`, 10, 110);
-    }
-    } catch (error) {
-        console.error('drawStartScreen 오류:', error);
-        // 오류 발생 시 기본 배경만 그리기
-        ctx.fillStyle = '#000033';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
 }
 
 // 폭탄 생성 함수 추가
@@ -4705,80 +4601,17 @@ async function initializeGame() {
         // 오디오 초기화 (사용자 상호작용 후)
         initAudio();
         
-            // 모바일에서는 터치 이벤트로 게임 시작
-    if (isMobile) {
-        console.log('모바일 환경 감지, 터치 이벤트 대기');
-        console.log('모바일 감지 세부사항:', {
-            userAgent: navigator.userAgent,
-            innerWidth: window.innerWidth,
-            innerHeight: window.innerHeight,
-            ontouchstart: 'ontouchstart' in window,
-            maxTouchPoints: navigator.maxTouchPoints
-        });
-        
-        // 모바일에서 게임 루프 강제 시작 (requestAnimationFrame 문제 해결)
-        setTimeout(() => {
-            console.log('모바일 초기화 타임아웃 실행');
-            if (!gameLoopRunning) {
-                console.log('모바일에서 게임 루프 강제 시작');
-                startGameLoop();
-            } else {
-                console.log('모바일에서 게임 루프가 이미 실행 중, 강제로 한 번 더 실행');
-                gameLoop();
-            }
-        }, 100);
-        
-        // 모바일에서 추가 안전장치
-        setTimeout(() => {
-            console.log('모바일 추가 안전장치 실행');
-            if (isStartScreen && !window.mobileStartScreenDrawn) {
-                console.log('모바일 시작 화면 강제 그리기');
-                window.mobileStartScreenDrawn = true;
-                drawStartScreen();
-            }
-        }, 200);
-        
-        // 모바일에서 캔버스 강제 초기화
-        setTimeout(() => {
-            console.log('모바일 캔버스 강제 초기화');
-            
-            // 캔버스 요소 다시 가져오기
-            const canvasElement = document.getElementById('gameCanvas');
-            const ctxElement = canvasElement ? canvasElement.getContext('2d') : null;
-            
-            if (canvasElement && ctxElement) {
-                console.log('캔버스 요소 찾음:', canvasElement);
-                
-                // 캔버스 크기 재설정
-                canvasElement.width = 392;
-                canvasElement.height = 700;
-                
-                // 기본 배경 그리기
-                ctxElement.fillStyle = '#ff0000';
-                ctxElement.fillRect(0, 0, canvasElement.width, canvasElement.height);
-                
-                // 테스트 텍스트 그리기
-                ctxElement.fillStyle = '#ffffff';
-                ctxElement.font = '20px Arial';
-                ctxElement.textAlign = 'center';
-                ctxElement.fillText('CANVAS TEST', canvasElement.width/2, canvasElement.height/2);
-                
-                // 추가 테스트 - 녹색 원 그리기
-                ctxElement.fillStyle = '#00ff00';
-                ctxElement.beginPath();
-                ctxElement.arc(200, 200, 50, 0, Math.PI * 2);
-                ctxElement.fill();
-                
-                console.log('모바일 캔버스 강제 초기화 완료');
-                
-                // 전역 변수 업데이트
-                canvas = canvasElement;
-                ctx = ctxElement;
-            } else {
-                console.log('캔버스 요소를 찾을 수 없음');
-            }
-        }, 500);
-    }
+        // 모바일에서는 터치 이벤트로 게임 시작
+        if (isMobile) {
+            console.log('모바일 환경 감지, 터치 이벤트 대기');
+            console.log('모바일 감지 세부사항:', {
+                userAgent: navigator.userAgent,
+                innerWidth: window.innerWidth,
+                innerHeight: window.innerHeight,
+                ontouchstart: 'ontouchstart' in window,
+                maxTouchPoints: navigator.maxTouchPoints
+            });
+        }
         
         // 최고 점수 로드
         highScore = await loadHighScore();
@@ -5060,9 +4893,7 @@ function startGameLoop() {
         console.log('게임 루프 시작');
         gameLoop();
     } else {
-        // 이미 실행 중이어도 강제로 1회 실행
-        console.log('게임 루프가 이미 실행 중입니다(강제 1회 실행)');
-        gameLoop();
+        console.log('게임 루프가 이미 실행 중입니다');
     }
 }
 
@@ -5101,19 +4932,7 @@ let levelBossPatterns = {
         BOSS_PATTERNS.TARGETED_SHOT,
         BOSS_PATTERNS.BURST_SHOT
     ]
-}
+};
 
-// 모바일 대응 이벤트 리스너들
-window.addEventListener('load', startGame);
-window.addEventListener('DOMContentLoaded', startGame);
-
-// 모바일에서 추가 안전장치
-if (isMobile) {
-    document.addEventListener('touchstart', () => {
-        if (!window.gameStarted) {
-            console.log('모바일 터치로 게임 시작');
-            window.gameStarted = true;
-            startGame();
-        }
-    }, { once: true });
-}
+// game.js 파일 맨 위에 추가 (임시)
+console.log('게임 파일 로드됨 - 버전:', Date.now());
