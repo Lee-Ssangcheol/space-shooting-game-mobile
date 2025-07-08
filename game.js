@@ -59,11 +59,7 @@ function enableFullscreen() {
 }
 
 // 터치 드래그 관련 변수
-let isDragging = false;
-let touchStartX = 0;
-let touchStartY = 0;
-let playerStartX = 0;
-let playerStartY = 0;
+
 
 // 모바일 연속 발사 관련 변수
 let mobileFireStartTime = 0;
@@ -188,7 +184,7 @@ function setupMobileControls() {
         keys.ArrowRight = false;
     }, { passive: false });
     
-    // 캔버스 터치 이벤트 (플레이어 이동용만 - 시작/재시작은 버튼으로만)
+    // 캔버스 터치 이벤트 (플레이어 이동 및 총알 발사)
     canvas.addEventListener('touchstart', (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -248,6 +244,33 @@ function setupMobileControls() {
             secondPlane.x = player.x - 60;
             secondPlane.y = player.y;
         }
+        
+        // 터치 시 총알 발사 (스페이스바 대신 터치로 발사)
+        // 스페이스바 상태를 true로 설정하여 handleBulletFiring() 함수가 작동하도록 함
+        isSpacePressed = true;
+        spacePressTime = Date.now();
+        isContinuousFire = true;
+        
+        // 총알 발사 처리
+        handleBulletFiring();
+    }, { passive: false });
+    
+    // 터치 종료 시 스페이스바 상태 초기화
+    canvas.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // 시작 화면에서는 터치 이벤트 무시
+        if (isStartScreen) {
+            return;
+        }
+        
+        // 스페이스바 상태 초기화
+        isSpacePressed = false;
+        isContinuousFire = false;
+        lastReleaseTime = Date.now();
+        
+        console.log('모바일 터치 종료 - 발사 중지');
     }, { passive: false });
     
     canvas.addEventListener('touchmove', (e) => {
@@ -277,6 +300,14 @@ function setupMobileControls() {
             secondPlane.x = player.x - 60;
             secondPlane.y = player.y;
         }
+        
+        // 터치 드래그 시에도 총알 발사 (연속 발사)
+        // 연속 발사 상태 유지
+        isSpacePressed = true;
+        isContinuousFire = true;
+        
+        // 총알 발사 처리
+        handleBulletFiring();
     }, { passive: false });
     
     // 시작/재시작 버튼 터치 이벤트
@@ -4561,13 +4592,8 @@ async function initializeGame() {
         // 종료 이벤트 핸들러 설정
         setupExitHandlers();
         
-            // 모바일 컨트롤 설정
+            // 모바일 컨트롤 설정 (터치 드래그 포함)
     setupMobileControls();
-    
-    // 모바일에서 터치 드래그 컨트롤 설정
-    if (isMobile) {
-        setupTouchDragControls();
-    }
     
     // 모바일 전체화면 모드 활성화
     enableFullscreen();
@@ -4858,94 +4884,7 @@ function restartGame() {
     });
 }
 
-// 터치 드래그 컨트롤 설정
-function setupTouchDragControls() {
-    console.log('터치 드래그 컨트롤 설정');
-    
-    // 터치 시작
-    canvas.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        const touch = e.touches[0];
-        const rect = canvas.getBoundingClientRect();
-        
-        // 캔버스 좌표계로 변환 (CSS 크기와 실제 캔버스 크기의 비율 고려)
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-        touchStartX = (touch.clientX - rect.left) * scaleX;
-        touchStartY = (touch.clientY - rect.top) * scaleY;
-        playerStartX = player.x;
-        playerStartY = player.y;
-        isDragging = true;
-        
-        // 드래그 시작 시 자동 연속발사 시작
-        if (!isGameOver && !isStartScreen) {
-            keys.Space = true;
-            isSpacePressed = true;
-            spacePressTime = Date.now();
-            isContinuousFire = true;
-            console.log('드래그 연속발사 시작');
-        }
-        
-        // 게임이 시작되지 않았다면 시작
-        if (isStartScreen) {
-            // 오디오 초기화
-            initAudio();
-            isStartScreen = false;
-            gameStarted = true;
-            console.log('터치 드래그로 게임 시작:', { isStartScreen, gameStarted });
-        }
-        
-        console.log('터치 드래그 시작');
-    }, { passive: false });
-    
-    // 터치 이동
-    canvas.addEventListener('touchmove', (e) => {
-        e.preventDefault();
-        if (!isDragging) return;
-        
-        const touch = e.touches[0];
-        const rect = canvas.getBoundingClientRect();
-        
-        // 캔버스 좌표계로 변환 (CSS 크기와 실제 캔버스 크기의 비율 고려)
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-        const touchX = (touch.clientX - rect.left) * scaleX;
-        const touchY = (touch.clientY - rect.top) * scaleY;
-        
-        // 플레이어 위치 계산 - 터치점이 플레이어 꼬리에서 10픽셀 아래에 오도록 조정
-        const tailLength = player.height / 2;
-        const newX = Math.max(0, Math.min(canvas.width - player.width, touchX - player.width / 2));
-        const newY = Math.max(0, Math.min(canvas.height - player.height, touchY - player.height - tailLength));
-        
-        // 플레이어 위치 업데이트
-        player.x = newX;
-        player.y = newY;
-        
-        // 두 번째 비행기도 함께 이동
-        if (hasSecondPlane) {
-            secondPlane.x = newX - 60;
-            secondPlane.y = newY;
-        }
-        
-    }, { passive: false });
-    
-    // 터치 종료
-    canvas.addEventListener('touchend', (e) => {
-        e.preventDefault();
-        isDragging = false;
-        
-        // 드래그 종료 시 연속발사 중지
-        if (!isGameOver && !isStartScreen) {
-            keys.Space = false;
-            isSpacePressed = false;
-            lastReleaseTime = Date.now();
-            isContinuousFire = false;
-            console.log('드래그 연속발사 중지');
-        }
-        
-        console.log('터치 드래그 종료');
-    }, { passive: false });
-}
+
 
 // 게임 루프 시작 함수
 function startGameLoop() {
