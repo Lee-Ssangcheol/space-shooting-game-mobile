@@ -2149,7 +2149,7 @@ function gameLoop() {
                 ctx.fillText('GAME OVER', canvas.width/2, canvas.height/2 - 60);
                 
                 ctx.font = 'bold 20px Arial';
-                ctx.fillStyle = '#ffffff';
+                ctx.fillStyle = '#ffff00';
                 ctx.fillText(`최종 점수: ${score}`, canvas.width/2, canvas.height/2);
                 ctx.fillText(`충돌 횟수: ${collisionCount}`, canvas.width/2, canvas.height/2 + 30);
                 ctx.font = 'bold 24px Arial';
