@@ -2112,6 +2112,8 @@ function drawAirplane(x, y, width, height, color, isEnemy = false) {
 function gameLoop() {
     if (!gameLoopRunning) return;
     
+    console.log('게임 루프 실행 중...', { isStartScreen, isGameOver, isPaused });
+    
     if (isPaused) {
         if (gameLoopRunning) {
             requestAnimationFrame(gameLoop);
@@ -2124,6 +2126,7 @@ function gameLoop() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     if (isStartScreen) {
+        console.log('시작 화면 그리기 중...', { titleY, subtitleY, starsLength: stars.length });
         drawStartScreen();
         if (gameLoopRunning) {
             requestAnimationFrame(gameLoop);
@@ -3116,11 +3119,8 @@ window.addEventListener('load', async () => {
         // 게임 초기화 실행
         await initializeGame();
         
-        // 게임 루프 즉시 시작
-        if (!gameLoopRunning) {
-            startGameLoop();
-        }
-        console.log('게임 루프 시작됨');
+        // 게임 루프는 window.addEventListener('load')에서 처리하므로 여기서는 호출하지 않음
+        console.log('게임 초기화 완료 - 게임 루프는 별도로 시작됨');
         
         // 자동 시작 제거 - 사용자가 직접 시작하도록 함
 
@@ -4230,11 +4230,15 @@ let isStartScreen = true;  // 시작 화면 상태
 let gameStarted = false;  // 게임 시작 상태
 let startScreenAnimation = 0;  // 시작 화면 애니메이션 변수
 let titleY = -100;  // 제목 Y 위치
-let subtitleY = canvas.height + 100;  // 부제목 Y 위치
+let subtitleY = 800;  // 부제목 Y 위치 (canvas.height + 100 대신 고정값 사용)
 let stars = [];  // 배경 별들
 
 // 시작 화면 초기화 함수
 function initStartScreen() {
+    // 제목과 부제목 위치 초기화
+    titleY = -100;
+    subtitleY = canvas.height + 100;
+    
     // 배경 별들 생성
     stars = [];
     for (let i = 0; i < 100; i++) {
@@ -4250,6 +4254,11 @@ function initStartScreen() {
 
 // 시작 화면 그리기 함수
 function drawStartScreen() {
+    // 안전장치: stars 배열이 없으면 초기화
+    if (!stars || stars.length === 0) {
+        initStartScreen();
+    }
+    
     // 배경 그라데이션
     const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
     gradient.addColorStop(0, '#000033');
@@ -4904,7 +4913,9 @@ function startGameLoop() {
         console.log('게임 루프 시작');
         gameLoop();
     } else {
-        console.log('게임 루프가 이미 실행 중입니다');
+        // 이미 실행 중이어도 강제로 1회 실행
+        console.log('게임 루프가 이미 실행 중입니다(강제 1회 실행)');
+        gameLoop();
     }
 }
 
