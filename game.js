@@ -188,7 +188,7 @@ function setupMobileControls() {
         keys.ArrowRight = false;
     }, { passive: false });
     
-    // 캔버스 터치 이벤트 (플레이어 이동용)
+    // 캔버스 터치 이벤트 (플레이어 이동용만 - 시작/재시작은 버튼으로만)
     canvas.addEventListener('touchstart', (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -242,20 +242,20 @@ function setupMobileControls() {
             secondPlane.y = player.y;
         }
         
-        // 게임이 시작되지 않았다면 시작
-        if (isStartScreen) {
-            // 오디오 초기화
-            initAudio();
-            isStartScreen = false;
-            gameStarted = true;
-            console.log('모바일 터치로 게임 시작:', { isStartScreen, gameStarted });
-        }
+        // 게임이 시작되지 않았다면 시작 (버튼으로만 시작하도록 제거)
+        // if (isStartScreen) {
+        //     // 오디오 초기화
+        //     initAudio();
+        //     isStartScreen = false;
+        //     gameStarted = true;
+        //     console.log('모바일 터치로 게임 시작:', { isStartScreen, gameStarted });
+        // }
         
-        // 게임 오버 상태에서 재시작
-        if (isGameOver) {
-            restartGame();
-            return;
-        }
+        // 게임 오버 상태에서 재시작 (버튼으로만 재시작하도록 제거)
+        // if (isGameOver) {
+        //     restartGame();
+        //     return;
+        // }
     }, { passive: false });
     
     canvas.addEventListener('touchmove', (e) => {
@@ -2153,8 +2153,8 @@ function gameLoop() {
                 ctx.fillText(`최종 점수: ${score}`, canvas.width/2, canvas.height/2);
                 ctx.fillText(`충돌 횟수: ${collisionCount}`, canvas.width/2, canvas.height/2 + 30);
                 ctx.font = 'bold 20px Arial';
-                ctx.fillText('화면을 터치하거나', canvas.width/2, canvas.height/2 + 80);
-                ctx.fillText('시작/재시작 버튼을 눌러 게임 재시작', canvas.width/2, canvas.height/2 + 110);
+                ctx.fillText('시작/재시작 버튼을 눌러', canvas.width/2, canvas.height/2 + 80);
+                ctx.fillText('게임을 재시작하세요', canvas.width/2, canvas.height/2 + 110);
             }
         }
         if (gameLoopRunning) {
@@ -4263,8 +4263,8 @@ function drawStartScreen() {
     if (isVisible) {
         ctx.font = 'bold 20px Arial';
         ctx.fillStyle = '#ffff00';
-        ctx.fillText('화면을 터치하거나', canvas.width/2, subtitleY);
-        ctx.fillText('시작/재시작 버튼을 눌러 게임 시작', canvas.width/2, subtitleY + 30);
+        ctx.fillText('시작/재시작 버튼을 눌러', canvas.width/2, subtitleY);
+        ctx.fillText('게임을 시작하세요', canvas.width/2, subtitleY + 30);
     }
 
     // 조작법 안내
@@ -4481,12 +4481,12 @@ let isSoundControlActive = false;
 
 // 키보드 입력 처리 함수
 function handleGameInput(e) {
-    // 게임 오버 상태에서 스페이스바로 재시작
-    if (isGameOver && e.code === 'Space') {
-        e.preventDefault();
-        restartGame();
-        return;
-    }
+    // 게임 오버 상태에서 스페이스바로 재시작 (버튼으로만 재시작하도록 제거)
+    // if (isGameOver && e.code === 'Space') {
+    //     e.preventDefault();
+    //     restartGame();
+    //     return;
+    // }
 
     if (!isGameActive || isSoundControlActive) {
         return;

@@ -110,13 +110,13 @@ body {
 }
 
 .action-btn {
-  width: 70px;
-  height: 45px;
+  width: 60px;
+  height: 40px;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   background: rgba(255, 255, 255, 0.9);
   color: #000;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: bold;
   cursor: pointer;
   user-select: none;
