@@ -4737,6 +4737,47 @@ async function initializeGame() {
                 drawStartScreen();
             }
         }, 200);
+        
+        // 모바일에서 캔버스 강제 초기화
+        setTimeout(() => {
+            console.log('모바일 캔버스 강제 초기화');
+            
+            // 캔버스 요소 다시 가져오기
+            const canvasElement = document.getElementById('gameCanvas');
+            const ctxElement = canvasElement ? canvasElement.getContext('2d') : null;
+            
+            if (canvasElement && ctxElement) {
+                console.log('캔버스 요소 찾음:', canvasElement);
+                
+                // 캔버스 크기 재설정
+                canvasElement.width = 392;
+                canvasElement.height = 700;
+                
+                // 기본 배경 그리기
+                ctxElement.fillStyle = '#ff0000';
+                ctxElement.fillRect(0, 0, canvasElement.width, canvasElement.height);
+                
+                // 테스트 텍스트 그리기
+                ctxElement.fillStyle = '#ffffff';
+                ctxElement.font = '20px Arial';
+                ctxElement.textAlign = 'center';
+                ctxElement.fillText('CANVAS TEST', canvasElement.width/2, canvasElement.height/2);
+                
+                // 추가 테스트 - 녹색 원 그리기
+                ctxElement.fillStyle = '#00ff00';
+                ctxElement.beginPath();
+                ctxElement.arc(200, 200, 50, 0, Math.PI * 2);
+                ctxElement.fill();
+                
+                console.log('모바일 캔버스 강제 초기화 완료');
+                
+                // 전역 변수 업데이트
+                canvas = canvasElement;
+                ctx = ctxElement;
+            } else {
+                console.log('캔버스 요소를 찾을 수 없음');
+            }
+        }, 500);
     }
         
         // 최고 점수 로드
