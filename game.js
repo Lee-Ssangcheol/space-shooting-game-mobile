@@ -192,6 +192,13 @@ function setupMobileControls() {
     canvas.addEventListener('touchstart', (e) => {
         e.preventDefault();
         e.stopPropagation();
+        
+        // 시작 화면에서는 터치 이벤트 무시
+        if (isStartScreen) {
+            console.log('시작 화면에서 터치 무시');
+            return;
+        }
+        
         console.log('모바일 터치 시작');
         
         const touch = e.touches[0];
@@ -241,25 +248,16 @@ function setupMobileControls() {
             secondPlane.x = player.x - 60;
             secondPlane.y = player.y;
         }
-        
-        // 게임이 시작되지 않았다면 시작 (버튼으로만 시작하도록 제거)
-        // if (isStartScreen) {
-        //     // 오디오 초기화
-        //     initAudio();
-        //     isStartScreen = false;
-        //     gameStarted = true;
-        //     console.log('모바일 터치로 게임 시작:', { isStartScreen, gameStarted });
-        // }
-        
-        // 게임 오버 상태에서 재시작 (버튼으로만 재시작하도록 제거)
-        // if (isGameOver) {
-        //     restartGame();
-        //     return;
-        // }
     }, { passive: false });
     
     canvas.addEventListener('touchmove', (e) => {
         e.preventDefault();
+        
+        // 시작 화면에서는 터치 이벤트 무시
+        if (isStartScreen) {
+            return;
+        }
+        
         const touch = e.touches[0];
         const rect = canvas.getBoundingClientRect();
         
@@ -2149,10 +2147,11 @@ function gameLoop() {
                 ctx.fillText('GAME OVER', canvas.width/2, canvas.height/2 - 60);
                 
                 ctx.font = 'bold 20px Arial';
-                ctx.fillStyle = '#ffff00';
+                ctx.fillStyle = '#ffffff';
                 ctx.fillText(`최종 점수: ${score}`, canvas.width/2, canvas.height/2);
                 ctx.fillText(`충돌 횟수: ${collisionCount}`, canvas.width/2, canvas.height/2 + 30);
                 ctx.font = 'bold 24px Arial';
+                ctx.fillStyle = '#ffff00';
                 ctx.fillText('시작/재시작 버튼을 눌러 시작', canvas.width/2, canvas.height/2 + 80);
 
             }
@@ -4487,6 +4486,11 @@ function handleGameInput(e) {
     //     return;
     // }
 
+    // 시작 화면에서는 키보드 입력 무시
+    if (isStartScreen) {
+        return;
+    }
+
     if (!isGameActive || isSoundControlActive) {
         return;
     }
@@ -4512,6 +4516,11 @@ function handleGameInput(e) {
 
 // 키보드 해제 처리 함수
 function handleGameInputRelease(e) {
+    // 시작 화면에서는 키보드 입력 무시
+    if (isStartScreen) {
+        return;
+    }
+
     if (!isGameActive || isSoundControlActive) {
         return;
     }
