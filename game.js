@@ -3116,9 +3116,9 @@ function drawUI() {
     showMobileControlStatus();
 }
 
-// 게임 시작 이벤트 리스너 수정
-window.addEventListener('load', async () => {
-    console.log('페이지 로드 완료');
+// 게임 시작 함수 (모바일 대응)
+const startGame = async () => {
+    console.log('게임 시작 함수 호출됨');
     
     try {
         // 버전 정보 로드 - Electron 환경에서는 package.json 접근이 제한적이므로 기본값 사용
@@ -3184,7 +3184,7 @@ window.addEventListener('load', async () => {
             console.log('게임 루프 시작됨');
         }
     }
-});
+};
 
 // 난이도 이름 반환 함수
 function getDifficultyName(level) {
@@ -5101,4 +5101,19 @@ let levelBossPatterns = {
         BOSS_PATTERNS.TARGETED_SHOT,
         BOSS_PATTERNS.BURST_SHOT
     ]
+}
+
+// 모바일 대응 이벤트 리스너들
+window.addEventListener('load', startGame);
+window.addEventListener('DOMContentLoaded', startGame);
+
+// 모바일에서 추가 안전장치
+if (isMobile) {
+    document.addEventListener('touchstart', () => {
+        if (!window.gameStarted) {
+            console.log('모바일 터치로 게임 시작');
+            window.gameStarted = true;
+            startGame();
+        }
+    }, { once: true });
 }
