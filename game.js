@@ -2112,7 +2112,22 @@ function drawAirplane(x, y, width, height, color, isEnemy = false) {
 function gameLoop() {
     if (!gameLoopRunning) return;
     
-    console.log('게임 루프 실행 중...', { isStartScreen, isGameOver, isPaused });
+    // 모바일에서만 더 자세한 로그 출력 (성능을 위해 제한)
+    if (isMobile && !window.lastMobileLog) {
+        window.lastMobileLog = Date.now();
+        console.log('모바일 게임 루프 실행 중...', { 
+            isStartScreen, 
+            isGameOver, 
+            isPaused, 
+            gameLoopRunning,
+            canvas: !!canvas,
+            ctx: !!ctx,
+            timestamp: Date.now()
+        });
+    } else if (isMobile && Date.now() - window.lastMobileLog > 1000) {
+        window.lastMobileLog = Date.now();
+        console.log('모바일 게임 루프 계속 실행 중...', { isStartScreen, isGameOver, isPaused });
+    }
     
     if (isPaused) {
         if (gameLoopRunning) {
@@ -2127,6 +2142,9 @@ function gameLoop() {
 
     if (isStartScreen) {
         console.log('시작 화면 그리기 중...', { titleY, subtitleY, starsLength: stars.length });
+        if (isMobile) {
+            console.log('모바일 시작 화면 그리기 시작');
+        }
         drawStartScreen();
         if (gameLoopRunning) {
             // 모바일에서는 requestAnimationFrame 대신 setTimeout 사용
@@ -4264,10 +4282,23 @@ function initStartScreen() {
 
 // 시작 화면 그리기 함수
 function drawStartScreen() {
-    // 안전장치: stars 배열이 없으면 초기화
-    if (!stars || stars.length === 0) {
-        initStartScreen();
-    }
+    try {
+        // 모바일에서 디버깅 정보 추가
+        if (isMobile) {
+            console.log('drawStartScreen 시작', { 
+                stars: stars?.length, 
+                canvas: !!canvas, 
+                ctx: !!ctx,
+                canvasWidth: canvas?.width,
+                canvasHeight: canvas?.height
+            });
+        }
+        
+        // 안전장치: stars 배열이 없으면 초기화
+        if (!stars || stars.length === 0) {
+            console.log('stars 배열 초기화 필요');
+            initStartScreen();
+        }
     
     // 배경 그라데이션
     const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
@@ -4333,6 +4364,12 @@ function drawStartScreen() {
     ctx.fillText('화면을 터치하고 드래그하여', 50, canvas.height - 150);
     ctx.fillText('플레이어 비행기를 움직이세요.', 50, canvas.height - 120);
     ctx.fillText('총알은 자동으로 발사됩니다.', 50, canvas.height - 90);
+    } catch (error) {
+        console.error('drawStartScreen 오류:', error);
+        // 오류 발생 시 기본 배경만 그리기
+        ctx.fillStyle = '#000033';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
 }
 
 // 폭탄 생성 함수 추가
@@ -4644,11 +4681,25 @@ async function initializeGame() {
         
         // 모바일에서 게임 루프 강제 시작 (requestAnimationFrame 문제 해결)
         setTimeout(() => {
+            console.log('모바일 초기화 타임아웃 실행');
             if (!gameLoopRunning) {
                 console.log('모바일에서 게임 루프 강제 시작');
                 startGameLoop();
+            } else {
+                console.log('모바일에서 게임 루프가 이미 실행 중, 강제로 한 번 더 실행');
+                gameLoop();
             }
         }, 100);
+        
+        // 모바일에서 추가 안전장치
+        setTimeout(() => {
+            console.log('모바일 추가 안전장치 실행');
+            if (isStartScreen && !window.mobileStartScreenDrawn) {
+                console.log('모바일 시작 화면 강제 그리기');
+                window.mobileStartScreenDrawn = true;
+                drawStartScreen();
+            }
+        }, 200);
     }
         
         // 최고 점수 로드
