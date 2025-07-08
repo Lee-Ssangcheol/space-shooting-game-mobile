@@ -2129,7 +2129,12 @@ function gameLoop() {
         console.log('시작 화면 그리기 중...', { titleY, subtitleY, starsLength: stars.length });
         drawStartScreen();
         if (gameLoopRunning) {
-            requestAnimationFrame(gameLoop);
+            // 모바일에서는 requestAnimationFrame 대신 setTimeout 사용
+            if (isMobile) {
+                setTimeout(() => gameLoop(), 16); // 약 60fps
+            } else {
+                requestAnimationFrame(gameLoop);
+            }
         }
         return;
     }
@@ -2255,7 +2260,12 @@ function gameLoop() {
 
         // 프레임 레이트 제한 (30 FPS)
         if (gameLoopRunning) {
-            requestAnimationFrame(gameLoop);
+            // 모바일에서는 requestAnimationFrame 대신 setTimeout 사용
+            if (isMobile) {
+                setTimeout(() => gameLoop(), 16); // 약 60fps
+            } else {
+                requestAnimationFrame(gameLoop);
+            }
         }
     } catch (error) {
         console.error('게임 루프 실행 중 오류:', error);
@@ -4621,17 +4631,25 @@ async function initializeGame() {
         // 오디오 초기화 (사용자 상호작용 후)
         initAudio();
         
-        // 모바일에서는 터치 이벤트로 게임 시작
-        if (isMobile) {
-            console.log('모바일 환경 감지, 터치 이벤트 대기');
-            console.log('모바일 감지 세부사항:', {
-                userAgent: navigator.userAgent,
-                innerWidth: window.innerWidth,
-                innerHeight: window.innerHeight,
-                ontouchstart: 'ontouchstart' in window,
-                maxTouchPoints: navigator.maxTouchPoints
-            });
-        }
+            // 모바일에서는 터치 이벤트로 게임 시작
+    if (isMobile) {
+        console.log('모바일 환경 감지, 터치 이벤트 대기');
+        console.log('모바일 감지 세부사항:', {
+            userAgent: navigator.userAgent,
+            innerWidth: window.innerWidth,
+            innerHeight: window.innerHeight,
+            ontouchstart: 'ontouchstart' in window,
+            maxTouchPoints: navigator.maxTouchPoints
+        });
+        
+        // 모바일에서 게임 루프 강제 시작 (requestAnimationFrame 문제 해결)
+        setTimeout(() => {
+            if (!gameLoopRunning) {
+                console.log('모바일에서 게임 루프 강제 시작');
+                startGameLoop();
+            }
+        }, 100);
+    }
         
         // 최고 점수 로드
         highScore = await loadHighScore();
