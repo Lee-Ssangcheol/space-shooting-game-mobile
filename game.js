@@ -2146,6 +2146,9 @@ function gameLoop() {
             console.log('모바일 시작 화면 그리기 시작');
         }
         drawStartScreen();
+        if (isMobile) {
+            console.log('모바일 시작 화면 그리기 완료');
+        }
         if (gameLoopRunning) {
             // 모바일에서는 requestAnimationFrame 대신 setTimeout 사용
             if (isMobile) {
@@ -4300,14 +4303,27 @@ function drawStartScreen() {
             initStartScreen();
         }
     
-    // 배경 그라데이션
-    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    gradient.addColorStop(0, '#000033');
-    gradient.addColorStop(1, '#000066');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+            // 배경 그라데이션
+        const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        gradient.addColorStop(0, '#000033');
+        gradient.addColorStop(1, '#000066');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // 모바일에서 캔버스 테스트용 빨간색 사각형
+        if (isMobile) {
+            ctx.fillStyle = '#ff0000';
+            ctx.fillRect(10, 130, 100, 50);
+        }
+        
+        if (isMobile) {
+            console.log('모바일 배경 그라데이션 완료', { canvasWidth: canvas.width, canvasHeight: canvas.height });
+        }
 
     // 별들 그리기
+    if (isMobile) {
+        console.log('모바일 별들 그리기 시작', { starsCount: stars.length });
+    }
     stars.forEach(star => {
         star.y += star.speed;
         if (star.y > canvas.height) {
@@ -4319,6 +4335,9 @@ function drawStartScreen() {
         ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
         ctx.fill();
     });
+    if (isMobile) {
+        console.log('모바일 별들 그리기 완료');
+    }
 
     // 제목 그라데이션
     const titleGradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
@@ -4337,6 +4356,10 @@ function drawStartScreen() {
     ctx.fillStyle = titleGradient;
     ctx.textAlign = 'center';
     ctx.fillText('SPACE SHOOTER', canvas.width/2, titleY);
+    
+    if (isMobile) {
+        console.log('모바일 제목 그리기 완료', { titleY, canvasWidth: canvas.width });
+    }
 
     // 시작 화면 애니메이션
     if (titleY < canvas.height/2 - 100) {
@@ -4364,6 +4387,20 @@ function drawStartScreen() {
     ctx.fillText('화면을 터치하고 드래그하여', 50, canvas.height - 150);
     ctx.fillText('플레이어 비행기를 움직이세요.', 50, canvas.height - 120);
     ctx.fillText('총알은 자동으로 발사됩니다.', 50, canvas.height - 90);
+    
+    // 모바일 디버깅 정보를 화면에 표시
+    if (isMobile) {
+        ctx.font = '12px Arial';
+        ctx.fillStyle = '#00ff00';
+        ctx.textAlign = 'left';
+        ctx.fillText(`Canvas: ${canvas.width}x${canvas.height}`, 10, 20);
+        ctx.fillText(`Stars: ${stars.length}`, 10, 35);
+        ctx.fillText(`TitleY: ${titleY}`, 10, 50);
+        ctx.fillText(`SubtitleY: ${subtitleY}`, 10, 65);
+        ctx.fillText(`GameLoop: ${gameLoopRunning}`, 10, 80);
+        ctx.fillText(`StartScreen: ${isStartScreen}`, 10, 95);
+        ctx.fillText(`Time: ${Date.now()}`, 10, 110);
+    }
     } catch (error) {
         console.error('drawStartScreen 오류:', error);
         // 오류 발생 시 기본 배경만 그리기
