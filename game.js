@@ -1,6 +1,3 @@
-// game.js 파일 맨 위에 추가
-console.log('게임 파일 수정됨:', new Date().toLocaleString());
-
 // 게임 상수 정의
 const SPECIAL_WEAPON_MAX_CHARGE = 1000;  // 특수무기 최대 충전량
 const SPECIAL_WEAPON_CHARGE_RATE = 10;   // 특수무기 충전 속도
@@ -36,30 +33,26 @@ function enableFullscreen() {
         
         // Android Chrome 전체화면 모드
         if (document.documentElement.webkitRequestFullscreen) {
-            const webkitPromise = document.documentElement.webkitRequestFullscreen();
-            if (webkitPromise && typeof webkitPromise.catch === 'function') {
-                webkitPromise.catch(err => {
-                    console.log('webkit 전체화면 모드 실패:', err);
-                });
-            }
+            document.documentElement.webkitRequestFullscreen().catch(err => {
+                console.log('webkit 전체화면 모드 실패:', err);
+            });
         }
         
         // 화면 방향 고정 (세로 모드)
+        // 화면 방향 고정 (세로 모드)
         if (screen.orientation && screen.orientation.lock) {
-            const orientationPromise = screen.orientation.lock('portrait');
-            if (orientationPromise && typeof orientationPromise.catch === 'function') {
-                orientationPromise.catch(err => {
-                    console.log('화면 방향 고정 실패:', err);
-                });
-            }
+            screen.orientation.lock('portrait').catch(err => {
+                console.log('화면 방향 고정 실패:', err);
+            });
         }
         
         console.log('모바일 전체화면 모드 활성화 시도');
     }
 }
 
-// 터치 드래그 관련 변수
-
+// 터치 위치 이동 관련 변수 (향후 확장을 위해 유지)
+let touchStartX = 0;
+let touchStartY = 0;
 
 // 모바일 연속 발사 관련 변수
 let mobileFireStartTime = 0;
