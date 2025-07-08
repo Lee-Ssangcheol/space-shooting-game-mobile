@@ -14,12 +14,9 @@ function enableFullscreen() {
     if (isMobile) {
         // iOS Safari 전체화면 모드
         if (document.documentElement.requestFullscreen) {
-            const fullscreenPromise = document.documentElement.requestFullscreen();
-            if (fullscreenPromise && typeof fullscreenPromise.catch === 'function') {
-                fullscreenPromise.catch(err => {
-                    console.log('전체화면 모드 실패:', err);
-                });
-            }
+            document.documentElement.requestFullscreen().catch(err => {
+                console.log('전체화면 모드 실패:', err);
+            });
         }
         
         // iOS Safari에서 주소창 숨김
@@ -37,8 +34,7 @@ function enableFullscreen() {
                 console.log('webkit 전체화면 모드 실패:', err);
             });
         }
-        
-        // 화면 방향 고정 (세로 모드)
+
         // 화면 방향 고정 (세로 모드)
         if (screen.orientation && screen.orientation.lock) {
             screen.orientation.lock('portrait').catch(err => {
@@ -58,6 +54,7 @@ let touchStartY = 0;
 let mobileFireStartTime = 0;
 let isMobileFirePressed = false;
 let mobileContinuousFireInterval = null;
+
 // 캔버스 설정
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
