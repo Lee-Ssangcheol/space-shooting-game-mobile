@@ -65,7 +65,7 @@ body {
   align-items: center;
   padding: 10px;
   box-sizing: border-box;
-  z-index: 1000;
+  z-index: 10000; /* 전체화면 모드에서도 보이도록 z-index 높임 */
 }
 
 /* 기능키만 중앙에 배치 */
@@ -114,7 +114,7 @@ body {
   height: 40px;
   border: none;
   border-radius: 6px;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.95); /* 전체화면에서 더 잘 보이도록 투명도 높임 */
   color: #000;
   font-size: 10px;
   font-weight: bold;
@@ -123,7 +123,12 @@ body {
   -webkit-user-select: none;
   -webkit-touch-callout: none;
   transition: all 0.2s;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5); /* 전체화면에서 더 잘 보이도록 그림자 강화 */
+  position: relative;
+  z-index: 10001; /* 버튼 자체의 z-index도 높임 */
+  /* 전체화면 모드에서 터치 이벤트가 제대로 작동하도록 설정 */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0.3);
 }
 
 /* 버튼 순서 배치 */
@@ -246,7 +251,7 @@ body {
     bottom: 0;
     left: 0;
     right: 0;
-    z-index: 1000;
+    z-index: 10000; /* 전체화면 모드에서도 보이도록 z-index 높임 */
     /* iOS Safari에서 추가 설정 */
     -webkit-transform: translateZ(0);
     transform: translateZ(0);
