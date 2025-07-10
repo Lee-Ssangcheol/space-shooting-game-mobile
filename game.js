@@ -209,9 +209,27 @@ function setupMobileControls() {
             enableFullscreen();
         }
         
-        // 시작 화면에서는 터치 이벤트 무시
+        // 시작 화면에서 터치 시 게임 시작
         if (isStartScreen) {
-            console.log('시작 화면에서 터치 무시');
+            console.log('시작 화면에서 터치 - 게임 시작!');
+            isStartScreen = false;
+            gameStarted = true;
+            
+            // 플레이어 위치 초기화
+            player.x = canvas.width / 2;
+            player.y = canvas.height - 50;
+            if (hasSecondPlane) {
+                secondPlane.x = canvas.width / 2 - 60;
+                secondPlane.y = canvas.height - 50;
+            }
+            
+            return;
+        }
+        
+        // 게임 오버 상태에서 터치 시 재시작
+        if (isGameOver) {
+            console.log('게임 오버 상태에서 터치 - 게임 재시작!');
+            restartGame();
             return;
         }
         
@@ -301,8 +319,27 @@ function setupMobileControls() {
             enableFullscreen();
         }
         
-        // 시작 화면에서는 터치 이벤트 무시
+        // 시작 화면에서 터치 이동 시 게임 시작
         if (isStartScreen) {
+            console.log('시작 화면에서 터치 이동 - 게임 시작!');
+            isStartScreen = false;
+            gameStarted = true;
+            
+            // 플레이어 위치 초기화
+            player.x = canvas.width / 2;
+            player.y = canvas.height - 50;
+            if (hasSecondPlane) {
+                secondPlane.x = canvas.width / 2 - 60;
+                secondPlane.y = canvas.height - 50;
+            }
+            
+            return;
+        }
+        
+        // 게임 오버 상태에서 터치 이동 시 재시작
+        if (isGameOver) {
+            console.log('게임 오버 상태에서 터치 이동 - 게임 재시작!');
+            restartGame();
             return;
         }
         
@@ -347,13 +384,11 @@ function setupMobileControls() {
                 enableFullscreen();
             }
             
-            // 시작 화면에서 버튼을 누르면 게임 시작
+            // 시작 화면에서 버튼을 누르면 게임 시작 준비
             if (isStartScreen) {
                 // 오디오 초기화
                 initAudio();
-                isStartScreen = false;
-                gameStarted = true;
-                console.log('모바일 버튼으로 게임 시작:', { isStartScreen, gameStarted });
+                console.log('게임 시작 준비 완료');
             }
             
             // 게임 오버 상태에서 재시작
@@ -377,9 +412,7 @@ function setupMobileControls() {
             if (isStartScreen) {
                 // 오디오 초기화
                 initAudio();
-                isStartScreen = false;
-                gameStarted = true;
-                console.log('모바일 클릭으로 게임 시작:', { isStartScreen, gameStarted });
+                console.log('게임 시작 준비 완료');
             }
             
             // 게임 오버 상태에서 재시작
@@ -2266,7 +2299,7 @@ function gameLoop() {
                 ctx.fillText(`충돌 횟수: ${collisionCount}`, canvas.width/2, canvas.height/2 + 30);
                 ctx.font = 'bold 24px Arial';
                 ctx.fillStyle = '#ffff00';
-                ctx.fillText('시작/재시작 버튼을 눌러 시작', canvas.width/2, canvas.height/2 + 80);
+                ctx.fillText('버튼을 누른 후 화면을 터치하세요', canvas.width/2, canvas.height/2 + 80);
 
             }
         }
@@ -4376,7 +4409,7 @@ function drawStartScreen() {
     if (isVisible) {
         ctx.font = 'bold 24px Arial';
         ctx.fillStyle = '#ffff00';
-        ctx.fillText('시작/재시작 버튼을 눌러 시작', canvas.width/2, subtitleY);
+        ctx.fillText('버튼을 누른 후 화면을 터치하세요', canvas.width/2, subtitleY);
     }
 
     // 조작법 안내
