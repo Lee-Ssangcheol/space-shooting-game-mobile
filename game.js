@@ -1476,8 +1476,9 @@ async function initializeGame() {
         });
         
         // 게임 루프 시작
-        startGameLoop();
-        console.log('게임 루프 시작됨');
+        //startGameLoop();
+        //console.log('게임 루프 시작됨');
+        console.log('게임 초기화 완료 - 버튼을 누르면 게임이 시작됩니다');
         
         // 자동 시작 제거 - 사용자가 직접 시작하도록 함
 
@@ -4948,9 +4949,9 @@ async function initializeGame() {
         });
         
         // 게임 루프 시작
-        startGameLoop();
-        console.log('게임 루프 시작됨');
-        
+        //startGameLoop();
+        //console.log('게임 루프 시작됨');
+        console.log('게임 초기화 완료 - 버튼을 누르면 게임이 시작됩니다');        
         // 자동 시작 제거 - 사용자가 직접 시작하도록 함
 
     } catch (error) {
