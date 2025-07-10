@@ -134,20 +134,22 @@ function initializeMobileControls() {
     console.log('모바일 컨트롤 요소들 초기화됨:', mobileControls);
 }
 
-// 모바일 컨트롤 요소 확인 및 디버깅
-console.log('모바일 컨트롤 요소들:', mobileControls);
+// 모바일 컨트롤 요소 확인 및 디버깅 (초기화 후에 실행)
+function debugMobileControls() {
+    console.log('모바일 컨트롤 요소들:', mobileControls);
 
-// 각 버튼 요소의 존재 여부 확인
-Object.keys(mobileControls).forEach(key => {
-    const element = mobileControls[key];
-    if (element) {
-        console.log(`${key}: 요소 존재 ✓`);
-        // 버튼이 클릭 가능한지 확인
-        console.log(`${key} 클릭 가능:`, element.offsetWidth > 0 && element.offsetHeight > 0);
-    } else {
-        console.log(`${key}: 요소 없음 ✗`);
-    }
-});
+    // 각 버튼 요소의 존재 여부 확인
+    Object.keys(mobileControls).forEach(key => {
+        const element = mobileControls[key];
+        if (element) {
+            console.log(`${key}: 요소 존재 ✓`);
+            // 버튼이 클릭 가능한지 확인
+            console.log(`${key} 클릭 가능:`, element.offsetWidth > 0 && element.offsetHeight > 0);
+        } else {
+            console.log(`${key}: 요소 없음 ✗`);
+        }
+    });
+}
 
 // 화면에 모바일 컨트롤 상태 표시
 function showMobileControlStatus() {
@@ -186,6 +188,9 @@ function setupMobileControls() {
     
     // DOM 로드 후 컨트롤 요소 초기화
     initializeMobileControls();
+    
+    // 디버깅 정보 출력
+    debugMobileControls();
     
     // 방향키 터치 이벤트
     mobileControls.btnUp.addEventListener('touchstart', (e) => {
@@ -412,6 +417,7 @@ function setupMobileControls() {
     
     // 시작/재시작 버튼 터치 이벤트
     if (mobileControls.btnFire) {
+        console.log('btnFire 요소 발견, 이벤트 리스너 등록 중...');
         mobileControls.btnFire.addEventListener('touchstart', (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -503,6 +509,8 @@ function setupMobileControls() {
         }, { passive: false });
     } else {
         console.error('btnFire 요소를 찾을 수 없습니다!');
+        console.error('HTML에서 id="btn-fire"인 요소가 있는지 확인하세요.');
+        console.error('현재 mobileControls:', mobileControls);
     }
     
     if (mobileControls.btnSpecial) {
@@ -5160,7 +5168,10 @@ window.addEventListener('DOMContentLoaded', () => {
     // 3. DOM 로드 후 컨트롤 초기화
     initializeMobileControls();
     
-    // 4. 게임 초기화
+    // 4. 모바일 컨트롤 설정
+    setupMobileControls();
+    
+    // 5. 게임 초기화
     initializeGame();
     
     // 5. 모바일에서 전체화면 모드 활성화
