@@ -1630,18 +1630,27 @@ function restartGame() {
 
 // 적 생성 함수 수정
 function createEnemy() {
-    const currentDifficulty = difficultySettings[Math.min(gameLevel, 5)] || {
-        enemySpeed: 6 + (gameLevel - 5) * 0.5,
-        enemySpawnRate: 0.06 + (gameLevel - 5) * 0.01,
-        horizontalSpeedRange: 6 + (gameLevel - 5) * 0.5,
-        patternChance: 1.0,
-        maxEnemies: 20 + (gameLevel - 5) * 2,
-        bossHealth: 2000 + (gameLevel - 5) * 500,
-        bossSpawnInterval: 10000, // 10초로 고정
-        powerUpChance: 0.3,
-        bombDropChance: 0.3,
-        dynamiteDropChance: 0.25
-    };
+    // 현재 난이도 설정 가져오기 - 레벨이 계속 올라가도록 수정
+    let currentDifficulty;
+    if (gameLevel <= 5) {
+        currentDifficulty = difficultySettings[gameLevel];
+    } else {
+        // 레벨 6 이상에서는 점진적으로 난이도 증가
+        const baseLevel = 5;
+        const levelDiff = gameLevel - baseLevel;
+        currentDifficulty = {
+            enemySpeed: (6 + levelDiff * 0.5) * mobileSpeedMultiplier,
+            enemySpawnRate: Math.min(0.06 + levelDiff * 0.005, 0.15),
+            horizontalSpeedRange: (6 + levelDiff * 0.5) * mobileSpeedMultiplier,
+            patternChance: 1.0,
+            maxEnemies: Math.min(20 + levelDiff * 2, 50),
+            bossHealth: 2000 + levelDiff * 300,
+            bossSpawnInterval: Math.max(10000 - levelDiff * 200, 5000),
+            powerUpChance: Math.min(0.3 + levelDiff * 0.01, 0.5),
+            bombDropChance: Math.min(0.3 + levelDiff * 0.01, 0.5),
+            dynamiteDropChance: Math.min(0.25 + levelDiff * 0.01, 0.4)
+        };
+    }
     
     // 뱀 패턴 시작 확률 (난이도에 따라 증가)
     if (!isSnakePatternActive && Math.random() < currentDifficulty.patternChance * 0.5) {
@@ -2524,18 +2533,27 @@ function handlePlayerMovement() {
 // 적 처리 함수 수정
 function handleEnemies() {
     const currentTime = Date.now();
-    const currentDifficulty = difficultySettings[Math.min(gameLevel, 5)] || {
-        enemySpeed: 6 + (gameLevel - 5) * 0.5,
-        enemySpawnRate: 0.06 + (gameLevel - 5) * 0.01,
-        horizontalSpeedRange: 6 + (gameLevel - 5) * 0.5,
-        patternChance: 1.0,
-        maxEnemies: 20 + (gameLevel - 5) * 2,
-        bossHealth: 2000 + (gameLevel - 5) * 500,
-        bossSpawnInterval: 10000, // 10초로 고정
-        powerUpChance: 0.3,
-        bombDropChance: 0.3,
-        dynamiteDropChance: 0.25
-    };
+    // 현재 난이도 설정 가져오기 - 레벨이 계속 올라가도록 수정
+    let currentDifficulty;
+    if (gameLevel <= 5) {
+        currentDifficulty = difficultySettings[gameLevel];
+    } else {
+        // 레벨 6 이상에서는 점진적으로 난이도 증가
+        const baseLevel = 5;
+        const levelDiff = gameLevel - baseLevel;
+        currentDifficulty = {
+            enemySpeed: (6 + levelDiff * 0.5) * mobileSpeedMultiplier,
+            enemySpawnRate: Math.min(0.06 + levelDiff * 0.005, 0.15),
+            horizontalSpeedRange: (6 + levelDiff * 0.5) * mobileSpeedMultiplier,
+            patternChance: 1.0,
+            maxEnemies: Math.min(20 + levelDiff * 2, 50),
+            bossHealth: 2000 + levelDiff * 300,
+            bossSpawnInterval: Math.max(10000 - levelDiff * 200, 5000),
+            powerUpChance: Math.min(0.3 + levelDiff * 0.01, 0.5),
+            bombDropChance: Math.min(0.3 + levelDiff * 0.01, 0.5),
+            dynamiteDropChance: Math.min(0.25 + levelDiff * 0.01, 0.4)
+        };
+    }
 
     // 뱀 패턴 처리
     if (isSnakePatternActive) {
@@ -4191,19 +4209,27 @@ function checkLevelUp() {
         levelScore = 0;
         levelUpScore = 1000 * gameLevel; // 레벨이 올라갈수록 다음 레벨까지 필요한 점수 증가
         
-        // 현재 난이도 설정 가져오기
-        const currentDifficulty = difficultySettings[Math.min(gameLevel, 5)] || {
-            enemySpeed: 6 + (gameLevel - 5) * 0.5,
-            enemySpawnRate: 0.06 + (gameLevel - 5) * 0.01,
-            horizontalSpeedRange: 6 + (gameLevel - 5) * 0.5,
-            patternChance: 1.0,
-            maxEnemies: 20 + (gameLevel - 5) * 2,
-            bossHealth: 2000 + (gameLevel - 5) * 500,
-            bossSpawnInterval: 10000, // 10초로 고정
-            powerUpChance: 0.3,
-            bombDropChance: 0.3,
-            dynamiteDropChance: 0.25
-        };
+        // 현재 난이도 설정 가져오기 - 레벨이 계속 올라가도록 수정
+        let currentDifficulty;
+        if (gameLevel <= 5) {
+            currentDifficulty = difficultySettings[gameLevel];
+        } else {
+            // 레벨 6 이상에서는 점진적으로 난이도 증가
+            const baseLevel = 5;
+            const levelDiff = gameLevel - baseLevel;
+            currentDifficulty = {
+                enemySpeed: (6 + levelDiff * 0.5) * mobileSpeedMultiplier,
+                enemySpawnRate: Math.min(0.06 + levelDiff * 0.005, 0.15), // 최대 15%로 제한
+                horizontalSpeedRange: (6 + levelDiff * 0.5) * mobileSpeedMultiplier,
+                patternChance: 1.0,
+                maxEnemies: Math.min(20 + levelDiff * 2, 50), // 최대 50마리로 제한
+                bossHealth: 2000 + levelDiff * 300,
+                bossSpawnInterval: Math.max(10000 - levelDiff * 200, 5000), // 최소 5초로 제한
+                powerUpChance: Math.min(0.3 + levelDiff * 0.01, 0.5), // 최대 50%로 제한
+                bombDropChance: Math.min(0.3 + levelDiff * 0.01, 0.5),
+                dynamiteDropChance: Math.min(0.25 + levelDiff * 0.01, 0.4)
+            };
+        }
         
         // 보스 설정 업데이트
         BOSS_SETTINGS.HEALTH = currentDifficulty.bossHealth;
