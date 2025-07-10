@@ -195,6 +195,7 @@ function setupMobileControls() {
     // 방향키 터치 이벤트
     mobileControls.btnUp.addEventListener('touchstart', (e) => {
         e.preventDefault();
+        console.log('위쪽 버튼 터치');
         keys.ArrowUp = true;
     }, { passive: false });
     mobileControls.btnUp.addEventListener('touchend', (e) => {
@@ -270,6 +271,7 @@ function setupMobileControls() {
         // 게임이 시작된 상태에서 터치 시 전체화면 전환
         if (gameStarted && !isStartScreen) {
             console.log('게임 중 터치 - 전체화면 전환 및 총알 발사');
+            console.log('게임 상태:', { gameStarted, isStartScreen, isGameOver, isPaused });
         }
         
         const touch = e.touches[0];
@@ -431,6 +433,9 @@ function setupMobileControls() {
             // 시작 화면에서 버튼을 누르면 게임 시작
             if (isStartScreen) {
                 console.log('시작/재시작 버튼으로 게임 시작!');
+                console.log('모바일 환경:', isMobile);
+                console.log('현재 상태:', { isStartScreen, gameStarted, isGameOver });
+                
                 isStartScreen = false;
                 gameStarted = true;
                 
@@ -448,6 +453,7 @@ function setupMobileControls() {
                 }
                 
                 console.log('게임 시작 완료');
+                console.log('게임 상태 업데이트:', { isStartScreen, gameStarted, isGameOver });
                 
                 // 게임 루프 시작
                 startGameLoop();
@@ -2336,7 +2342,7 @@ function gameLoop() {
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    if (isStartScreen) {
+    if (isStartScreen && !gameStarted) {
         drawStartScreen();
         if (gameLoopRunning) {
             requestAnimationFrame(gameLoop);
@@ -3318,8 +3324,10 @@ window.addEventListener('load', async () => {
         
         // 시작 화면 초기화
         initStartScreen();
-        gameStarted = false;  // 게임 시작 상태 초기화
+        gameStarted = false;  // 게임 시작 상태 초기화 (버튼을 누를 때 true로 변경됨)
         isStartScreen = true;  // 시작 화면 상태 초기화
+        
+        console.log('초기 게임 상태:', { gameStarted, isStartScreen, isGameOver });
         
         // IndexedDB 초기화 및 최고 점수 로드
         await initDB();
@@ -4832,8 +4840,10 @@ async function initializeGame() {
         
         // 시작 화면 초기화
         initStartScreen();
-        gameStarted = false;  // 게임 시작 상태 초기화
+        gameStarted = false;  // 게임 시작 상태 초기화 (버튼을 누를 때 true로 변경됨)
         isStartScreen = true;  // 시작 화면 상태 초기화
+        
+        console.log('초기 게임 상태:', { gameStarted, isStartScreen, isGameOver });
         
         // === 모든 게임 요소 완전 초기화 ===
         
