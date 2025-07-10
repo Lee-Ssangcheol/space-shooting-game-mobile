@@ -234,8 +234,8 @@ function setupMobileControls() {
             enableFullscreen();
         }
         
-        // 시작 화면에서 터치 시 게임 시작
-        if (isStartScreen) {
+        // 시작 화면에서 터치 시 게임 시작 (버튼을 누르지 않은 경우)
+        if (isStartScreen && !gameStarted) {
             console.log('시작 화면에서 터치 - 게임 시작!');
             isStartScreen = false;
             gameStarted = true;
@@ -261,6 +261,11 @@ function setupMobileControls() {
         }
         
         console.log('모바일 터치 시작');
+        
+        // 게임이 시작된 상태에서 터치 시 전체화면 전환
+        if (gameStarted && !isStartScreen) {
+            console.log('게임 중 터치 - 전체화면 전환 및 총알 발사');
+        }
         
         const touch = e.touches[0];
         if (!canvas) return;
@@ -348,8 +353,8 @@ function setupMobileControls() {
             enableFullscreen();
         }
         
-        // 시작 화면에서 터치 이동 시 게임 시작
-        if (isStartScreen) {
+        // 시작 화면에서 터치 이동 시 게임 시작 (버튼을 누르지 않은 경우)
+        if (isStartScreen && !gameStarted) {
             console.log('시작 화면에서 터치 이동 - 게임 시작!');
             isStartScreen = false;
             gameStarted = true;
@@ -417,11 +422,29 @@ function setupMobileControls() {
                 enableFullscreen();
             }
             
-            // 시작 화면에서 버튼을 누르면 게임 시작 준비
+            // 시작 화면에서 버튼을 누르면 게임 시작
             if (isStartScreen) {
+                console.log('시작/재시작 버튼으로 게임 시작!');
+                isStartScreen = false;
+                gameStarted = true;
+                
                 // 오디오 초기화
                 initAudio();
-                console.log('게임 시작 준비 완료');
+                
+                // 플레이어 위치 초기화
+                if (canvas) {
+                    player.x = canvas.width / 2;
+                    player.y = canvas.height - 50;
+                    if (hasSecondPlane) {
+                        secondPlane.x = canvas.width / 2 - 60;
+                        secondPlane.y = canvas.height - 50;
+                    }
+                }
+                
+                console.log('게임 시작 완료');
+                
+                // 게임 루프 시작
+                startGameLoop();
             }
             
             // 게임 오버 상태에서 재시작
@@ -443,9 +466,27 @@ function setupMobileControls() {
             }
             
             if (isStartScreen) {
+                console.log('시작/재시작 버튼 클릭으로 게임 시작!');
+                isStartScreen = false;
+                gameStarted = true;
+                
                 // 오디오 초기화
                 initAudio();
-                console.log('게임 시작 준비 완료');
+                
+                // 플레이어 위치 초기화
+                if (canvas) {
+                    player.x = canvas.width / 2;
+                    player.y = canvas.height - 50;
+                    if (hasSecondPlane) {
+                        secondPlane.x = canvas.width / 2 - 60;
+                        secondPlane.y = canvas.height - 50;
+                    }
+                }
+                
+                console.log('게임 시작 완료');
+                
+                // 게임 루프 시작
+                startGameLoop();
             }
             
             // 게임 오버 상태에서 재시작
