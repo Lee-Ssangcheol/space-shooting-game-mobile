@@ -17,9 +17,12 @@ function enableFullscreen() {
     if (isMobile) {
         // iOS Safari 전체화면 모드
         if (document.documentElement.requestFullscreen) {
-            document.documentElement.requestFullscreen().catch(err => {
-                console.log('전체화면 모드 실패:', err);
-            });
+            const fullscreenPromise = document.documentElement.requestFullscreen();
+            if (fullscreenPromise && fullscreenPromise.catch) {
+                fullscreenPromise.catch(err => {
+                    console.log('전체화면 모드 실패:', err);
+                });
+            }
         }
         
         // iOS Safari에서 주소창 숨김
@@ -33,16 +36,22 @@ function enableFullscreen() {
         
         // Android Chrome 전체화면 모드
         if (document.documentElement.webkitRequestFullscreen) {
-            document.documentElement.webkitRequestFullscreen().catch(err => {
-                console.log('webkit 전체화면 모드 실패:', err);
-            });
+            const webkitPromise = document.documentElement.webkitRequestFullscreen();
+            if (webkitPromise && webkitPromise.catch) {
+                webkitPromise.catch(err => {
+                    console.log('webkit 전체화면 모드 실패:', err);
+                });
+            }
         }
         
         // 화면 방향 고정 (세로 모드)
         if (screen.orientation && screen.orientation.lock) {
-            screen.orientation.lock('portrait').catch(err => {
-                console.log('화면 방향 고정 실패:', err);
-            });
+            const lockPromise = screen.orientation.lock('portrait');
+            if (lockPromise && lockPromise.catch) {
+                lockPromise.catch(err => {
+                    console.log('화면 방향 고정 실패:', err);
+                });
+            }
         }
         
         console.log('모바일 전체화면 모드 활성화 시도');
@@ -1475,10 +1484,9 @@ async function initializeGame() {
             isSnakePatternActive: isSnakePatternActive
         });
         
-        // 게임 루프 시작
-        //startGameLoop();
-        //console.log('게임 루프 시작됨');
-        console.log('게임 초기화 완료 - 버튼을 누르면 게임이 시작됩니다');
+        // 시작 화면을 그리기 위한 루프 시작
+        startGameLoop();
+        console.log('게임 초기화 완료 - 시작 화면 루프 시작됨');
         
         // 자동 시작 제거 - 사용자가 직접 시작하도록 함
 
@@ -4948,10 +4956,10 @@ async function initializeGame() {
             isSnakePatternActive: isSnakePatternActive
         });
         
-        // 게임 루프 시작
-        //startGameLoop();
-        //console.log('게임 루프 시작됨');
-        console.log('게임 초기화 완료 - 버튼을 누르면 게임이 시작됩니다');        
+        // 시작 화면을 그리기 위한 루프 시작
+        startGameLoop();
+        console.log('게임 초기화 완료 - 시작 화면 루프 시작됨');
+        
         // 자동 시작 제거 - 사용자가 직접 시작하도록 함
 
     } catch (error) {
