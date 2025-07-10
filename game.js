@@ -90,20 +90,39 @@ window.addEventListener('resize', resizeCanvas);
 // 초기 캔버스 크기 설정
 resizeCanvas();
 
-// 모바일 터치 컨트롤 요소들
-const mobileControls = {
-    btnUp: document.getElementById('btn-up'),
-    btnDown: document.getElementById('btn-down'),
-    btnLeft: document.getElementById('btn-left'),
-    btnRight: document.getElementById('btn-right'),
-    btnFire: document.getElementById('btn-fire'),
-    btnSpecial: document.getElementById('btn-special'),
-    btnPause: document.getElementById('btn-pause'),
-    btnReset: document.getElementById('btn-reset')
-};
+// 모바일 터치 컨트롤 요소들 (DOM 로드 후 초기화)
+let mobileControls = {};
 
-// 모바일 컨트롤 요소 확인
+// DOM 로드 후 컨트롤 요소 초기화
+function initializeMobileControls() {
+    mobileControls = {
+        btnUp: document.getElementById('btn-up'),
+        btnDown: document.getElementById('btn-down'),
+        btnLeft: document.getElementById('btn-left'),
+        btnRight: document.getElementById('btn-right'),
+        btnFire: document.getElementById('btn-fire'),
+        btnSpecial: document.getElementById('btn-special'),
+        btnPause: document.getElementById('btn-pause'),
+        btnReset: document.getElementById('btn-reset')
+    };
+    
+    console.log('모바일 컨트롤 요소들 초기화됨:', mobileControls);
+}
+
+// 모바일 컨트롤 요소 확인 및 디버깅
 console.log('모바일 컨트롤 요소들:', mobileControls);
+
+// 각 버튼 요소의 존재 여부 확인
+Object.keys(mobileControls).forEach(key => {
+    const element = mobileControls[key];
+    if (element) {
+        console.log(`${key}: 요소 존재 ✓`);
+        // 버튼이 클릭 가능한지 확인
+        console.log(`${key} 클릭 가능:`, element.offsetWidth > 0 && element.offsetHeight > 0);
+    } else {
+        console.log(`${key}: 요소 없음 ✗`);
+    }
+});
 
 // 화면에 모바일 컨트롤 상태 표시
 function showMobileControlStatus() {
@@ -139,6 +158,9 @@ function setupMobileControls() {
         console.log('데스크탑 환경이므로 모바일 컨트롤 설정 건너뜀');
         return;
     }
+    
+    // DOM 로드 후 컨트롤 요소 초기화
+    initializeMobileControls();
     
     // 방향키 터치 이벤트
     mobileControls.btnUp.addEventListener('touchstart', (e) => {
@@ -314,139 +336,160 @@ function setupMobileControls() {
     }, { passive: false });
     
     // 시작/재시작 버튼 터치 이벤트
-    mobileControls.btnFire.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('시작/재시작 버튼 터치');
+    if (mobileControls.btnFire) {
+        mobileControls.btnFire.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('시작/재시작 버튼 터치');
+            
+            // 모바일에서 버튼 터치 시 전체화면 시도
+            if (isMobile) {
+                enableFullscreen();
+            }
+            
+            // 시작 화면에서 버튼을 누르면 게임 시작
+            if (isStartScreen) {
+                // 오디오 초기화
+                initAudio();
+                isStartScreen = false;
+                gameStarted = true;
+                console.log('모바일 버튼으로 게임 시작:', { isStartScreen, gameStarted });
+            }
+            
+            // 게임 오버 상태에서 재시작
+            if (isGameOver) {
+                restartGame();
+                return;
+            }
+        }, { passive: false });
         
-        // 모바일에서 버튼 터치 시 전체화면 시도
-        if (isMobile) {
-            enableFullscreen();
-        }
+        // 시작/재시작 버튼 클릭 이벤트 (전체화면 모드 대응)
+        mobileControls.btnFire.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('시작/재시작 버튼 클릭');
+            
+            // 모바일에서 버튼 클릭 시 전체화면 시도
+            if (isMobile) {
+                enableFullscreen();
+            }
+            
+            if (isStartScreen) {
+                // 오디오 초기화
+                initAudio();
+                isStartScreen = false;
+                gameStarted = true;
+                console.log('모바일 클릭으로 게임 시작:', { isStartScreen, gameStarted });
+            }
+            
+            // 게임 오버 상태에서 재시작
+            if (isGameOver) {
+                restartGame();
+                return;
+            }
+        });
         
-        // 시작 화면에서 버튼을 누르면 게임 시작
-        if (isStartScreen) {
-            // 오디오 초기화
-            initAudio();
-            isStartScreen = false;
-            gameStarted = true;
-            console.log('모바일 버튼으로 게임 시작:', { isStartScreen, gameStarted });
-        }
-        
-        // 게임 오버 상태에서 재시작
-        if (isGameOver) {
-            restartGame();
-            return;
-        }
-    }, { passive: false });
+        mobileControls.btnFire.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('시작/재시작 버튼 터치 종료');
+        }, { passive: false });
+    } else {
+        console.error('btnFire 요소를 찾을 수 없습니다!');
+    }
     
-    mobileControls.btnFire.addEventListener('touchend', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('시작/재시작 버튼 터치 종료');
-    }, { passive: false });
+    if (mobileControls.btnSpecial) {
+        mobileControls.btnSpecial.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            
+            // 모바일에서 버튼 터치 시 전체화면 시도
+            if (isMobile) {
+                enableFullscreen();
+            }
+            
+            keys.KeyB = true;
+        }, { passive: false });
+        mobileControls.btnSpecial.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            keys.KeyB = false;
+        }, { passive: false });
+    } else {
+        console.error('btnSpecial 요소를 찾을 수 없습니다!');
+    }
     
-    // 클릭 이벤트도 추가 (데스크탑용)
-    mobileControls.btnFire.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('시작/재시작 버튼 클릭');
-        
-        if (isStartScreen) {
-            // 오디오 초기화
-            initAudio();
-            isStartScreen = false;
-            gameStarted = true;
-            console.log('모바일 클릭으로 게임 시작:', { isStartScreen, gameStarted });
-        }
-        
-        // 게임 오버 상태에서 재시작
-        if (isGameOver) {
-            restartGame();
-            return;
-        }
-    });
+    if (mobileControls.btnPause) {
+        mobileControls.btnPause.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('일시정지 버튼 터치');
+            
+            // 모바일에서 버튼 터치 시 전체화면 시도
+            if (isMobile) {
+                enableFullscreen();
+            }
+            
+            if (!isGameOver) {
+                isPaused = !isPaused;
+                console.log('일시정지 상태:', isPaused);
+            }
+        }, { passive: false });
+    } else {
+        console.error('btnPause 요소를 찾을 수 없습니다!');
+    }
     
-    mobileControls.btnSpecial.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        
-        // 모바일에서 버튼 터치 시 전체화면 시도
-        if (isMobile) {
-            enableFullscreen();
-        }
-        
-        keys.KeyB = true;
-    }, { passive: false });
-    mobileControls.btnSpecial.addEventListener('touchend', (e) => {
-        e.preventDefault();
-        keys.KeyB = false;
-    }, { passive: false });
-    
-    mobileControls.btnPause.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('일시정지 버튼 터치');
-        
-        // 모바일에서 버튼 터치 시 전체화면 시도
-        if (isMobile) {
-            enableFullscreen();
-        }
-        
-        if (!isGameOver) {
-            isPaused = !isPaused;
-            console.log('일시정지 상태:', isPaused);
-        }
-    }, { passive: false });
-    
-    mobileControls.btnReset.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('최고점수 리셋 버튼 터치');
-        
-        // 모바일에서 버튼 터치 시 전체화면 시도
-        if (isMobile) {
-            enableFullscreen();
-        }
-        
-        // 최고 점수 리셋 확인
-        if (confirm('최고 점수를 리셋하시겠습니까?')) {
-            ScoreManager.reset().then(() => {
-                console.log('ScoreManager를 통한 최고 점수 리셋 완료');
-            }).catch(error => {
-                console.error('ScoreManager 리셋 실패:', error);
-                // 백업 리셋 방법 - 모든 저장소 완전 클리어
-                try {
-                    highScore = 0;
-                    score = 0;
-                    levelScore = 0;
-                    scoreForSpread = 0;
-                    gameLevel = 1;
-                    
-                    // localStorage 완전 클리어
-                    localStorage.removeItem('highScore');
-                    localStorage.removeItem('highScore_backup');
-                    localStorage.removeItem('highScore_timestamp');
-                    localStorage.removeItem('gameScore');
-                    localStorage.removeItem('gameScore_backup');
-                    // 리셋 완료 표시
-                    localStorage.setItem('scoreResetComplete', 'true');
-                    localStorage.setItem('resetTimestamp', Date.now().toString());
-                    
-                    // sessionStorage 완전 클리어
-                    sessionStorage.removeItem('highScore');
-                    sessionStorage.removeItem('gameScore');
-                    sessionStorage.clear();
-                    // 리셋 완료 표시
-                    sessionStorage.setItem('scoreResetComplete', 'true');
-                    sessionStorage.setItem('resetTimestamp', Date.now().toString());
-                    
-                    console.log('백업 방법으로 모든 저장소 완전 리셋 완료');
-                } catch (e) {
-                    console.error('백업 리셋도 실패:', e);
-                }
-            });
-        }
-    }, { passive: false });
+    if (mobileControls.btnReset) {
+        mobileControls.btnReset.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('최고점수 리셋 버튼 터치');
+            
+            // 모바일에서 버튼 터치 시 전체화면 시도
+            if (isMobile) {
+                enableFullscreen();
+            }
+            
+            // 최고 점수 리셋 확인
+            if (confirm('최고 점수를 리셋하시겠습니까?')) {
+                ScoreManager.reset().then(() => {
+                    console.log('ScoreManager를 통한 최고 점수 리셋 완료');
+                }).catch(error => {
+                    console.error('ScoreManager 리셋 실패:', error);
+                    // 백업 리셋 방법 - 모든 저장소 완전 클리어
+                    try {
+                        highScore = 0;
+                        score = 0;
+                        levelScore = 0;
+                        scoreForSpread = 0;
+                        gameLevel = 1;
+                        
+                        // localStorage 완전 클리어
+                        localStorage.removeItem('highScore');
+                        localStorage.removeItem('highScore_backup');
+                        localStorage.removeItem('highScore_timestamp');
+                        localStorage.removeItem('gameScore');
+                        localStorage.removeItem('gameScore_backup');
+                        // 리셋 완료 표시
+                        localStorage.setItem('scoreResetComplete', 'true');
+                        localStorage.setItem('resetTimestamp', Date.now().toString());
+                        
+                        // sessionStorage 완전 클리어
+                        sessionStorage.removeItem('highScore');
+                        sessionStorage.removeItem('gameScore');
+                        sessionStorage.clear();
+                        // 리셋 완료 표시
+                        sessionStorage.setItem('scoreResetComplete', 'true');
+                        sessionStorage.setItem('resetTimestamp', Date.now().toString());
+                        
+                        console.log('백업 방법으로 모든 저장소 완전 리셋 완료');
+                    } catch (e) {
+                        console.error('백업 리셋도 실패:', e);
+                    }
+                });
+            }
+        }, { passive: false });
+    } else {
+        console.error('btnReset 요소를 찾을 수 없습니다!');
+    }
     
     // 클릭 이벤트도 추가 (데스크탑용)
     mobileControls.btnReset.addEventListener('click', (e) => {
@@ -495,6 +538,22 @@ function setupMobileControls() {
     });
     
     console.log('모바일 컨트롤 설정 완료');
+    
+    // 버튼 클릭 테스트를 위한 추가 이벤트 리스너
+    if (mobileControls.btnFire) {
+        // 버튼에 직접 스타일 추가로 클릭 가능한지 확인
+        mobileControls.btnFire.style.pointerEvents = 'auto';
+        mobileControls.btnFire.style.cursor = 'pointer';
+        
+        // 추가 디버깅을 위한 이벤트
+        mobileControls.btnFire.addEventListener('mousedown', (e) => {
+            console.log('btnFire mousedown 이벤트 발생');
+        });
+        
+        mobileControls.btnFire.addEventListener('pointerdown', (e) => {
+            console.log('btnFire pointerdown 이벤트 발생');
+        });
+    }
 }
 
 // 오디오 요소 생성 (안전하게)
@@ -4967,6 +5026,9 @@ console.log('게임 파일 로드됨 - 버전:', Date.now());
 
 // 페이지 로드 시 모바일 전체화면 모드 활성화
 window.addEventListener('DOMContentLoaded', () => {
+    // DOM 로드 후 컨트롤 초기화
+    initializeMobileControls();
+    
     // 모바일에서 전체화면 모드 활성화
     if (isMobile) {
         // 페이지 로드 후 약간의 지연을 두고 전체화면 모드 활성화
