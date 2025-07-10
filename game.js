@@ -58,12 +58,40 @@ function enableFullscreen() {
 let mobileFireStartTime = 0;
 let isMobileFirePressed = false;
 let mobileContinuousFireInterval = null;
-// 캔버스 설정
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
+
+// 캔버스 설정 (DOM 로드 후 초기화)
+let canvas, ctx;
+
+// DOM 로드 후 캔버스 초기화
+function initializeCanvas() {
+    canvas = document.getElementById('gameCanvas');
+    if (!canvas) {
+        console.error('gameCanvas 요소를 찾을 수 없습니다!');
+        return false;
+    }
+    ctx = canvas.getContext('2d');
+    if (!ctx) {
+        console.error('2D 컨텍스트를 가져올 수 없습니다!');
+        return false;
+    }
+    
+    // 플레이어 위치 초기화
+    player.x = canvas.width / 2;
+    player.y = canvas.height - 50;
+    secondPlane.x = canvas.width / 2 - 60;
+    secondPlane.y = canvas.height - 50;
+    
+    console.log('캔버스 초기화 완료 - 플레이어 위치 설정됨');
+    return true;
+}
 
 // 캔버스 크기 설정
 function resizeCanvas() {
+    if (!canvas) {
+        console.error('캔버스가 초기화되지 않았습니다!');
+        return;
+    }
+    
     const container = document.getElementById('canvas-container');
     if (container) {
         // 컨테이너 스타일 조정
@@ -86,9 +114,6 @@ function resizeCanvas() {
 
 // 창 크기 변경 시 캔버스 크기 조정
 window.addEventListener('resize', resizeCanvas);
-
-// 초기 캔버스 크기 설정
-resizeCanvas();
 
 // 모바일 터치 컨트롤 요소들 (DOM 로드 후 초기화)
 let mobileControls = {};
@@ -216,11 +241,13 @@ function setupMobileControls() {
             gameStarted = true;
             
             // 플레이어 위치 초기화
-            player.x = canvas.width / 2;
-            player.y = canvas.height - 50;
-            if (hasSecondPlane) {
-                secondPlane.x = canvas.width / 2 - 60;
-                secondPlane.y = canvas.height - 50;
+            if (canvas) {
+                player.x = canvas.width / 2;
+                player.y = canvas.height - 50;
+                if (hasSecondPlane) {
+                    secondPlane.x = canvas.width / 2 - 60;
+                    secondPlane.y = canvas.height - 50;
+                }
             }
             
             return;
@@ -236,6 +263,7 @@ function setupMobileControls() {
         console.log('모바일 터치 시작');
         
         const touch = e.touches[0];
+        if (!canvas) return;
         const rect = canvas.getBoundingClientRect();
         
         // 캔버스 좌표계로 변환 (CSS 크기와 실제 캔버스 크기의 비율 고려)
@@ -262,6 +290,7 @@ function setupMobileControls() {
 
         
         // 플레이어 위치 업데이트 - 터치점이 플레이어 꼬리 끝에 정확히 오도록 조정
+        if (!canvas) return;
         const tailLength = player.height;
         player.x = Math.max(0, Math.min(canvas.width - player.width, x - player.width / 2));
         player.y = Math.max(0, Math.min(canvas.height - player.height, y - player.height - tailLength));
@@ -326,11 +355,13 @@ function setupMobileControls() {
             gameStarted = true;
             
             // 플레이어 위치 초기화
-            player.x = canvas.width / 2;
-            player.y = canvas.height - 50;
-            if (hasSecondPlane) {
-                secondPlane.x = canvas.width / 2 - 60;
-                secondPlane.y = canvas.height - 50;
+            if (canvas) {
+                player.x = canvas.width / 2;
+                player.y = canvas.height - 50;
+                if (hasSecondPlane) {
+                    secondPlane.x = canvas.width / 2 - 60;
+                    secondPlane.y = canvas.height - 50;
+                }
             }
             
             return;
@@ -344,6 +375,7 @@ function setupMobileControls() {
         }
         
         const touch = e.touches[0];
+        if (!canvas) return;
         const rect = canvas.getBoundingClientRect();
         
         // 캔버스 좌표계로 변환 (CSS 크기와 실제 캔버스 크기의 비율 고려)
@@ -353,6 +385,7 @@ function setupMobileControls() {
         const y = (touch.clientY - rect.top) * scaleY;
         
         // 플레이어 위치 업데이트 - 터치점이 플레이어 꼬리 끝에 정확히 오도록 조정
+        if (!canvas) return;
         const tailLength = player.height;
         player.x = Math.max(0, Math.min(canvas.width - player.width, x - player.width / 2));
         player.y = Math.max(0, Math.min(canvas.height - player.height, y - player.height - tailLength));
@@ -627,19 +660,19 @@ function initAudio() {
 let lastCollisionTime = 0;
 const collisionSoundCooldown = 300;  // 충돌음 쿨다운 시간 증가
 
-// 플레이어 우주선
-const player = {
-    x: canvas.width / 2,
-    y: canvas.height - 50,
+// 플레이어 우주선 (초기화 함수에서 설정)
+let player = {
+    x: 0,
+    y: 0,
     width: 40,
     height: 40,
     speed: 8 * mobileSpeedMultiplier
 };
 
-// 두 번째 비행기
-const secondPlane = {
-    x: canvas.width / 2 - 60,
-    y: canvas.height - 50,
+// 두 번째 비행기 (초기화 함수에서 설정)
+let secondPlane = {
+    x: 0,
+    y: 0,
     width: 40,
     height: 40,
     speed: 8 * mobileSpeedMultiplier
@@ -684,6 +717,9 @@ let bossDestroyed = false;  // 보스 파괴 상태
 let bossPattern = 0;
 let specialWeaponCharged = false;
 let specialWeaponCharge = 0;
+
+// 게임 활성화 상태 변수
+let isGameActive = true;
 
 
 
@@ -1323,10 +1359,12 @@ async function initializeGame() {
 
         
         // 6. 플레이어 초기 위치 설정
-        player.x = canvas.width / 2;
-        player.y = canvas.height - 50;
-        secondPlane.x = canvas.width / 2 - 60;
-        secondPlane.y = canvas.height - 50;
+        if (canvas) {
+            player.x = canvas.width / 2;
+            player.y = canvas.height - 50;
+            secondPlane.x = canvas.width / 2 - 60;
+            secondPlane.y = canvas.height - 50;
+        }
         
         // 7. 게임 타이머 초기화
         lastEnemySpawnTime = 0;
@@ -4335,11 +4373,16 @@ let isStartScreen = true;  // 시작 화면 상태
 let gameStarted = false;  // 게임 시작 상태
 let startScreenAnimation = 0;  // 시작 화면 애니메이션 변수
 let titleY = -100;  // 제목 Y 위치
-let subtitleY = canvas.height + 100;  // 부제목 Y 위치
+let subtitleY = 800;  // 부제목 Y 위치 (임시값)
 let stars = [];  // 배경 별들
 
 // 시작 화면 초기화 함수
 function initStartScreen() {
+    if (!canvas) return;
+    
+    // 부제목 위치 초기화
+    subtitleY = canvas.height + 100;
+    
     // 배경 별들 생성
     stars = [];
     for (let i = 0; i < 100; i++) {
@@ -4355,6 +4398,8 @@ function initStartScreen() {
 
 // 시작 화면 그리기 함수
 function drawStartScreen() {
+    if (!canvas || !ctx) return;
+    
     // 배경 그라데이션
     const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
     gradient.addColorStop(0, '#000033');
@@ -4620,8 +4665,7 @@ function playExplosionSound(isSnakePattern = false) {
     lastExplosionTime = currentTime;
 }
 
-// 게임 상태 변수 추가
-let isGameActive = true;
+// 사운드 컨트롤 상태 변수
 let isSoundControlActive = false;
 
 // 키보드 입력 처리 함수
@@ -4783,10 +4827,12 @@ async function initializeGame() {
         lastBossSpawnTime = Date.now();
         
         // 6. 플레이어 초기 위치 설정
-        player.x = canvas.width / 2;
-        player.y = canvas.height - 50;
-        secondPlane.x = canvas.width / 2 - 60;
-        secondPlane.y = canvas.height - 50;
+        if (canvas) {
+            player.x = canvas.width / 2;
+            player.y = canvas.height - 50;
+            secondPlane.x = canvas.width / 2 - 60;
+            secondPlane.y = canvas.height - 50;
+        }
         
         // 7. 게임 타이머 초기화
         lastEnemySpawnTime = 0;
@@ -5057,12 +5103,26 @@ let levelBossPatterns = {
 // game.js 파일 맨 위에 추가 (임시)
 console.log('게임 파일 로드됨 - 버전:', Date.now());
 
-// 페이지 로드 시 모바일 전체화면 모드 활성화
+// 페이지 로드 시 초기화
 window.addEventListener('DOMContentLoaded', () => {
-    // DOM 로드 후 컨트롤 초기화
+    console.log('DOM 로드 완료 - 게임 초기화 시작');
+    
+    // 1. 캔버스 초기화
+    if (!initializeCanvas()) {
+        console.error('캔버스 초기화 실패!');
+        return;
+    }
+    
+    // 2. 캔버스 크기 설정
+    resizeCanvas();
+    
+    // 3. DOM 로드 후 컨트롤 초기화
     initializeMobileControls();
     
-    // 모바일에서 전체화면 모드 활성화
+    // 4. 게임 초기화
+    initializeGame();
+    
+    // 5. 모바일에서 전체화면 모드 활성화
     if (isMobile) {
         // 페이지 로드 후 약간의 지연을 두고 전체화면 모드 활성화
         setTimeout(() => {
@@ -5078,4 +5138,6 @@ window.addEventListener('DOMContentLoaded', () => {
             enableFullscreen();
         }, { once: true });
     }
+    
+    console.log('게임 초기화 완료');
 });
