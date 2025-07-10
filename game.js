@@ -310,11 +310,13 @@ function setupMobileControls() {
         
 
         
-        // 플레이어 위치 업데이트 - 터치점이 플레이어 꼬리 끝에 정확히 오도록 조정
+        // 플레이어 위치 업데이트 - 터치점과 플레이어 사이 거리를 Y축 기준으로 반으로 줄임
         if (!canvas) return;
         const tailLength = player.height;
         player.x = Math.max(0, Math.min(canvas.width - player.width, x - player.width / 2));
-        player.y = Math.max(0, Math.min(canvas.height - player.height, y - player.height - tailLength));
+        // Y축 거리를 반으로 줄임: (y - player.height - tailLength) / 2
+        const targetY = (y - player.height - tailLength) / 2 + player.y / 2;
+        player.y = Math.max(0, Math.min(canvas.height - player.height, targetY));
         
         // 디버깅 정보를 화면에 표시하기 위한 전역 변수
         window.debugInfo = {
@@ -405,11 +407,13 @@ function setupMobileControls() {
         const x = (touch.clientX - rect.left) * scaleX;
         const y = (touch.clientY - rect.top) * scaleY;
         
-        // 플레이어 위치 업데이트 - 터치점이 플레이어 꼬리 끝에 정확히 오도록 조정
+        // 플레이어 위치 업데이트 - 터치점과 플레이어 사이 거리를 Y축 기준으로 반으로 줄임
         if (!canvas) return;
         const tailLength = player.height;
         player.x = Math.max(0, Math.min(canvas.width - player.width, x - player.width / 2));
-        player.y = Math.max(0, Math.min(canvas.height - player.height, y - player.height - tailLength));
+        // Y축 거리를 반으로 줄임: (y - player.height - tailLength) / 2
+        const targetY = (y - player.height - tailLength) / 2 + player.y / 2;
+        player.y = Math.max(0, Math.min(canvas.height - player.height, targetY));
         
         // 두 번째 비행기가 있으면 함께 이동
         if (hasSecondPlane) {
