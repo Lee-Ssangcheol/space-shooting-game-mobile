@@ -9,7 +9,7 @@ const TOP_EFFECT_ZONE = 20;  // 상단 효과 무시 영역 (픽셀)
 // 모바일 디바이스 감지 (종이비행기용과 동일하게)
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-// 모바일 속도 조절 (80% 속도)
+// 모바일 속도 조절 (60% 속도)
 const mobileSpeedMultiplier = isMobile ? 0.6 : 1.0;
 
 // 모바일 전체화면 모드 활성화
