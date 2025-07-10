@@ -473,10 +473,10 @@ function setupMobileControls() {
             }
             
             // 게임 오버 상태에서 재시작
-            if (isGameOver) {
-                restartGame();
-                return;
-            }
+            // if (isGameOver) {
+            //     restartGame();
+            //     return;
+            // }
         }, { passive: false });
         
         // 시작/재시작 버튼 클릭 이벤트 (전체화면 모드 대응)
@@ -515,10 +515,10 @@ function setupMobileControls() {
             }
             
             // 게임 오버 상태에서 재시작
-            if (isGameOver) {
-                restartGame();
-                return;
-            }
+            // if (isGameOver) {
+            //     restartGame();
+            //     return;
+            // }
         });
         
         mobileControls.btnFire.addEventListener('touchend', (e) => {
