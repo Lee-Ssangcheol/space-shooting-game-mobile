@@ -1544,13 +1544,11 @@ function restartGame() {
     lastEnemySpawnTime = 0;
     lastBossSpawnTime = Date.now();
     
-    // 5. 점수 및 레벨 초기화
+    // 5. 점수 및 레벨 초기화 (게임 오버 후 재시작이므로 레벨도 리셋)
     score = 0;
     levelScore = 0;
     scoreForSpread = 0;
-    if (isGameOver) {
-        gameLevel = 1; // 게임 오버 후 재시작일 때만 레벨 1로 리셋
-    }
+    gameLevel = 1; // 게임 오버 후 재시작이므로 레벨 1로 리셋
     levelUpScore = 1000;
     
     // 6. 특수무기 관련 상태 초기화
@@ -5066,13 +5064,11 @@ function restartGame() {
     lastEnemySpawnTime = 0;
     lastBossSpawnTime = Date.now();
     
-    // 5. 점수 및 레벨 초기화
+    // 5. 점수 및 레벨 초기화 (게임 오버 후 재시작이므로 레벨도 리셋)
     score = 0;
     levelScore = 0;
     scoreForSpread = 0;
-    if (isGameOver) {
-        gameLevel = 1; // 게임 오버 후 재시작일 때만 레벨 1로 리셋
-    }
+    gameLevel = 1; // 게임 오버 후 재시작이므로 레벨 1로 리셋
     levelUpScore = 1000;
     
     // 6. 특수무기 관련 상태 초기화
