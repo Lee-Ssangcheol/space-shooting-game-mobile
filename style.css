@@ -126,7 +126,7 @@ body {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
-/* 특수무기키를 맨 앞으로 배치 */
+/* 버튼 순서 배치 */
 #btn-special {
   order: 1;
 }

@@ -17,12 +17,9 @@ function enableFullscreen() {
     if (isMobile) {
         // iOS Safari 전체화면 모드
         if (document.documentElement.requestFullscreen) {
-            const fullscreenPromise = document.documentElement.requestFullscreen();
-            if (fullscreenPromise && typeof fullscreenPromise.catch === 'function') {
-                fullscreenPromise.catch(err => {
-                    console.log('전체화면 모드 실패:', err);
-                });
-            }
+            document.documentElement.requestFullscreen().catch(err => {
+                console.log('전체화면 모드 실패:', err);
+            });
         }
         
         // iOS Safari에서 주소창 숨김
@@ -36,27 +33,23 @@ function enableFullscreen() {
         
         // Android Chrome 전체화면 모드
         if (document.documentElement.webkitRequestFullscreen) {
-            const webkitPromise = document.documentElement.webkitRequestFullscreen();
-            if (webkitPromise && typeof webkitPromise.catch === 'function') {
-                webkitPromise.catch(err => {
-                    console.log('webkit 전체화면 모드 실패:', err);
-                });
-            }
+            document.documentElement.webkitRequestFullscreen().catch(err => {
+                console.log('webkit 전체화면 모드 실패:', err);
+            });
         }
         
         // 화면 방향 고정 (세로 모드)
         if (screen.orientation && screen.orientation.lock) {
-            const orientationPromise = screen.orientation.lock('portrait');
-            if (orientationPromise && typeof orientationPromise.catch === 'function') {
-                orientationPromise.catch(err => {
-                    console.log('화면 방향 고정 실패:', err);
-                });
-            }
+            screen.orientation.lock('portrait').catch(err => {
+                console.log('화면 방향 고정 실패:', err);
+            });
         }
         
         console.log('모바일 전체화면 모드 활성화 시도');
     }
 }
+
+
 
 // 터치 드래그 관련 변수
 
@@ -189,6 +182,11 @@ function setupMobileControls() {
         e.preventDefault();
         e.stopPropagation();
         
+        // 모바일에서 터치 시 전체화면 시도
+        if (isMobile) {
+            enableFullscreen();
+        }
+        
         // 시작 화면에서는 터치 이벤트 무시
         if (isStartScreen) {
             console.log('시작 화면에서 터치 무시');
@@ -276,6 +274,11 @@ function setupMobileControls() {
     canvas.addEventListener('touchmove', (e) => {
         e.preventDefault();
         
+        // 모바일에서 터치 이동 시에도 전체화면 시도
+        if (isMobile) {
+            enableFullscreen();
+        }
+        
         // 시작 화면에서는 터치 이벤트 무시
         if (isStartScreen) {
             return;
@@ -315,6 +318,11 @@ function setupMobileControls() {
         e.preventDefault();
         e.stopPropagation();
         console.log('시작/재시작 버튼 터치');
+        
+        // 모바일에서 버튼 터치 시 전체화면 시도
+        if (isMobile) {
+            enableFullscreen();
+        }
         
         // 시작 화면에서 버튼을 누르면 게임 시작
         if (isStartScreen) {
@@ -361,6 +369,12 @@ function setupMobileControls() {
     
     mobileControls.btnSpecial.addEventListener('touchstart', (e) => {
         e.preventDefault();
+        
+        // 모바일에서 버튼 터치 시 전체화면 시도
+        if (isMobile) {
+            enableFullscreen();
+        }
+        
         keys.KeyB = true;
     }, { passive: false });
     mobileControls.btnSpecial.addEventListener('touchend', (e) => {
@@ -373,6 +387,11 @@ function setupMobileControls() {
         e.stopPropagation();
         console.log('일시정지 버튼 터치');
         
+        // 모바일에서 버튼 터치 시 전체화면 시도
+        if (isMobile) {
+            enableFullscreen();
+        }
+        
         if (!isGameOver) {
             isPaused = !isPaused;
             console.log('일시정지 상태:', isPaused);
@@ -383,6 +402,11 @@ function setupMobileControls() {
         e.preventDefault();
         e.stopPropagation();
         console.log('최고점수 리셋 버튼 터치');
+        
+        // 모바일에서 버튼 터치 시 전체화면 시도
+        if (isMobile) {
+            enableFullscreen();
+        }
         
         // 최고 점수 리셋 확인
         if (confirm('최고 점수를 리셋하시겠습니까?')) {
@@ -4595,8 +4619,12 @@ async function initializeGame() {
             // 모바일 컨트롤 설정 (터치 드래그 포함)
     setupMobileControls();
     
-    // 모바일 전체화면 모드 활성화
-    enableFullscreen();
+    // 모바일에서 전체화면 모드 활성화
+    if (isMobile) {
+        setTimeout(() => {
+            enableFullscreen();
+        }, 1000);
+    }
         
         // 오디오 초기화 (사용자 상호작용 후)
         initAudio();
@@ -4936,3 +4964,23 @@ let levelBossPatterns = {
 
 // game.js 파일 맨 위에 추가 (임시)
 console.log('게임 파일 로드됨 - 버전:', Date.now());
+
+// 페이지 로드 시 모바일 전체화면 모드 활성화
+window.addEventListener('DOMContentLoaded', () => {
+    // 모바일에서 전체화면 모드 활성화
+    if (isMobile) {
+        // 페이지 로드 후 약간의 지연을 두고 전체화면 모드 활성화
+        setTimeout(() => {
+            enableFullscreen();
+        }, 1000);
+        
+        // 사용자 상호작용 후 전체화면 모드 활성화 (iOS Safari 요구사항)
+        document.addEventListener('touchstart', () => {
+            enableFullscreen();
+        }, { once: true });
+        
+        document.addEventListener('click', () => {
+            enableFullscreen();
+        }, { once: true });
+    }
+});
