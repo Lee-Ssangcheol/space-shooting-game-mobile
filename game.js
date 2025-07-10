@@ -275,14 +275,8 @@ function setupMobileControls() {
             return;
         }
         
-        // 게임 오버 상태에서 터치 시 게임 시작 (버튼을 누른 후에만 가능)
+        // 게임 오버 상태에서는 터치로 게임 시작 불가 (버튼으로만 재시작)
         if (isGameOver) {
-            if (!buttonPressed) {
-                console.log('게임 오버 상태에서는 터치로 게임을 시작할 수 없습니다. 버튼을 눌러주세요!');
-                return;
-            }
-            console.log('게임 오버 상태에서 터치 - 게임 재시작!');
-            restartGame();
             return;
         }
         
@@ -405,14 +399,8 @@ function setupMobileControls() {
             return;
         }
         
-        // 게임 오버 상태에서 터치 이동 시 게임 시작 (버튼을 누른 후에만 가능)
+        // 게임 오버 상태에서는 터치 이동으로 게임 시작 불가 (버튼으로만 재시작)
         if (isGameOver) {
-            if (!buttonPressed) {
-                console.log('게임 오버 상태에서는 터치로 게임을 시작할 수 없습니다. 버튼을 눌러주세요!');
-                return;
-            }
-            console.log('게임 오버 상태에서 터치 이동 - 게임 재시작!');
-            restartGame();
             return;
         }
         
@@ -496,10 +484,10 @@ function setupMobileControls() {
             
             // 게임 오버 상태에서 재시작
             if (isGameOver) {
-                // 버튼 눌림 상태 설정
-                buttonPressed = true;
-                console.log('게임 오버 상태에서 버튼 눌림 - 게임 모드로 전환됨');
-                console.log('이제 화면을 터치하여 게임을 시작하세요!');
+                console.log('게임 오버 상태에서 버튼 터치로 게임 재시작!');
+                
+                // 게임 재시작
+                restartGame();
                 return;
             }
         }, { passive: false });
@@ -545,10 +533,10 @@ function setupMobileControls() {
             
             // 게임 오버 상태에서 재시작
             if (isGameOver) {
-                // 버튼 눌림 상태 설정
-                buttonPressed = true;
-                console.log('게임 오버 상태에서 버튼 눌림 - 게임 모드로 전환됨');
-                console.log('이제 화면을 터치하여 게임을 시작하세요!');
+                console.log('게임 오버 상태에서 버튼 터치로 게임 재시작!');
+                
+                // 게임 재시작
+                restartGame();
                 return;
             }
         });
