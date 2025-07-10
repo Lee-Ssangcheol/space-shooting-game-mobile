@@ -68,6 +68,9 @@ let mobileFireStartTime = 0;
 let isMobileFirePressed = false;
 let mobileContinuousFireInterval = null;
 
+// 버튼 눌림 상태 추적 변수
+let buttonPressed = false;
+
 // 캔버스 설정 (DOM 로드 후 초기화)
 let canvas, ctx;
 
@@ -249,8 +252,12 @@ function setupMobileControls() {
             enableFullscreen();
         }
         
-        // 시작 화면에서 터치 시 게임 시작 (버튼을 누르지 않은 경우)
+        // 시작 화면에서 터치 시 게임 시작 (버튼을 누른 후에만 가능)
         if (isStartScreen && !gameStarted) {
+            if (!buttonPressed) {
+                console.log('버튼을 먼저 눌러주세요!');
+                return;
+            }
             console.log('시작 화면에서 터치 - 게임 시작!');
             isStartScreen = false;
             gameStarted = true;
@@ -268,8 +275,12 @@ function setupMobileControls() {
             return;
         }
         
-        // 게임 오버 상태에서 터치 시 재시작
+        // 게임 오버 상태에서 터치 시 재시작 (버튼을 누른 후에만 가능)
         if (isGameOver) {
+            if (!buttonPressed) {
+                console.log('게임 오버 상태에서 버튼을 먼저 눌러주세요!');
+                return;
+            }
             console.log('게임 오버 상태에서 터치 - 게임 재시작!');
             restartGame();
             return;
@@ -371,8 +382,12 @@ function setupMobileControls() {
             enableFullscreen();
         }
         
-        // 시작 화면에서 터치 이동 시 게임 시작 (버튼을 누르지 않은 경우)
+        // 시작 화면에서 터치 이동 시 게임 시작 (버튼을 누른 후에만 가능)
         if (isStartScreen && !gameStarted) {
+            if (!buttonPressed) {
+                console.log('버튼을 먼저 눌러주세요!');
+                return;
+            }
             console.log('시작 화면에서 터치 이동 - 게임 시작!');
             isStartScreen = false;
             gameStarted = true;
@@ -390,8 +405,12 @@ function setupMobileControls() {
             return;
         }
         
-        // 게임 오버 상태에서 터치 이동 시 재시작
+        // 게임 오버 상태에서 터치 이동 시 재시작 (버튼을 누른 후에만 가능)
         if (isGameOver) {
+            if (!buttonPressed) {
+                console.log('게임 오버 상태에서 버튼을 먼저 눌러주세요!');
+                return;
+            }
             console.log('게임 오버 상태에서 터치 이동 - 게임 재시작!');
             restartGame();
             return;
@@ -449,6 +468,9 @@ function setupMobileControls() {
                 console.log('모바일 환경:', isMobile);
                 console.log('현재 상태:', { isStartScreen, gameStarted, isGameOver });
                 
+                // 버튼 눌림 상태 설정
+                buttonPressed = true;
+                
                 isStartScreen = false;
                 gameStarted = true;
                 
@@ -473,10 +495,12 @@ function setupMobileControls() {
             }
             
             // 게임 오버 상태에서 재시작
-            // if (isGameOver) {
-            //     restartGame();
-            //     return;
-            // }
+            if (isGameOver) {
+                // 버튼 눌림 상태 설정
+                buttonPressed = true;
+                restartGame();
+                return;
+            }
         }, { passive: false });
         
         // 시작/재시작 버튼 클릭 이벤트 (전체화면 모드 대응)
@@ -492,6 +516,10 @@ function setupMobileControls() {
             
             if (isStartScreen) {
                 console.log('시작/재시작 버튼 클릭으로 게임 시작!');
+                
+                // 버튼 눌림 상태 설정
+                buttonPressed = true;
+                
                 isStartScreen = false;
                 gameStarted = true;
                 
@@ -515,10 +543,12 @@ function setupMobileControls() {
             }
             
             // 게임 오버 상태에서 재시작
-            // if (isGameOver) {
-            //     restartGame();
-            //     return;
-            // }
+            if (isGameOver) {
+                // 버튼 눌림 상태 설정
+                buttonPressed = true;
+                restartGame();
+                return;
+            }
         });
         
         mobileControls.btnFire.addEventListener('touchend', (e) => {
