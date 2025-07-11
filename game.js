@@ -12,50 +12,70 @@ const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/
 // 모바일 속도 조절 (60% 속도)
 const mobileSpeedMultiplier = isMobile ? 0.6 : 1.0;
 
+// 전체화면 상태 추적 변수
+let isFullscreenRequested = false;
+let fullscreenRequestTime = 0;
+
 // 모바일 전체화면 모드 활성화
 function enableFullscreen() {
-    if (isMobile) {
-        // iOS Safari 전체화면 모드
-        if (document.documentElement.requestFullscreen) {
-            const fullscreenPromise = document.documentElement.requestFullscreen();
-            if (fullscreenPromise && fullscreenPromise.catch) {
-                fullscreenPromise.catch(err => {
-                    console.log('전체화면 모드 실패:', err);
-                });
-            }
-        }
-        
-        // iOS Safari에서 주소창 숨김
-        if (window.navigator.standalone) {
-            document.body.style.position = 'fixed';
-            document.body.style.top = '0';
-            document.body.style.left = '0';
-            document.body.style.width = '100vw';
-            document.body.style.height = '100vh';
-        }
-        
-        // Android Chrome 전체화면 모드
-        if (document.documentElement.webkitRequestFullscreen) {
-            const webkitPromise = document.documentElement.webkitRequestFullscreen();
-            if (webkitPromise && webkitPromise.catch) {
-                webkitPromise.catch(err => {
-                    console.log('webkit 전체화면 모드 실패:', err);
-                });
-            }
-        }
-        
-        // 화면 방향 고정 (세로 모드)
-        if (screen.orientation && screen.orientation.lock) {
-            const lockPromise = screen.orientation.lock('portrait');
-            if (lockPromise && lockPromise.catch) {
-                lockPromise.catch(err => {
-                    console.log('화면 방향 고정 실패:', err);
-                });
-            }
-        }
-        
-        console.log('모바일 전체화면 모드 활성화 시도');
+    if (!isMobile) return;
+    
+    // 이미 전체화면 요청 중이거나 최근에 요청했다면 중복 실행 방지
+    const now = Date.now();
+    if (isFullscreenRequested || (now - fullscreenRequestTime < 2000)) {
+        return;
     }
+    
+    isFullscreenRequested = true;
+    fullscreenRequestTime = now;
+    
+    console.log('모바일 전체화면 모드 활성화 시도');
+    
+    // iOS Safari 전체화면 모드
+    if (document.documentElement.requestFullscreen) {
+        const fullscreenPromise = document.documentElement.requestFullscreen();
+        if (fullscreenPromise && fullscreenPromise.catch) {
+            fullscreenPromise.catch(err => {
+                console.log('전체화면 모드 실패:', err);
+                isFullscreenRequested = false; // 실패 시 플래그 리셋
+            });
+        }
+    }
+    
+    // iOS Safari에서 주소창 숨김
+    if (window.navigator.standalone) {
+        document.body.style.position = 'fixed';
+        document.body.style.top = '0';
+        document.body.style.left = '0';
+        document.body.style.width = '100vw';
+        document.body.style.height = '100vh';
+    }
+    
+    // Android Chrome 전체화면 모드
+    if (document.documentElement.webkitRequestFullscreen) {
+        const webkitPromise = document.documentElement.webkitRequestFullscreen();
+        if (webkitPromise && webkitPromise.catch) {
+            webkitPromise.catch(err => {
+                console.log('webkit 전체화면 모드 실패:', err);
+                isFullscreenRequested = false; // 실패 시 플래그 리셋
+            });
+        }
+    }
+    
+    // 화면 방향 고정 (세로 모드)
+    if (screen.orientation && screen.orientation.lock) {
+        const lockPromise = screen.orientation.lock('portrait');
+        if (lockPromise && lockPromise.catch) {
+            lockPromise.catch(err => {
+                console.log('화면 방향 고정 실패:', err);
+            });
+        }
+    }
+    
+    // 3초 후 플래그 리셋 (성공했든 실패했든)
+    setTimeout(() => {
+        isFullscreenRequested = false;
+    }, 3000);
 }
 
 
@@ -247,11 +267,6 @@ function setupMobileControls() {
         e.preventDefault();
         e.stopPropagation();
         
-        // 모바일에서 터치 시 전체화면 시도
-        if (isMobile) {
-            enableFullscreen();
-        }
-        
         // 시작 화면에서 터치 시 게임 시작 (버튼을 누른 후에만 가능)
         if (isStartScreen && !gameStarted) {
             if (!buttonPressed) {
@@ -371,11 +386,6 @@ function setupMobileControls() {
     canvas.addEventListener('touchmove', (e) => {
         e.preventDefault();
         
-        // 모바일에서 터치 이동 시에도 전체화면 시도
-        if (isMobile) {
-            enableFullscreen();
-        }
-        
         // 시작 화면에서 터치 이동 시 게임 시작 (버튼을 누른 후에만 가능)
         if (isStartScreen && !gameStarted) {
             if (!buttonPressed) {
@@ -445,11 +455,6 @@ function setupMobileControls() {
             e.stopPropagation();
             console.log('시작/재시작 버튼 터치');
             
-            // 모바일에서 버튼 터치 시 전체화면 시도
-            if (isMobile) {
-                enableFullscreen();
-            }
-            
             // 시작 화면에서 버튼을 누르면 게임 시작
             if (isStartScreen) {
                 console.log('시작/재시작 버튼으로 게임 시작!');
@@ -497,11 +502,6 @@ function setupMobileControls() {
             e.preventDefault();
             e.stopPropagation();
             console.log('시작/재시작 버튼 클릭');
-            
-            // 모바일에서 버튼 클릭 시 전체화면 시도
-            if (isMobile) {
-                enableFullscreen();
-            }
             
             if (isStartScreen) {
                 console.log('시작/재시작 버튼 클릭으로 게임 시작!');
@@ -556,11 +556,6 @@ function setupMobileControls() {
         mobileControls.btnSpecial.addEventListener('touchstart', (e) => {
             e.preventDefault();
             
-            // 모바일에서 버튼 터치 시 전체화면 시도
-            if (isMobile) {
-                enableFullscreen();
-            }
-            
             keys.KeyB = true;
         }, { passive: false });
         mobileControls.btnSpecial.addEventListener('touchend', (e) => {
@@ -577,11 +572,6 @@ function setupMobileControls() {
             e.stopPropagation();
             console.log('일시정지 버튼 터치');
             
-            // 모바일에서 버튼 터치 시 전체화면 시도
-            if (isMobile) {
-                enableFullscreen();
-            }
-            
             if (!isGameOver) {
                 isPaused = !isPaused;
                 console.log('일시정지 상태:', isPaused);
@@ -596,11 +586,6 @@ function setupMobileControls() {
             e.preventDefault();
             e.stopPropagation();
             console.log('최고점수 리셋 버튼 터치');
-            
-            // 모바일에서 버튼 터치 시 전체화면 시도
-            if (isMobile) {
-                enableFullscreen();
-            }
             
             // 최고 점수 리셋 확인
             if (confirm('최고 점수를 리셋하시겠습니까?')) {
@@ -4870,13 +4855,6 @@ async function initializeGame() {
         
             // 모바일 컨트롤 설정 (터치 드래그 포함)
     setupMobileControls();
-    
-    // 모바일에서 전체화면 모드 활성화
-    if (isMobile) {
-        setTimeout(() => {
-            enableFullscreen();
-        }, 1000);
-    }
         
         // 오디오 초기화 (사용자 상호작용 후)
         initAudio();
@@ -5243,21 +5221,18 @@ window.addEventListener('DOMContentLoaded', () => {
     // 5. 게임 초기화
     initializeGame();
     
-    // 5. 모바일에서 전체화면 모드 활성화
+    // 5. 모바일에서 전체화면 모드 활성화 (한 번만 실행)
     if (isMobile) {
-        // 페이지 로드 후 약간의 지연을 두고 전체화면 모드 활성화
-        setTimeout(() => {
-            enableFullscreen();
-        }, 1000);
-        
         // 사용자 상호작용 후 전체화면 모드 활성화 (iOS Safari 요구사항)
-        document.addEventListener('touchstart', () => {
+        const enableFullscreenOnce = () => {
             enableFullscreen();
-        }, { once: true });
+            // 이벤트 리스너 제거
+            document.removeEventListener('touchstart', enableFullscreenOnce);
+            document.removeEventListener('click', enableFullscreenOnce);
+        };
         
-        document.addEventListener('click', () => {
-            enableFullscreen();
-        }, { once: true });
+        document.addEventListener('touchstart', enableFullscreenOnce, { once: true });
+        document.addEventListener('click', enableFullscreenOnce, { once: true });
     }
     
     console.log('게임 초기화 완료');
