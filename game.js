@@ -618,8 +618,9 @@ function setupMobileControls() {
                 
                 console.log('시작/재시작 버튼 처리');
                 
-                // 모바일에서 버튼 클릭 시 전체화면 시도
-                if (isMobile) {
+                // 모바일에서 버튼 클릭 시 전체화면 시도 (첫 화면과 게임오버 화면에서)
+                if (isMobile && (isStartScreen || isGameOver)) {
+                    console.log('전체화면 활성화 시도 - 화면 상태:', { isStartScreen, isGameOver });
                     reactivateFullscreen();
                 }
                 
@@ -651,11 +652,6 @@ function setupMobileControls() {
                     console.log('게임 시작 완료');
                     console.log('게임 상태 업데이트:', { isStartScreen, gameStarted, isGameOver });
                     
-                    // 모바일에서 전체화면 재활성화
-                    if (isMobile) {
-                        reactivateFullscreen();
-                    }
-                    
                     // 게임 루프 시작
                     startGameLoop();
                 }
@@ -664,12 +660,8 @@ function setupMobileControls() {
                 if (isGameOver) {
                     console.log('게임 오버 상태에서 버튼 터치로 게임 재시작!');
                     
-                                    // 게임 재시작
-                restartGame();
-                // 모바일에서 게임 재시작 시 전체화면 모드 활성화
-                if (isMobile) {
-                    reactivateFullscreen();
-                }
+                    // 게임 재시작
+                    restartGame();
                 }
                 
                 // 1초 후 플래그 리셋
@@ -1846,10 +1838,7 @@ function restartGame() {
         isSnakePatternActive: isSnakePatternActive
     });
     
-    // 모바일에서 전체화면 재활성화
-    if (isMobile) {
-        reactivateFullscreen();
-    }
+    // 전체화면 재활성화는 handleStartButton에서 처리하므로 여기서는 제거
 }
 
 // 적 생성 함수 수정
@@ -5562,7 +5551,7 @@ window.addEventListener('DOMContentLoaded', () => {
     // 6. 게임 초기화
     initializeGame();
     
-    // 5. 모바일에서 전체화면 모드 활성화 (썬더볼트용과 동일)
+    // 5. 모바일에서 전체화면 모드 활성화 (페이지 로드 시 자동 시도)
     if (isMobile) {
         // 사용자 상호작용 후 전체화면 모드 활성화 (iOS Safari 요구사항)
         let fullscreenRequested = false;
@@ -5571,7 +5560,7 @@ window.addEventListener('DOMContentLoaded', () => {
             if (fullscreenRequested) return; // 이미 요청했다면 무시
             fullscreenRequested = true;
             
-            console.log('전체화면 모드 활성화 시도');
+            console.log('페이지 로드 시 전체화면 모드 활성화 시도');
             enableFullscreen();
             
             // 이벤트 리스너 제거
