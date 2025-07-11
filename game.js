@@ -654,63 +654,147 @@ function setupMobileControls() {
             
             console.log('최고점수 리셋 요청');
             
-            // 최고 점수 리셋 확인
-            if (confirm('최고 점수를 리셋하시겠습니까?')) {
-                ScoreManager.reset().then(() => {
-                    console.log('ScoreManager를 통한 최고 점수 리셋 완료');
-                    resetRequested = false; // 완료 후 플래그 리셋
-                }).catch(error => {
-                    console.error('ScoreManager 리셋 실패:', error);
-                    // 백업 리셋 방법 - 모든 저장소 완전 클리어
-                    try {
-                        highScore = 0;
-                        score = 0;
-                        levelScore = 0;
-                        scoreForSpread = 0;
-                        gameLevel = 1;
-                        
-                        // localStorage 완전 클리어
-                        localStorage.removeItem('highScore');
-                        localStorage.removeItem('highScore_backup');
-                        localStorage.removeItem('highScore_timestamp');
-                        localStorage.removeItem('gameScore');
-                        localStorage.removeItem('gameScore_backup');
-                        // 리셋 완료 표시
-                        localStorage.setItem('scoreResetComplete', 'true');
-                        localStorage.setItem('resetTimestamp', Date.now().toString());
-                        
-                        // sessionStorage 완전 클리어
-                        sessionStorage.removeItem('highScore');
-                        sessionStorage.removeItem('gameScore');
-                        sessionStorage.clear();
-                        // 리셋 완료 표시
-                        sessionStorage.setItem('scoreResetComplete', 'true');
-                        sessionStorage.setItem('resetTimestamp', Date.now().toString());
-                        
-                        console.log('백업 방법으로 모든 저장소 완전 리셋 완료');
-                    } catch (e) {
-                        console.error('백업 리셋도 실패:', e);
+            // 커스텀 확인 다이얼로그 생성 (전체화면 상태 보존)
+            const customConfirm = () => {
+                return new Promise((resolve) => {
+                    // 기존 다이얼로그가 있다면 제거
+                    const existingDialog = document.getElementById('custom-confirm-dialog');
+                    if (existingDialog) {
+                        existingDialog.remove();
                     }
-                    resetRequested = false; // 완료 후 플래그 리셋
+                    
+                    // 커스텀 다이얼로그 생성
+                    const dialog = document.createElement('div');
+                    dialog.id = 'custom-confirm-dialog';
+                    dialog.style.cssText = `
+                        position: fixed;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background: rgba(0, 0, 0, 0.9);
+                        border: 2px solid #00ff00;
+                        border-radius: 10px;
+                        padding: 20px;
+                        z-index: 10000;
+                        color: white;
+                        font-family: Arial, sans-serif;
+                        text-align: center;
+                        min-width: 300px;
+                    `;
+                    
+                    dialog.innerHTML = `
+                        <div style="margin-bottom: 20px; font-size: 18px;">
+                            최고 점수를 리셋하시겠습니까?
+                        </div>
+                        <div style="display: flex; justify-content: center; gap: 10px;">
+                            <button id="confirm-yes" style="
+                                background: #ff4444;
+                                color: white;
+                                border: none;
+                                padding: 10px 20px;
+                                border-radius: 5px;
+                                cursor: pointer;
+                                font-size: 16px;
+                            ">예</button>
+                            <button id="confirm-no" style="
+                                background: #444444;
+                                color: white;
+                                border: none;
+                                padding: 10px 20px;
+                                border-radius: 5px;
+                                cursor: pointer;
+                                font-size: 16px;
+                            ">아니오</button>
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(dialog);
+                    
+                    // 버튼 이벤트
+                    document.getElementById('confirm-yes').onclick = () => {
+                        dialog.remove();
+                        resolve(true);
+                    };
+                    
+                    document.getElementById('confirm-no').onclick = () => {
+                        dialog.remove();
+                        resolve(false);
+                    };
+                    
+                    // ESC 키로 취소
+                    const handleEsc = (e) => {
+                        if (e.key === 'Escape') {
+                            dialog.remove();
+                            document.removeEventListener('keydown', handleEsc);
+                            resolve(false);
+                        }
+                    };
+                    document.addEventListener('keydown', handleEsc);
                 });
-            } else {
-                resetRequested = false; // 취소 시 플래그 리셋
-            }
+            };
+            
+            // 커스텀 확인 다이얼로그 사용
+            customConfirm().then((shouldReset) => {
+                if (shouldReset) {
+                    ScoreManager.reset().then(() => {
+                        console.log('ScoreManager를 통한 최고 점수 리셋 완료');
+                        resetRequested = false; // 완료 후 플래그 리셋
+                    }).catch(error => {
+                        console.error('ScoreManager 리셋 실패:', error);
+                        // 백업 리셋 방법 - 모든 저장소 완전 클리어
+                        try {
+                            highScore = 0;
+                            score = 0;
+                            levelScore = 0;
+                            scoreForSpread = 0;
+                            gameLevel = 1;
+                            
+                            // localStorage 완전 클리어
+                            localStorage.removeItem('highScore');
+                            localStorage.removeItem('highScore_backup');
+                            localStorage.removeItem('highScore_timestamp');
+                            localStorage.removeItem('gameScore');
+                            localStorage.removeItem('gameScore_backup');
+                            // 리셋 완료 표시
+                            localStorage.setItem('scoreResetComplete', 'true');
+                            localStorage.setItem('resetTimestamp', Date.now().toString());
+                            
+                            // sessionStorage 완전 클리어
+                            sessionStorage.removeItem('highScore');
+                            sessionStorage.removeItem('gameScore');
+                            sessionStorage.clear();
+                            // 리셋 완료 표시
+                            sessionStorage.setItem('scoreResetComplete', 'true');
+                            sessionStorage.setItem('resetTimestamp', Date.now().toString());
+                            
+                            console.log('백업 방법으로 모든 저장소 완전 리셋 완료');
+                        } catch (e) {
+                            console.error('백업 리셋도 실패:', e);
+                        }
+                        resetRequested = false; // 완료 후 플래그 리셋
+                    });
+                } else {
+                    resetRequested = false; // 취소 시 플래그 리셋
+                }
+            });
         };
         
-        // 터치 이벤트 (모바일용)
-        mobileControls.btnReset.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            resetHighScore();
-        }, { passive: false });
-        
-        // 클릭 이벤트 (데스크탑용)
-        mobileControls.btnReset.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            resetHighScore();
-        });
+        // 모바일에서는 터치 이벤트만 사용, 데스크탑에서는 클릭 이벤트만 사용
+        if (isMobile) {
+            // 터치 이벤트 (모바일용)
+            mobileControls.btnReset.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                resetHighScore();
+            }, { passive: false });
+        } else {
+            // 클릭 이벤트 (데스크탑용)
+            mobileControls.btnReset.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                resetHighScore();
+            });
+        }
     } else {
         console.error('btnReset 요소를 찾을 수 없습니다!');
     }
@@ -3487,12 +3571,121 @@ document.addEventListener('keydown', (e) => {
         if (!window.keyboardResetRequested) {
             window.keyboardResetRequested = true;
             
-            if (confirm('최고 점수를 리셋하시겠습니까?')) {
-                highScore = 0;
-                localStorage.setItem('highScore', '0');
-                alert('최고 점수가 리셋되었습니다.');
-                console.log('최고 점수 리셋');
-            }
+            // 키보드용 커스텀 확인 다이얼로그
+            const customConfirm = () => {
+                return new Promise((resolve) => {
+                    const existingDialog = document.getElementById('custom-confirm-dialog');
+                    if (existingDialog) {
+                        existingDialog.remove();
+                    }
+                    
+                    const dialog = document.createElement('div');
+                    dialog.id = 'custom-confirm-dialog';
+                    dialog.style.cssText = `
+                        position: fixed;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background: rgba(0, 0, 0, 0.9);
+                        border: 2px solid #00ff00;
+                        border-radius: 10px;
+                        padding: 20px;
+                        z-index: 10000;
+                        color: white;
+                        font-family: Arial, sans-serif;
+                        text-align: center;
+                        min-width: 300px;
+                    `;
+                    
+                    dialog.innerHTML = `
+                        <div style="margin-bottom: 20px; font-size: 18px;">
+                            최고 점수를 리셋하시겠습니까?
+                        </div>
+                        <div style="display: flex; justify-content: center; gap: 10px;">
+                            <button id="confirm-yes" style="
+                                background: #ff4444;
+                                color: white;
+                                border: none;
+                                padding: 10px 20px;
+                                border-radius: 5px;
+                                cursor: pointer;
+                                font-size: 16px;
+                            ">예</button>
+                            <button id="confirm-no" style="
+                                background: #444444;
+                                color: white;
+                                border: none;
+                                padding: 10px 20px;
+                                border-radius: 5px;
+                                cursor: pointer;
+                                font-size: 16px;
+                            ">아니오</button>
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(dialog);
+                    
+                    document.getElementById('confirm-yes').onclick = () => {
+                        dialog.remove();
+                        resolve(true);
+                    };
+                    
+                    document.getElementById('confirm-no').onclick = () => {
+                        dialog.remove();
+                        resolve(false);
+                    };
+                    
+                    const handleEsc = (e) => {
+                        if (e.key === 'Escape') {
+                            dialog.remove();
+                            document.removeEventListener('keydown', handleEsc);
+                            resolve(false);
+                        }
+                    };
+                    document.addEventListener('keydown', handleEsc);
+                });
+            };
+            
+            customConfirm().then((shouldReset) => {
+                if (shouldReset) {
+                    highScore = 0;
+                    localStorage.setItem('highScore', '0');
+                    
+                    // 커스텀 완료 메시지
+                    const messageDialog = document.createElement('div');
+                    messageDialog.style.cssText = `
+                        position: fixed;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background: rgba(0, 0, 0, 0.9);
+                        border: 2px solid #00ff00;
+                        border-radius: 10px;
+                        padding: 20px;
+                        z-index: 10000;
+                        color: white;
+                        font-family: Arial, sans-serif;
+                        text-align: center;
+                    `;
+                    messageDialog.innerHTML = `
+                        <div style="margin-bottom: 20px; font-size: 18px;">
+                            최고 점수가 리셋되었습니다.
+                        </div>
+                        <button onclick="this.parentElement.remove()" style="
+                            background: #444444;
+                            color: white;
+                            border: none;
+                            padding: 10px 20px;
+                            border-radius: 5px;
+                            cursor: pointer;
+                            font-size: 16px;
+                        ">확인</button>
+                    `;
+                    document.body.appendChild(messageDialog);
+                    
+                    console.log('최고 점수 리셋');
+                }
+            });
             
             // 1초 후 플래그 리셋
             setTimeout(() => {
