@@ -23,15 +23,15 @@ function enableFullscreen() {
         return;
     }
     
-    // 이미 전체화면 모드인지 확인
+    // 이미 전체화면 모드인지 확인 (하지만 다시 시도는 허용)
     const isCurrentlyFullscreen = document.fullscreenElement || 
                                  document.webkitFullscreenElement || 
                                  document.mozFullScreenElement || 
                                  document.msFullscreenElement;
     
     if (isCurrentlyFullscreen) {
-        console.log('이미 전체화면 모드입니다');
-        return;
+        console.log('이미 전체화면 모드입니다 - 다시 시도');
+        // 이미 전체화면이어도 다시 시도 (전체화면이 종료된 후 재활성화를 위해)
     }
     
     // 이미 전체화면 요청 중이거나 최근에 요청했다면 중복 실행 방지
@@ -135,7 +135,9 @@ function setupFullscreenEventListeners() {
                 console.log('전체화면 모드 진입');
                 isFullscreenRequested = false; // 성공 시 플래그 리셋
             } else {
-                console.log('전체화면 모드 종료');
+                console.log('전체화면 모드 종료 - 재활성화 가능');
+                isFullscreenRequested = false; // 종료 시에도 플래그 리셋하여 재활성화 허용
+                fullscreenRequestTime = 0; // 시간 제한도 리셋
             }
         });
     });
@@ -510,99 +512,86 @@ function setupMobileControls() {
         handleBulletFiring();
     }, { passive: false });
     
-    // 시작/재시작 버튼 터치 이벤트
-    if (mobileControls.btnFire) {
-        console.log('btnFire 요소 발견, 이벤트 리스너 등록 중...');
-        mobileControls.btnFire.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('시작/재시작 버튼 터치');
+                    // 시작/재시작 버튼 이벤트
+        if (mobileControls.btnFire) {
+            console.log('btnFire 요소 발견, 이벤트 리스너 등록 중...');
             
-            // 시작 화면에서 버튼을 누르면 게임 시작
-            if (isStartScreen) {
-                console.log('시작/재시작 버튼으로 게임 시작!');
-                console.log('모바일 환경:', isMobile);
-                console.log('현재 상태:', { isStartScreen, gameStarted, isGameOver });
+            // 시작/재시작 버튼 함수 (중복 방지)
+            let startButtonPressed = false;
+            
+            const handleStartButton = () => {
+                if (startButtonPressed) return; // 이미 처리 중이면 무시
+                startButtonPressed = true;
                 
-                // 버튼 눌림 상태 설정
-                buttonPressed = true;
+                console.log('시작/재시작 버튼 처리');
                 
-                isStartScreen = false;
-                gameStarted = true;
-                
-                // 오디오 초기화
-                initAudio();
-                
-                // 플레이어 위치 초기화
-                if (canvas) {
-                    player.x = canvas.width / 2;
-                    player.y = canvas.height - 50;
-                    if (hasSecondPlane) {
-                        secondPlane.x = canvas.width / 2 - 60;
-                        secondPlane.y = canvas.height - 50;
-                    }
+                // 모바일에서 버튼 클릭 시 전체화면 시도
+                if (isMobile) {
+                    enableFullscreen();
                 }
                 
-                console.log('게임 시작 완료');
-                console.log('게임 상태 업데이트:', { isStartScreen, gameStarted, isGameOver });
-                
-                // 게임 루프 시작
-                startGameLoop();
-            }
-            
-            // 게임 오버 상태에서 재시작
-            if (isGameOver) {
-                console.log('게임 오버 상태에서 버튼 터치로 게임 재시작!');
-                
-                // 게임 재시작
-                restartGame();
-                return;
-            }
-        }, { passive: false });
-        
-        // 시작/재시작 버튼 클릭 이벤트 (전체화면 모드 대응)
-        mobileControls.btnFire.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('시작/재시작 버튼 클릭');
-            
-            if (isStartScreen) {
-                console.log('시작/재시작 버튼 클릭으로 게임 시작!');
-                
-                // 버튼 눌림 상태 설정
-                buttonPressed = true;
-                
-                isStartScreen = false;
-                gameStarted = true;
-                
-                // 오디오 초기화
-                initAudio();
-                
-                // 플레이어 위치 초기화
-                if (canvas) {
-                    player.x = canvas.width / 2;
-                    player.y = canvas.height - 50;
-                    if (hasSecondPlane) {
-                        secondPlane.x = canvas.width / 2 - 60;
-                        secondPlane.y = canvas.height - 50;
+                // 시작 화면에서 버튼을 누르면 게임 시작
+                if (isStartScreen) {
+                    console.log('시작/재시작 버튼으로 게임 시작!');
+                    console.log('모바일 환경:', isMobile);
+                    console.log('현재 상태:', { isStartScreen, gameStarted, isGameOver });
+                    
+                    // 버튼 눌림 상태 설정
+                    buttonPressed = true;
+                    
+                    isStartScreen = false;
+                    gameStarted = true;
+                    
+                    // 오디오 초기화
+                    initAudio();
+                    
+                    // 플레이어 위치 초기화
+                    if (canvas) {
+                        player.x = canvas.width / 2;
+                        player.y = canvas.height - 50;
+                        if (hasSecondPlane) {
+                            secondPlane.x = canvas.width / 2 - 60;
+                            secondPlane.y = canvas.height - 50;
+                        }
                     }
+                    
+                    console.log('게임 시작 완료');
+                    console.log('게임 상태 업데이트:', { isStartScreen, gameStarted, isGameOver });
+                    
+                    // 게임 루프 시작
+                    startGameLoop();
                 }
                 
-                console.log('게임 시작 완료');
+                // 게임 오버 상태에서 재시작
+                if (isGameOver) {
+                    console.log('게임 오버 상태에서 버튼 터치로 게임 재시작!');
+                    
+                    // 게임 재시작
+                    restartGame();
+                }
                 
-                // 게임 루프 시작
-                startGameLoop();
-            }
+                // 1초 후 플래그 리셋
+                setTimeout(() => {
+                    startButtonPressed = false;
+                }, 1000);
+            };
             
-            // 게임 오버 상태에서 재시작
-            if (isGameOver) {
-                console.log('게임 오버 상태에서 버튼 터치로 게임 재시작!');
-                
-                // 게임 재시작
-                restartGame();
-                return;
+            // 모바일에서는 터치 이벤트만 사용, 데스크탑에서는 클릭 이벤트만 사용
+            if (isMobile) {
+                // 터치 이벤트 (모바일용)
+                mobileControls.btnFire.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleStartButton();
+                }, { passive: false });
+            } else {
+                // 클릭 이벤트 (데스크탑용)
+                mobileControls.btnFire.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleStartButton();
+                });
             }
-        });
         
         mobileControls.btnFire.addEventListener('touchend', (e) => {
             e.preventDefault();
