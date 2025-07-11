@@ -35,10 +35,11 @@ function enableFullscreen() {
         return; // 이미 전체화면이면 종료
     }
     
-    // 이미 전체화면 요청 중이거나 최근에 요청했다면 중복 실행 방지 (전체화면이 활성화된 경우에만)
+    // 이미 전체화면 요청 중이거나 최근에 요청했다면 중복 실행 방지
     const now = Date.now();
-    if (fullscreenEnabled && (isFullscreenRequested || (now - fullscreenRequestTime < 2000))) {
+    if (isFullscreenRequested || (now - fullscreenRequestTime < 2000)) {
         console.log('전체화면 요청 중이거나 최근에 요청됨');
+        console.log('isFullscreenRequested:', isFullscreenRequested, '시간차:', now - fullscreenRequestTime);
         return;
     }
     
@@ -48,6 +49,8 @@ function enableFullscreen() {
     console.log('모바일 전체화면 모드 활성화 시도');
     console.log('브라우저 정보:', navigator.userAgent);
     console.log('전체화면 활성화 상태:', fullscreenEnabled);
+    console.log('현재 전체화면 상태:', isCurrentlyFullscreen);
+    console.log('전체화면 요청 플래그:', isFullscreenRequested);
     
     // 브라우저별 전체화면 API 호출 (하나만 실행)
     let fullscreenPromise = null;
@@ -78,20 +81,30 @@ function enableFullscreen() {
         apiUsed = 'ms';
     }
     
+    console.log('사용 가능한 전체화면 API 확인:');
+    console.log('- 표준 API:', !!document.documentElement.requestFullscreen);
+    console.log('- WebKit API:', !!document.documentElement.webkitRequestFullscreen);
+    console.log('- Mozilla API:', !!document.documentElement.mozRequestFullScreen);
+    console.log('- MS API:', !!document.documentElement.msRequestFullscreen);
+    
     console.log('사용된 API:', apiUsed);
     
     // 전체화면 요청 처리
     if (fullscreenPromise && fullscreenPromise.catch) {
+        console.log('전체화면 Promise 생성됨, 처리 시작');
         fullscreenPromise.then(() => {
             console.log('전체화면 모드 성공');
             fullscreenEnabled = true; // 성공 시 활성화 플래그 설정
+            console.log('fullscreenEnabled 플래그 설정됨:', fullscreenEnabled);
         }).catch(err => {
             console.log('전체화면 모드 실패:', err);
             console.log('사용된 API:', apiUsed);
+            console.log('에러 타입:', err.name, '에러 메시지:', err.message);
             isFullscreenRequested = false; // 실패 시 플래그 리셋
         });
     } else if (!fullscreenPromise) {
         console.log('지원되는 전체화면 API가 없습니다');
+        console.log('fullscreenPromise:', fullscreenPromise);
         isFullscreenRequested = false;
     }
     
@@ -534,11 +547,19 @@ function setupMobileControls() {
                 
                 // 모바일에서 첫 화면의 버튼 클릭 시에만 전체화면 시도
                 if (isMobile && isStartScreen) {
+                    console.log('첫 화면에서 전체화면 활성화 시도');
+                    console.log('isMobile:', isMobile, 'isStartScreen:', isStartScreen);
                     enableFullscreen();
                 }
                 // 모바일에서 전체화면이 활성화된 상태에서 전체화면이 종료된 경우 재활성화
                 else if (isMobile && fullscreenEnabled && !isStartScreen) {
+                    console.log('전체화면 재활성화 시도');
+                    console.log('isMobile:', isMobile, 'fullscreenEnabled:', fullscreenEnabled, 'isStartScreen:', isStartScreen);
                     enableFullscreen();
+                }
+                else {
+                    console.log('전체화면 활성화 조건 불만족');
+                    console.log('isMobile:', isMobile, 'isStartScreen:', isStartScreen, 'fullscreenEnabled:', fullscreenEnabled);
                 }
                 
                 // 시작 화면에서 버튼을 누르면 게임 시작
