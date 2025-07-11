@@ -18,7 +18,10 @@ let fullscreenRequestTime = 0;
 
 // 모바일 전체화면 모드 활성화
 function enableFullscreen() {
-    if (!isMobile) return;
+    if (!isMobile) {
+        console.log('데스크탑 환경이므로 전체화면 모드 건너뜀');
+        return;
+    }
     
     // 이미 전체화면 모드인지 확인
     const isCurrentlyFullscreen = document.fullscreenElement || 
@@ -34,6 +37,7 @@ function enableFullscreen() {
     // 이미 전체화면 요청 중이거나 최근에 요청했다면 중복 실행 방지
     const now = Date.now();
     if (isFullscreenRequested || (now - fullscreenRequestTime < 2000)) {
+        console.log('전체화면 요청 중이거나 최근에 요청됨');
         return;
     }
     
@@ -41,33 +45,49 @@ function enableFullscreen() {
     fullscreenRequestTime = now;
     
     console.log('모바일 전체화면 모드 활성화 시도');
+    console.log('브라우저 정보:', navigator.userAgent);
     
     // 브라우저별 전체화면 API 호출 (하나만 실행)
     let fullscreenPromise = null;
+    let apiUsed = 'none';
     
     // 표준 API 우선 시도
     if (document.documentElement.requestFullscreen) {
+        console.log('표준 전체화면 API 사용');
         fullscreenPromise = document.documentElement.requestFullscreen();
+        apiUsed = 'standard';
     }
     // WebKit API (Safari, Chrome)
     else if (document.documentElement.webkitRequestFullscreen) {
+        console.log('WebKit 전체화면 API 사용');
         fullscreenPromise = document.documentElement.webkitRequestFullscreen();
+        apiUsed = 'webkit';
     }
     // Mozilla API (Firefox)
     else if (document.documentElement.mozRequestFullScreen) {
+        console.log('Mozilla 전체화면 API 사용');
         fullscreenPromise = document.documentElement.mozRequestFullScreen();
+        apiUsed = 'mozilla';
     }
     // MS API (IE)
     else if (document.documentElement.msRequestFullscreen) {
+        console.log('MS 전체화면 API 사용');
         fullscreenPromise = document.documentElement.msRequestFullscreen();
+        apiUsed = 'ms';
     }
+    
+    console.log('사용된 API:', apiUsed);
     
     // 전체화면 요청 처리
     if (fullscreenPromise && fullscreenPromise.catch) {
         fullscreenPromise.catch(err => {
             console.log('전체화면 모드 실패:', err);
+            console.log('사용된 API:', apiUsed);
             isFullscreenRequested = false; // 실패 시 플래그 리셋
         });
+    } else if (!fullscreenPromise) {
+        console.log('지원되는 전체화면 API가 없습니다');
+        isFullscreenRequested = false;
     }
     
     // iOS Safari에서 주소창 숨김 (전체화면과 별개)
@@ -625,15 +645,20 @@ function setupMobileControls() {
     }
     
     if (mobileControls.btnReset) {
-        mobileControls.btnReset.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('최고점수 리셋 버튼 터치');
+        // 최고점수 리셋 함수 (중복 방지)
+        let resetRequested = false;
+        
+        const resetHighScore = () => {
+            if (resetRequested) return; // 이미 요청 중이면 무시
+            resetRequested = true;
+            
+            console.log('최고점수 리셋 요청');
             
             // 최고 점수 리셋 확인
             if (confirm('최고 점수를 리셋하시겠습니까?')) {
                 ScoreManager.reset().then(() => {
                     console.log('ScoreManager를 통한 최고 점수 리셋 완료');
+                    resetRequested = false; // 완료 후 플래그 리셋
                 }).catch(error => {
                     console.error('ScoreManager 리셋 실패:', error);
                     // 백업 리셋 방법 - 모든 저장소 완전 클리어
@@ -666,58 +691,29 @@ function setupMobileControls() {
                     } catch (e) {
                         console.error('백업 리셋도 실패:', e);
                     }
+                    resetRequested = false; // 완료 후 플래그 리셋
                 });
+            } else {
+                resetRequested = false; // 취소 시 플래그 리셋
             }
+        };
+        
+        // 터치 이벤트 (모바일용)
+        mobileControls.btnReset.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            resetHighScore();
         }, { passive: false });
+        
+        // 클릭 이벤트 (데스크탑용)
+        mobileControls.btnReset.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            resetHighScore();
+        });
     } else {
         console.error('btnReset 요소를 찾을 수 없습니다!');
     }
-    
-    // 클릭 이벤트도 추가 (데스크탑용)
-    mobileControls.btnReset.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('최고점수 리셋 버튼 클릭');
-        
-        // 최고 점수 리셋 확인
-        if (confirm('최고 점수를 리셋하시겠습니까?')) {
-            ScoreManager.reset().then(() => {
-                console.log('ScoreManager를 통한 최고 점수 리셋 완료');
-            }).catch(error => {
-                console.error('ScoreManager 리셋 실패:', error);
-                // 백업 리셋 방법 - 모든 저장소 완전 클리어
-                try {
-                    highScore = 0;
-                    score = 0;
-                    levelScore = 0;
-                    scoreForSpread = 0;
-                    gameLevel = 1;
-                    
-                    // localStorage 완전 클리어
-                    localStorage.removeItem('highScore');
-                    localStorage.removeItem('highScore_backup');
-                    localStorage.removeItem('highScore_timestamp');
-                    localStorage.removeItem('gameScore');
-                    localStorage.removeItem('gameScore_backup');
-                    // 리셋 완료 표시
-                    localStorage.setItem('scoreResetComplete', 'true');
-                    localStorage.setItem('resetTimestamp', Date.now().toString());
-                    
-                    // sessionStorage 완전 클리어
-                    sessionStorage.removeItem('highScore');
-                    sessionStorage.removeItem('gameScore');
-                    sessionStorage.clear();
-                    // 리셋 완료 표시
-                    sessionStorage.setItem('scoreResetComplete', 'true');
-                    sessionStorage.setItem('resetTimestamp', Date.now().toString());
-                    
-                    console.log('백업 방법으로 모든 저장소 완전 리셋 완료');
-                } catch (e) {
-                    console.error('백업 리셋도 실패:', e);
-                }
-            });
-        }
-    });
     
     console.log('모바일 컨트롤 설정 완료');
     
@@ -3487,11 +3483,21 @@ document.addEventListener('keydown', (e) => {
     
     // R 키를 눌렀을 때 최고 점수 리셋
     if (e.code === 'KeyR') {
-        if (confirm('최고 점수를 리셋하시겠습니까?')) {
-            highScore = 0;
-            localStorage.setItem('highScore', '0');
-            alert('최고 점수가 리셋되었습니다.');
-            console.log('최고 점수 리셋');
+        // 키보드 리셋 중복 방지
+        if (!window.keyboardResetRequested) {
+            window.keyboardResetRequested = true;
+            
+            if (confirm('최고 점수를 리셋하시겠습니까?')) {
+                highScore = 0;
+                localStorage.setItem('highScore', '0');
+                alert('최고 점수가 리셋되었습니다.');
+                console.log('최고 점수 리셋');
+            }
+            
+            // 1초 후 플래그 리셋
+            setTimeout(() => {
+                window.keyboardResetRequested = false;
+            }, 1000);
         }
     }
     
@@ -5276,15 +5282,33 @@ window.addEventListener('DOMContentLoaded', () => {
             if (fullscreenRequested) return; // 이미 요청했다면 무시
             fullscreenRequested = true;
             
+            console.log('전체화면 모드 활성화 시도');
             enableFullscreen();
             
             // 이벤트 리스너 제거
             document.removeEventListener('touchstart', enableFullscreenOnce);
             document.removeEventListener('click', enableFullscreenOnce);
+            document.removeEventListener('mousedown', enableFullscreenOnce);
         };
         
+        // 여러 이벤트에 등록하여 확실히 실행되도록 함
         document.addEventListener('touchstart', enableFullscreenOnce);
         document.addEventListener('click', enableFullscreenOnce);
+        document.addEventListener('mousedown', enableFullscreenOnce);
+        
+        // 캔버스에도 이벤트 리스너 추가
+        if (canvas) {
+            canvas.addEventListener('touchstart', enableFullscreenOnce);
+            canvas.addEventListener('click', enableFullscreenOnce);
+        }
+        
+        // 3초 후 자동으로 전체화면 시도 (백업 방법)
+        setTimeout(() => {
+            if (!fullscreenRequested) {
+                console.log('백업 전체화면 모드 활성화');
+                enableFullscreen();
+            }
+        }, 3000);
     }
     
     console.log('게임 초기화 완료');
