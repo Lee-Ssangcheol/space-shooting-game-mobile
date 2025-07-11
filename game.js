@@ -206,6 +206,13 @@ function reactivateFullscreen() {
     
     console.log('전체화면 재활성화 시도');
     
+    // 시작 화면이나 게임오버 화면에서는 전체화면 차단 플래그 임시 해제
+    const wasBlocked = blockFullscreenDuringGame;
+    if (isStartScreen || isGameOver) {
+        blockFullscreenDuringGame = false;
+        console.log('시작/게임오버 화면 - 전체화면 차단 플래그 임시 해제');
+    }
+    
     // 현재 전체화면 상태를 강제로 다시 확인
     const currentFullscreenState = checkFullscreenState();
     isFullscreenActive = currentFullscreenState;
@@ -221,6 +228,12 @@ function reactivateFullscreen() {
         console.log('전체화면이 이미 활성화되어 있음');
     } else {
         console.log('전체화면 활성화가 진행 중임');
+    }
+    
+    // 전체화면 차단 플래그 복원 (게임 중이었다면)
+    if (wasBlocked && !isStartScreen && !isGameOver) {
+        blockFullscreenDuringGame = true;
+        console.log('게임 중 - 전체화면 차단 플래그 복원');
     }
 }
 
@@ -633,7 +646,21 @@ function setupMobileControls() {
                 // 모바일에서 버튼 클릭 시 전체화면 시도 (첫 화면과 게임오버 화면에서)
                 if (isMobile && (isStartScreen || isGameOver)) {
                     console.log('전체화면 활성화 시도 - 화면 상태:', { isStartScreen, isGameOver });
-                    reactivateFullscreen();
+                    
+                    // 시작/게임오버 화면에서는 전체화면 차단 플래그 임시 해제
+                    const wasBlocked = blockFullscreenDuringGame;
+                    blockFullscreenDuringGame = false;
+                    
+                    // 직접 전체화면 활성화 시도
+                    setTimeout(() => {
+                        console.log('버튼 클릭으로 전체화면 직접 활성화 시도');
+                        enableFullscreen();
+                        
+                        // 게임 중이었다면 차단 플래그 복원
+                        if (wasBlocked && !isStartScreen && !isGameOver) {
+                            blockFullscreenDuringGame = true;
+                        }
+                    }, 100);
                 }
                 
                 // 시작 화면에서 버튼을 누르면 게임 시작
