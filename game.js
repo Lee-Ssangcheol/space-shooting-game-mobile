@@ -591,71 +591,26 @@ function setupMobileControls() {
         console.error('btnPause 요소를 찾을 수 없습니다!');
     }
     
-    if (mobileControls.btnReset) {
-        mobileControls.btnReset.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('최고점수 리셋 버튼 터치');
-            
-            // 모바일에서 버튼 터치 시 전체화면 시도
-            if (isMobile) {
-                enableFullscreen();
-            }
-            
-            // 최고 점수 리셋 확인
-            if (confirm('최고 점수를 리셋하시겠습니까?')) {
-                ScoreManager.reset().then(() => {
-                    console.log('ScoreManager를 통한 최고 점수 리셋 완료');
-                }).catch(error => {
-                    console.error('ScoreManager 리셋 실패:', error);
-                    // 백업 리셋 방법 - 모든 저장소 완전 클리어
-                    try {
-                        highScore = 0;
-                        score = 0;
-                        levelScore = 0;
-                        scoreForSpread = 0;
-                        gameLevel = 1;
-                        
-                        // localStorage 완전 클리어
-                        localStorage.removeItem('highScore');
-                        localStorage.removeItem('highScore_backup');
-                        localStorage.removeItem('highScore_timestamp');
-                        localStorage.removeItem('gameScore');
-                        localStorage.removeItem('gameScore_backup');
-                        // 리셋 완료 표시
-                        localStorage.setItem('scoreResetComplete', 'true');
-                        localStorage.setItem('resetTimestamp', Date.now().toString());
-                        
-                        // sessionStorage 완전 클리어
-                        sessionStorage.removeItem('highScore');
-                        sessionStorage.removeItem('gameScore');
-                        sessionStorage.clear();
-                        // 리셋 완료 표시
-                        sessionStorage.setItem('scoreResetComplete', 'true');
-                        sessionStorage.setItem('resetTimestamp', Date.now().toString());
-                        
-                        console.log('백업 방법으로 모든 저장소 완전 리셋 완료');
-                    } catch (e) {
-                        console.error('백업 리셋도 실패:', e);
-                    }
-                });
-            }
-        }, { passive: false });
-    } else {
-        console.error('btnReset 요소를 찾을 수 없습니다!');
-    }
+    // 최고 점수 리셋 함수 (중복 실행 방지)
+    let isResettingScore = false;
     
-    // 클릭 이벤트도 추가 (데스크탑용)
-    mobileControls.btnReset.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('최고점수 리셋 버튼 클릭');
+    async function resetHighScore() {
+        if (isResettingScore) return; // 이미 실행 중이면 중단
+        
+        isResettingScore = true;
+        console.log('최고점수 리셋 시작');
+        
+        // 모바일에서 버튼 터치 시 전체화면 시도
+        if (isMobile) {
+            enableFullscreen();
+        }
         
         // 최고 점수 리셋 확인
         if (confirm('최고 점수를 리셋하시겠습니까?')) {
-            ScoreManager.reset().then(() => {
+            try {
+                await ScoreManager.reset();
                 console.log('ScoreManager를 통한 최고 점수 리셋 완료');
-            }).catch(error => {
+            } catch (error) {
                 console.error('ScoreManager 리셋 실패:', error);
                 // 백업 리셋 방법 - 모든 저장소 완전 클리어
                 try {
@@ -687,9 +642,32 @@ function setupMobileControls() {
                 } catch (e) {
                     console.error('백업 리셋도 실패:', e);
                 }
-            });
+            }
         }
-    });
+        
+        // 1초 후에 다시 실행 가능하도록 설정
+        setTimeout(() => {
+            isResettingScore = false;
+        }, 1000);
+    }
+    
+    if (mobileControls.btnReset) {
+        // 터치 이벤트 (모바일용)
+        mobileControls.btnReset.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            resetHighScore();
+        }, { passive: false });
+        
+        // 클릭 이벤트 (데스크탑용)
+        mobileControls.btnReset.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            resetHighScore();
+        });
+    } else {
+        console.error('btnReset 요소를 찾을 수 없습니다!');
+    }
     
     console.log('모바일 컨트롤 설정 완료');
     
