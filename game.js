@@ -20,6 +20,17 @@ let fullscreenRequestTime = 0;
 function enableFullscreen() {
     if (!isMobile) return;
     
+    // 이미 전체화면 모드인지 확인
+    const isCurrentlyFullscreen = document.fullscreenElement || 
+                                 document.webkitFullscreenElement || 
+                                 document.mozFullScreenElement || 
+                                 document.msFullscreenElement;
+    
+    if (isCurrentlyFullscreen) {
+        console.log('이미 전체화면 모드입니다');
+        return;
+    }
+    
     // 이미 전체화면 요청 중이거나 최근에 요청했다면 중복 실행 방지
     const now = Date.now();
     if (isFullscreenRequested || (now - fullscreenRequestTime < 2000)) {
@@ -31,18 +42,35 @@ function enableFullscreen() {
     
     console.log('모바일 전체화면 모드 활성화 시도');
     
-    // iOS Safari 전체화면 모드
+    // 브라우저별 전체화면 API 호출 (하나만 실행)
+    let fullscreenPromise = null;
+    
+    // 표준 API 우선 시도
     if (document.documentElement.requestFullscreen) {
-        const fullscreenPromise = document.documentElement.requestFullscreen();
-        if (fullscreenPromise && fullscreenPromise.catch) {
-            fullscreenPromise.catch(err => {
-                console.log('전체화면 모드 실패:', err);
-                isFullscreenRequested = false; // 실패 시 플래그 리셋
-            });
-        }
+        fullscreenPromise = document.documentElement.requestFullscreen();
+    }
+    // WebKit API (Safari, Chrome)
+    else if (document.documentElement.webkitRequestFullscreen) {
+        fullscreenPromise = document.documentElement.webkitRequestFullscreen();
+    }
+    // Mozilla API (Firefox)
+    else if (document.documentElement.mozRequestFullScreen) {
+        fullscreenPromise = document.documentElement.mozRequestFullScreen();
+    }
+    // MS API (IE)
+    else if (document.documentElement.msRequestFullscreen) {
+        fullscreenPromise = document.documentElement.msRequestFullscreen();
     }
     
-    // iOS Safari에서 주소창 숨김
+    // 전체화면 요청 처리
+    if (fullscreenPromise && fullscreenPromise.catch) {
+        fullscreenPromise.catch(err => {
+            console.log('전체화면 모드 실패:', err);
+            isFullscreenRequested = false; // 실패 시 플래그 리셋
+        });
+    }
+    
+    // iOS Safari에서 주소창 숨김 (전체화면과 별개)
     if (window.navigator.standalone) {
         document.body.style.position = 'fixed';
         document.body.style.top = '0';
@@ -51,18 +79,7 @@ function enableFullscreen() {
         document.body.style.height = '100vh';
     }
     
-    // Android Chrome 전체화면 모드
-    if (document.documentElement.webkitRequestFullscreen) {
-        const webkitPromise = document.documentElement.webkitRequestFullscreen();
-        if (webkitPromise && webkitPromise.catch) {
-            webkitPromise.catch(err => {
-                console.log('webkit 전체화면 모드 실패:', err);
-                isFullscreenRequested = false; // 실패 시 플래그 리셋
-            });
-        }
-    }
-    
-    // 화면 방향 고정 (세로 모드)
+    // 화면 방향 고정 (세로 모드) - 전체화면과 별개로 실행
     if (screen.orientation && screen.orientation.lock) {
         const lockPromise = screen.orientation.lock('portrait');
         if (lockPromise && lockPromise.catch) {
@@ -76,6 +93,32 @@ function enableFullscreen() {
     setTimeout(() => {
         isFullscreenRequested = false;
     }, 3000);
+}
+
+// 전체화면 상태 변화 이벤트 리스너
+function setupFullscreenEventListeners() {
+    const fullscreenChangeEvents = [
+        'fullscreenchange',
+        'webkitfullscreenchange',
+        'mozfullscreenchange',
+        'MSFullscreenChange'
+    ];
+    
+    fullscreenChangeEvents.forEach(eventName => {
+        document.addEventListener(eventName, () => {
+            const isFullscreen = document.fullscreenElement || 
+                                document.webkitFullscreenElement || 
+                                document.mozFullScreenElement || 
+                                document.msFullscreenElement;
+            
+            if (isFullscreen) {
+                console.log('전체화면 모드 진입');
+                isFullscreenRequested = false; // 성공 시 플래그 리셋
+            } else {
+                console.log('전체화면 모드 종료');
+            }
+        });
+    });
 }
 
 
@@ -5218,21 +5261,30 @@ window.addEventListener('DOMContentLoaded', () => {
     // 4. 모바일 컨트롤 설정
     setupMobileControls();
     
-    // 5. 게임 초기화
+    // 5. 전체화면 이벤트 리스너 설정
+    setupFullscreenEventListeners();
+    
+    // 6. 게임 초기화
     initializeGame();
     
     // 5. 모바일에서 전체화면 모드 활성화 (한 번만 실행)
     if (isMobile) {
         // 사용자 상호작용 후 전체화면 모드 활성화 (iOS Safari 요구사항)
+        let fullscreenRequested = false;
+        
         const enableFullscreenOnce = () => {
+            if (fullscreenRequested) return; // 이미 요청했다면 무시
+            fullscreenRequested = true;
+            
             enableFullscreen();
+            
             // 이벤트 리스너 제거
             document.removeEventListener('touchstart', enableFullscreenOnce);
             document.removeEventListener('click', enableFullscreenOnce);
         };
         
-        document.addEventListener('touchstart', enableFullscreenOnce, { once: true });
-        document.addEventListener('click', enableFullscreenOnce, { once: true });
+        document.addEventListener('touchstart', enableFullscreenOnce);
+        document.addEventListener('click', enableFullscreenOnce);
     }
     
     console.log('게임 초기화 완료');
