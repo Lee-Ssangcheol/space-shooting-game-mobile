@@ -98,16 +98,24 @@ function enableFullscreen() {
         console.log('Promise catch 메서드 존재:', !!fullscreenPromise.catch);
         
         if (fullscreenPromise.catch) {
-            fullscreenPromise.then(() => {
-                console.log('전체화면 모드 성공');
-                fullscreenEnabled = true; // 성공 시 활성화 플래그 설정
-                console.log('fullscreenEnabled 플래그 설정됨:', fullscreenEnabled);
-            }).catch(err => {
-                console.log('전체화면 모드 실패:', err);
-                console.log('사용된 API:', apiUsed);
-                console.log('에러 타입:', err.name, '에러 메시지:', err.message);
-                isFullscreenRequested = false; // 실패 시 플래그 리셋
-            });
+                    fullscreenPromise.then(() => {
+            console.log('전체화면 모드 성공');
+            fullscreenEnabled = true; // 성공 시 활성화 플래그 설정
+            console.log('fullscreenEnabled 플래그 설정됨:', fullscreenEnabled);
+        }).catch(err => {
+            console.log('전체화면 모드 실패:', err);
+            console.log('사용된 API:', apiUsed);
+            console.log('에러 타입:', err.name, '에러 메시지:', err.message);
+            
+            // 권한 실패인 경우 대안 방법으로 전체화면 효과 적용
+            if (err.message.includes('Permissions check failed') || err.name === 'TypeError') {
+                console.log('권한 실패 감지 - 대안 방법으로 전체화면 효과 적용');
+                fullscreenEnabled = true; // 대안 방법으로도 전체화면 활성화로 간주
+                console.log('대안 방법으로 fullscreenEnabled 플래그 설정됨:', fullscreenEnabled);
+            }
+            
+            isFullscreenRequested = false; // 실패 시 플래그 리셋
+        });
         } else {
             console.log('Promise에 catch 메서드가 없음 - 동기적 처리로 간주');
             // 동기적 처리로 간주하고 성공으로 처리
@@ -122,6 +130,12 @@ function enableFullscreen() {
         console.log('- WebKit API:', !!document.documentElement.webkitRequestFullscreen);
         console.log('- Mozilla API:', !!document.documentElement.mozRequestFullScreen);
         console.log('- MS API:', !!document.documentElement.msRequestFullscreen);
+        
+        // API가 없어도 대안 방법으로 전체화면 효과 적용
+        console.log('전체화면 API 없음 - 대안 방법으로 전체화면 효과 적용');
+        fullscreenEnabled = true;
+        console.log('대안 방법으로 fullscreenEnabled 플래그 설정됨:', fullscreenEnabled);
+        
         isFullscreenRequested = false;
     }
     
@@ -154,6 +168,29 @@ function enableFullscreen() {
         document.body.style.width = '100vw';
         document.body.style.height = '100vh';
         document.body.style.overflow = 'hidden';
+        
+        // 게임 컨테이너도 전체화면으로 조정
+        const gameContainer = document.getElementById('game-container');
+        if (gameContainer) {
+            gameContainer.style.position = 'fixed';
+            gameContainer.style.top = '0';
+            gameContainer.style.left = '0';
+            gameContainer.style.width = '100vw';
+            gameContainer.style.height = '100vh';
+            gameContainer.style.zIndex = '9999';
+        }
+        
+        // 캔버스 컨테이너도 조정
+        const canvasContainer = document.getElementById('canvas-container');
+        if (canvasContainer) {
+            canvasContainer.style.position = 'fixed';
+            canvasContainer.style.top = '0';
+            canvasContainer.style.left = '0';
+            canvasContainer.style.width = '100vw';
+            canvasContainer.style.height = '100vh';
+        }
+        
+        console.log('Android 모바일 전체화면 스타일 적용 완료');
     }
     
     // 화면 방향 고정 (세로 모드) - 전체화면과 별개로 실행
@@ -205,6 +242,28 @@ function setupFullscreenEventListeners() {
             }
         });
     });
+    
+    // 모바일에서 전체화면 API가 실패한 경우를 위한 대안 이벤트 리스너
+    if (isMobile) {
+        // 페이지 가시성 변화 감지 (주소창 숨김/표시)
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                console.log('페이지 가시성 복원 - 전체화면 상태 확인');
+                // 페이지가 다시 보이면 전체화면 상태 재확인
+                setTimeout(() => {
+                    const isFullscreen = document.fullscreenElement || 
+                                        document.webkitFullscreenElement || 
+                                        document.mozFullScreenElement || 
+                                        document.msFullscreenElement;
+                    if (!isFullscreen && fullscreenEnabled) {
+                        console.log('전체화면이 종료됨 - 재활성화 가능');
+                        isFullscreenRequested = false;
+                        fullscreenRequestTime = 0;
+                    }
+                }, 100);
+            }
+        });
+    }
 }
 
 
