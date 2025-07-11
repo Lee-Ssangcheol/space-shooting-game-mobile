@@ -19,6 +19,10 @@ let fullscreenEnabled = false; // 전체화면 활성화 여부 추적
 
 // 모바일 전체화면 모드 활성화
 function enableFullscreen() {
+    console.log('=== enableFullscreen 함수 호출됨 ===');
+    console.log('isMobile:', isMobile);
+    console.log('navigator.userAgent:', navigator.userAgent);
+    
     if (!isMobile) {
         console.log('데스크탑 환경이므로 전체화면 모드 건너뜀');
         return;
@@ -52,33 +56,31 @@ function enableFullscreen() {
     console.log('현재 전체화면 상태:', isCurrentlyFullscreen);
     console.log('전체화면 요청 플래그:', isFullscreenRequested);
     
-    // 브라우저별 전체화면 API 호출 (하나만 실행)
+    // 브라우저별 전체화면 API 호출 (모든 가능한 방법 시도)
     let fullscreenPromise = null;
     let apiUsed = 'none';
     
-    // 표준 API 우선 시도
-    if (document.documentElement.requestFullscreen) {
-        console.log('표준 전체화면 API 사용');
-        fullscreenPromise = document.documentElement.requestFullscreen();
-        apiUsed = 'standard';
-    }
-    // WebKit API (Safari, Chrome)
-    else if (document.documentElement.webkitRequestFullscreen) {
-        console.log('WebKit 전체화면 API 사용');
-        fullscreenPromise = document.documentElement.webkitRequestFullscreen();
-        apiUsed = 'webkit';
-    }
-    // Mozilla API (Firefox)
-    else if (document.documentElement.mozRequestFullScreen) {
-        console.log('Mozilla 전체화면 API 사용');
-        fullscreenPromise = document.documentElement.mozRequestFullScreen();
-        apiUsed = 'mozilla';
-    }
-    // MS API (IE)
-    else if (document.documentElement.msRequestFullscreen) {
-        console.log('MS 전체화면 API 사용');
-        fullscreenPromise = document.documentElement.msRequestFullscreen();
-        apiUsed = 'ms';
+    // 모든 가능한 전체화면 API를 순차적으로 시도
+    const fullscreenAPIs = [
+        { name: 'standard', method: document.documentElement.requestFullscreen },
+        { name: 'webkit', method: document.documentElement.webkitRequestFullscreen },
+        { name: 'moz', method: document.documentElement.mozRequestFullScreen },
+        { name: 'ms', method: document.documentElement.msRequestFullscreen }
+    ];
+    
+    for (const api of fullscreenAPIs) {
+        if (api.method) {
+            console.log(`${api.name} 전체화면 API 사용 시도`);
+            try {
+                fullscreenPromise = api.method.call(document.documentElement);
+                apiUsed = api.name;
+                console.log(`${api.name} API 호출 성공`);
+                break;
+            } catch (error) {
+                console.log(`${api.name} API 호출 실패:`, error);
+                continue;
+            }
+        }
     }
     
     console.log('사용 가능한 전체화면 API 확인:');
@@ -90,26 +92,45 @@ function enableFullscreen() {
     console.log('사용된 API:', apiUsed);
     
     // 전체화면 요청 처리
-    if (fullscreenPromise && fullscreenPromise.catch) {
+    if (fullscreenPromise) {
         console.log('전체화면 Promise 생성됨, 처리 시작');
-        fullscreenPromise.then(() => {
-            console.log('전체화면 모드 성공');
-            fullscreenEnabled = true; // 성공 시 활성화 플래그 설정
-            console.log('fullscreenEnabled 플래그 설정됨:', fullscreenEnabled);
-        }).catch(err => {
-            console.log('전체화면 모드 실패:', err);
-            console.log('사용된 API:', apiUsed);
-            console.log('에러 타입:', err.name, '에러 메시지:', err.message);
-            isFullscreenRequested = false; // 실패 시 플래그 리셋
-        });
-    } else if (!fullscreenPromise) {
+        console.log('Promise 타입:', typeof fullscreenPromise);
+        console.log('Promise catch 메서드 존재:', !!fullscreenPromise.catch);
+        
+        if (fullscreenPromise.catch) {
+            fullscreenPromise.then(() => {
+                console.log('전체화면 모드 성공');
+                fullscreenEnabled = true; // 성공 시 활성화 플래그 설정
+                console.log('fullscreenEnabled 플래그 설정됨:', fullscreenEnabled);
+            }).catch(err => {
+                console.log('전체화면 모드 실패:', err);
+                console.log('사용된 API:', apiUsed);
+                console.log('에러 타입:', err.name, '에러 메시지:', err.message);
+                isFullscreenRequested = false; // 실패 시 플래그 리셋
+            });
+        } else {
+            console.log('Promise에 catch 메서드가 없음 - 동기적 처리로 간주');
+            // 동기적 처리로 간주하고 성공으로 처리
+            console.log('전체화면 모드 성공 (동기적)');
+            fullscreenEnabled = true;
+        }
+    } else {
         console.log('지원되는 전체화면 API가 없습니다');
         console.log('fullscreenPromise:', fullscreenPromise);
+        console.log('사용 가능한 API들:');
+        console.log('- 표준 API:', !!document.documentElement.requestFullscreen);
+        console.log('- WebKit API:', !!document.documentElement.webkitRequestFullscreen);
+        console.log('- Mozilla API:', !!document.documentElement.mozRequestFullScreen);
+        console.log('- MS API:', !!document.documentElement.msRequestFullscreen);
         isFullscreenRequested = false;
     }
     
+    // 모바일 환경에서 전체화면 대안 방법들
+    console.log('모바일 전체화면 대안 방법 적용');
+    
     // iOS Safari에서 주소창 숨김 (전체화면과 별개)
     if (window.navigator.standalone) {
+        console.log('iOS standalone 모드 감지 - 주소창 숨김 적용');
         document.body.style.position = 'fixed';
         document.body.style.top = '0';
         document.body.style.left = '0';
@@ -117,14 +138,37 @@ function enableFullscreen() {
         document.body.style.height = '100vh';
     }
     
+    // Android Chrome에서 주소창 숨김 시도
+    if (isMobile && !window.navigator.standalone) {
+        console.log('Android 모바일 감지 - 주소창 숨김 시도');
+        // viewport 메타 태그 업데이트
+        const viewport = document.querySelector('meta[name="viewport"]');
+        if (viewport) {
+            viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover');
+        }
+        
+        // body 스타일 조정으로 전체화면 효과
+        document.body.style.position = 'fixed';
+        document.body.style.top = '0';
+        document.body.style.left = '0';
+        document.body.style.width = '100vw';
+        document.body.style.height = '100vh';
+        document.body.style.overflow = 'hidden';
+    }
+    
     // 화면 방향 고정 (세로 모드) - 전체화면과 별개로 실행
     if (screen.orientation && screen.orientation.lock) {
+        console.log('화면 방향 고정 시도');
         const lockPromise = screen.orientation.lock('portrait');
         if (lockPromise && lockPromise.catch) {
-            lockPromise.catch(err => {
+            lockPromise.then(() => {
+                console.log('화면 방향 고정 성공');
+            }).catch(err => {
                 console.log('화면 방향 고정 실패:', err);
             });
         }
+    } else {
+        console.log('화면 방향 고정 API 지원 안됨');
     }
     
     // 3초 후 플래그 리셋 (성공했든 실패했든)
