@@ -691,33 +691,11 @@ function setupMobileControls() {
                     console.log('게임 시작 완료');
                     console.log('게임 상태 업데이트:', { isStartScreen, gameStarted, isGameOver });
                     
-                    // 게임 시작 시 페이지 로드 시 등록된 전체화면 이벤트 리스너들 완전 제거
+                    // 게임 시작 시 전체화면 활성화 차단
                     if (isMobile) {
-                        // 기존 enableFullscreenOnce 함수를 임시로 저장
-                        const oldEnableFullscreenOnce = enableFullscreenOnce;
-                        
-                        // 모든 전체화면 관련 이벤트 리스너 제거 (게임 중 전체화면 방지)
-                        const events = ['touchstart', 'click', 'mousedown'];
-                        events.forEach(event => {
-                            // 기존 함수로 등록된 이벤트 리스너 제거
-                            if (oldEnableFullscreenOnce) {
-                                document.removeEventListener(event, oldEnableFullscreenOnce);
-                                if (canvas) {
-                                    canvas.removeEventListener(event, oldEnableFullscreenOnce);
-                                }
-                            }
-                        });
-                        
-                        // enableFullscreenOnce 함수를 게임 중에는 작동하지 않는 함수로 교체
-                        enableFullscreenOnce = () => {
-                            console.log('게임 중 - 전체화면 활성화 차단됨 (함수 교체됨)');
-                            return; // 아무것도 하지 않음
-                        };
-                        
                         // 게임 중 전체화면 활성화 차단 플래그 설정
                         blockFullscreenDuringGame = true;
-                        
-                        console.log('게임 시작 - 전체화면 자동 활성화 함수 완전 차단됨');
+                        console.log('게임 시작 - 전체화면 활성화 차단됨');
                     }
                     
                     // 게임 루프 시작
@@ -1906,45 +1884,11 @@ function restartGame() {
         isSnakePatternActive: isSnakePatternActive
     });
     
-    // 게임 재시작 시 전체화면 이벤트 리스너 다시 등록 (게임오버 화면에서 전체화면 활성화를 위해)
+    // 게임 재시작 시 전체화면 활성화 허용
     if (isMobile) {
-        // enableFullscreenOnce 함수를 다시 생성
-        let fullscreenRequested = false;
-        enableFullscreenOnce = () => {
-            // 게임이 시작된 후에는 전체화면 활성화하지 않음
-            if (gameStarted && !isStartScreen && !isGameOver) {
-                console.log('게임 중 - 전체화면 활성화 차단됨');
-                return;
-            }
-            
-            if (fullscreenRequested) return; // 이미 요청했다면 무시
-            fullscreenRequested = true;
-            
-            console.log('게임 재시작 후 전체화면 모드 활성화 시도');
-            enableFullscreen();
-            
-            // 이벤트 리스너 제거
-            const events = ['touchstart', 'click', 'mousedown'];
-            events.forEach(event => {
-                document.removeEventListener(event, enableFullscreenOnce);
-                if (canvas) {
-                    canvas.removeEventListener(event, enableFullscreenOnce);
-                }
-            });
-        };
-        
-        const events = ['touchstart', 'click', 'mousedown'];
-        events.forEach(event => {
-            document.addEventListener(event, enableFullscreenOnce);
-            if (canvas) {
-                canvas.addEventListener(event, enableFullscreenOnce);
-            }
-        });
-        
         // 게임 중 전체화면 활성화 차단 플래그 해제
         blockFullscreenDuringGame = false;
-        
-        console.log('게임 재시작 - 전체화면 이벤트 리스너 다시 등록됨');
+        console.log('게임 재시작 - 전체화면 활성화 허용됨');
     }
 }
 
@@ -3935,45 +3879,11 @@ function handleGameOver() {
         
         // 게임 오버 시 캔버스에 포커스
         document.getElementById('gameCanvas').focus();
-                // 게임 오버 시 전체화면 이벤트 리스너 다시 등록 (게임오버 화면에서 전체화면 활성화를 위해)
+                // 게임 오버 시 전체화면 활성화 허용
         if (isMobile) {
-            // enableFullscreenOnce 함수를 다시 생성
-            let fullscreenRequested = false;
-            enableFullscreenOnce = () => {
-                // 게임이 시작된 후에는 전체화면 활성화하지 않음
-                if (gameStarted && !isStartScreen && !isGameOver) {
-                    console.log('게임 중 - 전체화면 활성화 차단됨');
-                    return;
-                }
-                
-                if (fullscreenRequested) return; // 이미 요청했다면 무시
-                fullscreenRequested = true;
-                
-                console.log('게임오버 후 전체화면 모드 활성화 시도');
-                enableFullscreen();
-                
-                // 이벤트 리스너 제거
-                const events = ['touchstart', 'click', 'mousedown'];
-                events.forEach(event => {
-                    document.removeEventListener(event, enableFullscreenOnce);
-                    if (canvas) {
-                        canvas.removeEventListener(event, enableFullscreenOnce);
-                    }
-                });
-            };
-            
-            const events = ['touchstart', 'click', 'mousedown'];
-            events.forEach(event => {
-                document.addEventListener(event, enableFullscreenOnce);
-                if (canvas) {
-                    canvas.addEventListener(event, enableFullscreenOnce);
-                }
-            });
-            
             // 게임 중 전체화면 활성화 차단 플래그 해제
             blockFullscreenDuringGame = false;
-            
-            console.log('게임 오버 - 전체화면 이벤트 리스너 다시 등록됨');
+            console.log('게임 오버 - 전체화면 활성화 허용됨');
         }
     }
 }
@@ -5698,55 +5608,9 @@ window.addEventListener('DOMContentLoaded', () => {
     // 6. 게임 초기화
     initializeGame();
     
-    // 5. 모바일에서 전체화면 모드 활성화 (페이지 로드 시 자동 시도)
-    if (isMobile) {
-        // 사용자 상호작용 후 전체화면 모드 활성화 (iOS Safari 요구사항)
-        let fullscreenRequested = false;
-        
-        enableFullscreenOnce = () => {
-            // 게임이 시작된 후에는 전체화면 활성화하지 않음
-            if (gameStarted && !isStartScreen && !isGameOver) {
-                console.log('게임 중 - 전체화면 활성화 차단됨');
-                return;
-            }
-            
-            if (fullscreenRequested) return; // 이미 요청했다면 무시
-            fullscreenRequested = true;
-            
-            console.log('페이지 로드 시 전체화면 모드 활성화 시도');
-            enableFullscreen();
-            
-            // 이벤트 리스너 제거
-            document.removeEventListener('touchstart', enableFullscreenOnce);
-            document.removeEventListener('click', enableFullscreenOnce);
-            document.removeEventListener('mousedown', enableFullscreenOnce);
-            
-            // 캔버스 이벤트 리스너도 제거
-            if (canvas) {
-                canvas.removeEventListener('touchstart', enableFullscreenOnce);
-                canvas.removeEventListener('click', enableFullscreenOnce);
-            }
-        };
-        
-        // 여러 이벤트에 등록하여 확실히 실행되도록 함
-        document.addEventListener('touchstart', enableFullscreenOnce);
-        document.addEventListener('click', enableFullscreenOnce);
-        document.addEventListener('mousedown', enableFullscreenOnce);
-        
-        // 캔버스에도 이벤트 리스너 추가
-        if (canvas) {
-            canvas.addEventListener('touchstart', enableFullscreenOnce);
-            canvas.addEventListener('click', enableFullscreenOnce);
-        }
-        
-        // 3초 후 자동으로 전체화면 시도 (백업 방법)
-        setTimeout(() => {
-            if (!fullscreenRequested) {
-                console.log('백업 전체화면 모드 활성화');
-                enableFullscreen();
-            }
-        }, 3000);
-    }
+    // 5. 모바일에서 전체화면 모드 활성화 (페이지 로드 시 자동 시도) - 제거됨
+    // 페이지 로드 시 자동 전체화면 활성화는 제거하고, 오직 버튼 클릭 시에만 활성화
+    console.log('페이지 로드 시 자동 전체화면 활성화 비활성화됨');
     
     console.log('게임 초기화 완료');
 });
