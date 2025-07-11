@@ -4570,7 +4570,7 @@ function drawStartScreen() {
     if (isVisible) {
         ctx.font = 'bold 20px Arial';
         ctx.fillStyle = '#ffff00';
-        ctx.fillText('시작/재시작 버튼 누른 후 터치하여 재시작', canvas.width/2, subtitleY);
+        ctx.fillText('시작/재시작 버튼 누른 후 터치하여 시작', canvas.width/2, subtitleY);
     }
 
     // 조작법 안내
