@@ -643,7 +643,7 @@ function setupMobileControls() {
                 
                 console.log('시작/재시작 버튼 처리');
                 
-                // 모바일에서 버튼 클릭 시 전체화면 시도 (첫 화면과 게임오버 화면에서)
+                // 모바일에서 버튼 클릭 시 전체화면 활성화 (첫 화면과 게임오버 화면에서)
                 if (isMobile && (isStartScreen || isGameOver)) {
                     console.log('전체화면 활성화 시도 - 화면 상태:', { isStartScreen, isGameOver });
                     
@@ -651,10 +651,10 @@ function setupMobileControls() {
                     const wasBlocked = blockFullscreenDuringGame;
                     blockFullscreenDuringGame = false;
                     
-                    // 직접 전체화면 활성화 시도
+                    // reactivateFullscreen 함수 사용하여 전체화면 활성화
                     setTimeout(() => {
-                        console.log('버튼 클릭으로 전체화면 직접 활성화 시도');
-                        enableFullscreen();
+                        console.log('버튼 클릭으로 전체화면 활성화 시도');
+                        reactivateFullscreen();
                         
                         // 게임 중이었다면 차단 플래그 복원
                         if (wasBlocked && !isStartScreen && !isGameOver) {

@@ -48,7 +48,7 @@ body {
   width: 392px;
   height: 700px;
   object-fit: contain;
-  touch-action: manipulation; /* 터치 동작 허용하되 줌 방지 */
+  touch-action: none; /* 터치 동작 완전 차단 */
   cursor: pointer; /* 터치 가능함을 시각적으로 표시 */
 }
 
