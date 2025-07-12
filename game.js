@@ -3793,7 +3793,7 @@ function handleSpreadShot() {
                 y: player.y,
                 width: 10,
                 height: 25,
-                speed: 6,  // 속도를 반으로 줄임 (12 -> 6)
+                speed: 1,  // 속도를 반으로 줄임 (12 -> 1)
                 angle: angle,
                 isSpread: true
             };
@@ -3806,7 +3806,7 @@ function handleSpreadShot() {
                     y: secondPlane.y,
                     width: 10,
                     height: 25,
-                    speed: 6,  // 속도를 반으로 줄임 (12 -> 6)
+                    speed: 1,  // 속도를 반으로 줄임 (12 -> 1)
                     angle: angle,
                     isSpread: true
                 };
