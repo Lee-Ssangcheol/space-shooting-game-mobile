@@ -3793,7 +3793,7 @@ function handleSpreadShot() {
                 y: player.y,
                 width: 10,
                 height: 25,
-                speed: 12,
+                speed: 6,  // 속도를 반으로 줄임 (12 -> 6)
                 angle: angle,
                 isSpread: true
             };
@@ -3806,7 +3806,7 @@ function handleSpreadShot() {
                     y: secondPlane.y,
                     width: 10,
                     height: 25,
-                    speed: 12,
+                    speed: 6,  // 속도를 반으로 줄임 (12 -> 6)
                     angle: angle,
                     isSpread: true
                 };
@@ -3923,7 +3923,7 @@ function handleBullets() {
             // 확산탄 이동
             bullet.x += Math.sin(bullet.angle) * bullet.speed;
             bullet.y -= Math.cos(bullet.angle) * bullet.speed;
-            ctx.fillStyle = '#ff4444';
+            ctx.fillStyle = '#00ff88';  // 청녹색으로 변경
             ctx.fillRect(bullet.x - bullet.width/2, bullet.y - bullet.height/2, bullet.width, bullet.height);
         } else {
             // 일반 총알 이동
