@@ -1564,8 +1564,8 @@ async function initializeGame() {
         lastFireTime = 0;
         isSpacePressed = false;
         spacePressTime = 0;
-        fireDelay = 1200;
-        continuousFireDelay = 100;
+        fireDelay = 600;
+        continuousFireDelay = 50;
         bulletSpeed = 12 * mobileSpeedMultiplier;
         baseBulletSize = 4.5;
         isContinuousFire = false;
@@ -1694,8 +1694,8 @@ function restartGame() {
     lastFireTime = 0;
     isSpacePressed = false;
     spacePressTime = 0;
-    fireDelay = 1200;
-    continuousFireDelay = 100;
+    fireDelay = 600;
+    continuousFireDelay = 50;
     bulletSpeed = 12 * mobileSpeedMultiplier;
     baseBulletSize = 4.5;
     isContinuousFire = false;
@@ -3793,7 +3793,7 @@ function handleSpreadShot() {
                 y: player.y,
                 width: 10,
                 height: 25,
-                speed: 1,  // 속도를 반으로 줄임 (12 -> 1)
+                speed: 3,  // 속도를 반으로 줄임 (12 -> 1)
                 angle: angle,
                 isSpread: true
             };
@@ -3806,7 +3806,7 @@ function handleSpreadShot() {
                     y: secondPlane.y,
                     width: 10,
                     height: 25,
-                    speed: 1,  // 속도를 반으로 줄임 (12 -> 1)
+                    speed: 3,  // 속도를 반으로 줄임 (12 -> 1)
                     angle: angle,
                     isSpread: true
                 };
@@ -4664,8 +4664,8 @@ let fireRateMultiplier = 1;
 let lastFireTime = 0;  // 마지막 발사 시간
 let isSpacePressed = false;  // 스페이스바 누름 상태
 let spacePressTime = 0;  // 스페이스바를 처음 누른 시간
-let fireDelay = 1200;  // 기본 발사 딜레이 (끊어서 발사할 때 - 더 느리게)
-let continuousFireDelay = 100;  // 연속 발사 딜레이 (빠르게)
+let fireDelay = 600;  // 기본 발사 딜레이 (끊어서 발사할 때 - 더 느리게)
+let continuousFireDelay = 50;  // 연속 발사 딜레이 (빠르게)
 let bulletSpeed = 12 * mobileSpeedMultiplier;  // 총알 속도
 let baseBulletSize = 4.5;  // 기본 총알 크기 (1.5배 증가)
 let isContinuousFire = false;  // 연속 발사 상태
@@ -5174,8 +5174,8 @@ async function initializeGame() {
         lastFireTime = 0;
         isSpacePressed = false;
         spacePressTime = 0;
-        fireDelay = 1200;
-        continuousFireDelay = 100;
+        fireDelay = 600;
+        continuousFireDelay = 50;
         bulletSpeed = 12 * mobileSpeedMultiplier;
         baseBulletSize = 4.5;
         isContinuousFire = false;
@@ -5326,8 +5326,8 @@ function restartGame() {
     lastFireTime = 0;
     isSpacePressed = false;
     spacePressTime = 0;
-    fireDelay = 1200;
-    continuousFireDelay = 100;
+    fireDelay = 600;
+    continuousFireDelay = 50;
     bulletSpeed = 12 * mobileSpeedMultiplier;
     baseBulletSize = 4.5;
     isContinuousFire = false;
