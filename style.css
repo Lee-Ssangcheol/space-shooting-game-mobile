@@ -55,7 +55,7 @@ body {
   left: 0;
   right: 0;
   height: 80px;
-  background: rgba(0, 0, 0, 0.8);
+  background: transparent; /* 투명색 배경 */
   display: flex;
   justify-content: center;
   align-items: center;
