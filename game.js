@@ -124,9 +124,30 @@ function enableFullscreen() {
     // 비동기로 전체화면 시도
     tryFullscreen().then(success => {
         if (!success) {
-            console.log('모든 전체화면 API 실패');
+            console.log('모든 전체화면 API 실패 - CSS 전체화면 효과 적용');
+            // API 실패 시 CSS로 전체화면 효과 강화
+            if (isMobile) {
+                document.body.style.position = 'fixed';
+                document.body.style.top = '0';
+                document.body.style.left = '0';
+                document.body.style.width = '100vw';
+                document.body.style.height = '100vh';
+                document.body.style.overflow = 'hidden';
+                document.body.style.margin = '0';
+                document.body.style.padding = '0';
+                document.body.style.zIndex = '9999';
+                
+                // iOS Safari에서 추가 설정
+                if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
+                    document.body.style.webkitOverflowScrolling = 'touch';
+                    document.body.style.webkitUserSelect = 'none';
+                    document.body.style.webkitTouchCallout = 'none';
+                }
+            }
             isFullscreenRequested = false;
             fullscreenRequestTime = 0;
+        } else {
+            console.log('전체화면 API 성공!');
         }
     }).catch(err => {
         console.log('전체화면 요청 중 오류:', err);
@@ -648,12 +669,39 @@ function setupMobileControls() {
                             }
                         }
                         
-                        // 전체화면 전환 시도
+                        // 전체화면 전환 시도 (강화된 버전)
+                        console.log('전체화면 전환 시도 시작');
+                        
+                        // 즉시 전체화면 시도
                         enableFullscreen();
+                        
+                        // 추가 전체화면 시도 (지연 후)
+                        setTimeout(() => {
+                            console.log('지연된 전체화면 시도');
+                            enableFullscreen();
+                        }, 100);
+                        
+                        // 한 번 더 시도 (더 지연 후)
+                        setTimeout(() => {
+                            console.log('최종 전체화면 시도');
+                            enableFullscreen();
+                        }, 500);
                         
                         console.log('모바일 게임 시작 완료');
                         console.log('게임 상태 업데이트:', { isStartScreen, gameStarted, isGameOver });
                         console.log('게임 루프 상태:', { gameLoopRunning });
+                        
+                        // 화면에 상태 표시 (모바일 디버깅용)
+                        if (isMobile && canvas && ctx) {
+                            ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+                            ctx.fillRect(0, 0, canvas.width, canvas.height);
+                            ctx.fillStyle = 'white';
+                            ctx.font = 'bold 20px Arial';
+                            ctx.textAlign = 'center';
+                            ctx.fillText('게임 시작됨!', canvas.width/2, canvas.height/2 - 50);
+                            ctx.fillText('전체화면 전환 중...', canvas.width/2, canvas.height/2);
+                            ctx.fillText('터치하여 게임 시작', canvas.width/2, canvas.height/2 + 50);
+                        }
                         
                         // 게임 루프가 이미 실행 중인지 확인
                         if (!gameLoopRunning) {
@@ -2614,6 +2662,19 @@ function gameLoop() {
     if (isStartScreen && !gameStarted) {
         console.log('시작 화면 그리기 중...');
         drawStartScreen();
+        
+        // 모바일 디버깅 정보 표시
+        if (isMobile) {
+            ctx.fillStyle = 'white';
+            ctx.font = '14px Arial';
+            ctx.textAlign = 'left';
+            ctx.fillText('시작 화면 상태', 10, 30);
+            ctx.fillText(`isStartScreen: ${isStartScreen}`, 10, 50);
+            ctx.fillText(`gameStarted: ${gameStarted}`, 10, 70);
+            ctx.fillText(`buttonPressed: ${buttonPressed}`, 10, 90);
+            ctx.fillText(`gameLoopRunning: ${gameLoopRunning}`, 10, 110);
+        }
+        
         if (gameLoopRunning) {
             requestAnimationFrame(gameLoop);
         }
