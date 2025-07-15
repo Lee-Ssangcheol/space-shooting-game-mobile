@@ -379,6 +379,12 @@ function setupMobileControls() {
             return;
         }
         
+        // 게임이 이미 시작된 상태에서 터치 시 적 출현 활성화
+        if (gameStarted && !isStartScreen && !touchAfterButton) {
+            console.log('게임 중 터치 - 적 출현 활성화');
+            touchAfterButton = true;
+        }
+        
         // 게임 오버 상태에서는 터치로 게임 시작 불가 (버튼으로만 재시작)
         if (isGameOver) {
             console.log('게임 오버 상태 - 터치 무시');
@@ -500,6 +506,12 @@ function setupMobileControls() {
             return;
         }
         
+        // 게임이 이미 시작된 상태에서 터치 이동 시 적 출현 활성화
+        if (gameStarted && !isStartScreen && !touchAfterButton) {
+            console.log('게임 중 터치 이동 - 적 출현 활성화');
+            touchAfterButton = true;
+        }
+        
         // 게임 오버 상태에서는 터치 이동으로 게임 시작 불가 (버튼으로만 재시작)
         if (isGameOver) {
             console.log('게임 오버 상태 - 터치 이동 무시');
@@ -552,18 +564,6 @@ function setupMobileControls() {
                 
                 console.log('시작/재시작 버튼 처리');
                 
-                // 모바일에서 버튼 클릭 시 전체화면 시도 (첫화면에서만)
-                if (isMobile && isStartScreen) {
-                    console.log('모바일 첫화면 - 전체화면 전환 시도');
-                    
-                    // 전체화면 요청 플래그를 완전히 리셋
-                    isFullscreenRequested = false;
-                    fullscreenRequestTime = 0;
-                    
-                    // 즉시 전체화면 시도
-                    enableFullscreen();
-                }
-                
                 // 시작 화면에서 버튼을 누르면 게임 시작
                 if (isStartScreen) {
                     console.log('시작/재시작 버튼으로 게임 시작!');
@@ -573,11 +573,39 @@ function setupMobileControls() {
                     // 버튼 눌림 상태 설정
                     buttonPressed = true;
                     
-                    // 모바일에서 첫화면에서는 전체화면으로 전환만 하고, 터치 후 게임 시작
+                    // 모바일에서 첫화면에서는 전체화면 전환과 게임 시작을 동시에 처리
                     if (isMobile) {
-                        console.log('모바일 첫화면 - 전체화면 전환 후 터치 대기');
-                        // 전체화면 전환은 이미 위에서 처리됨
-                        // 터치 이벤트를 기다리므로 여기서는 return하지 않음
+                        console.log('모바일 첫화면 - 전체화면 전환 및 게임 시작');
+                        
+                        // 전체화면 요청 플래그를 완전히 리셋
+                        isFullscreenRequested = false;
+                        fullscreenRequestTime = 0;
+                        
+                        // 게임 상태를 즉시 변경하여 첫화면으로 돌아가지 않도록 함
+                        isStartScreen = false;
+                        gameStarted = true;
+                        
+                        // 오디오 초기화
+                        initAudio();
+                        
+                        // 플레이어 위치 초기화
+                        if (canvas) {
+                            player.x = canvas.width / 2;
+                            player.y = canvas.height - 50;
+                            if (hasSecondPlane) {
+                                secondPlane.x = canvas.width / 2 - 60;
+                                secondPlane.y = canvas.height - 50;
+                            }
+                        }
+                        
+                        // 전체화면 전환 시도
+                        enableFullscreen();
+                        
+                        console.log('모바일 게임 시작 완료');
+                        console.log('게임 상태 업데이트:', { isStartScreen, gameStarted, isGameOver });
+                        
+                        // 게임 루프 시작
+                        startGameLoop();
                     } else {
                         // 데스크탑에서는 바로 게임 시작
                         isStartScreen = false;
