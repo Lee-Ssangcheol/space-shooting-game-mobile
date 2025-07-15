@@ -317,6 +317,6 @@ body {
     margin-bottom: 80px;
   }
   body.in-game #mobile-controls {
-    bottom: -80px;
+    bottom: -160px;
   }
 } 
