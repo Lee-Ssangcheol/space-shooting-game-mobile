@@ -610,7 +610,9 @@ function setupMobileControls() {
                 if (startButtonPressed) return; // 이미 처리 중이면 무시
                 startButtonPressed = true;
                 
-                console.log('시작/재시작 버튼 처리');
+                console.log('=== 시작/재시작 버튼 처리 시작 ===');
+                console.log('현재 상태:', { isStartScreen, gameStarted, isGameOver, gameLoopRunning });
+                console.log('캔버스 상태:', { canvas: !!canvas, ctx: !!ctx });
                 
                 // 시작 화면에서 버튼을 누르면 게임 시작
                 if (isStartScreen) {
@@ -651,9 +653,15 @@ function setupMobileControls() {
                         
                         console.log('모바일 게임 시작 완료');
                         console.log('게임 상태 업데이트:', { isStartScreen, gameStarted, isGameOver });
+                        console.log('게임 루프 상태:', { gameLoopRunning });
                         
-                        // 게임 루프 시작
-                        startGameLoop();
+                        // 게임 루프가 이미 실행 중인지 확인
+                        if (!gameLoopRunning) {
+                            console.log('게임 루프 재시작');
+                            startGameLoop();
+                        } else {
+                            console.log('게임 루프가 이미 실행 중입니다');
+                        }
                     } else {
                         // 데스크탑에서는 바로 게임 시작
                         isStartScreen = false;
@@ -674,9 +682,15 @@ function setupMobileControls() {
                         
                         console.log('게임 시작 완료');
                         console.log('게임 상태 업데이트:', { isStartScreen, gameStarted, isGameOver });
+                        console.log('게임 루프 상태:', { gameLoopRunning });
                         
-                        // 게임 루프 시작
-                        startGameLoop();
+                        // 게임 루프가 이미 실행 중인지 확인
+                        if (!gameLoopRunning) {
+                            console.log('게임 루프 재시작');
+                            startGameLoop();
+                        } else {
+                            console.log('게임 루프가 이미 실행 중입니다');
+                        }
                     }
                 }
                 
@@ -2598,11 +2612,18 @@ function gameLoop() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     if (isStartScreen && !gameStarted) {
+        console.log('시작 화면 그리기 중...');
         drawStartScreen();
         if (gameLoopRunning) {
             requestAnimationFrame(gameLoop);
         }
         return;
+    }
+    
+    // 게임이 시작되었지만 아직 시작 화면이 그려지고 있는 경우
+    if (!isStartScreen && gameStarted) {
+        console.log('게임 화면으로 전환 중...');
+        // 게임 화면 그리기 시작
     }
 
     if (isGameOver) {
