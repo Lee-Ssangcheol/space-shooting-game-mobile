@@ -16,6 +16,12 @@ const mobileSpeedMultiplier = isMobile ? 0.6 : 1.0;
 let isFullscreenRequested = false;
 let fullscreenRequestTime = 0;
 
+// 게임 상태 전역 변수들
+let isStartScreen = true;  // 시작 화면 상태
+let gameStarted = false;  // 게임 시작 상태
+let buttonPressed = false;  // 버튼 눌림 상태
+let touchAfterButton = false;  // 버튼 후 터치 상태
+
 // 모바일 전체화면 모드 활성화
 function enableFullscreen() {
     // 모바일 환경에서만 전체화면 시도
@@ -219,9 +225,7 @@ let mobileFireStartTime = 0;
 let isMobileFirePressed = false;
 let mobileContinuousFireInterval = null;
 
-// 버튼 눌림 상태 추적 변수
-let buttonPressed = false;
-let touchAfterButton = false;  // 버튼을 누른 후 터치했는지 확인하는 변수
+// 버튼 눌림 상태 추적 변수 - 전역 변수로 이미 선언됨
 
 // 캔버스 설정 (DOM 로드 후 초기화)
 let canvas, ctx;
@@ -4814,8 +4818,8 @@ let lastEnemySpawnTime = 0;
 const MIN_ENEMY_SPAWN_INTERVAL = 500; // 최소 적 생성 간격 (밀리초)
 
 // 게임 상태 변수에 추가
-let isStartScreen = true;  // 시작 화면 상태
-let gameStarted = false;  // 게임 시작 상태
+// let isStartScreen = true;  // 시작 화면 상태 - 전역 변수와 충돌 방지
+// let gameStarted = false;  // 게임 시작 상태 - 전역 변수와 충돌 방지
 let startScreenAnimation = 0;  // 시작 화면 애니메이션 변수
 let titleY = -100;  // 제목 Y 위치
 let subtitleY = 800;  // 부제목 Y 위치 (임시값)
