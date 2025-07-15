@@ -5,13 +5,11 @@ html, body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  touch-action: manipulation; /* 터치 동작 허용하되 줌 방지 */
+  touch-action: manipulation;
   position: fixed;
   top: 0;
   left: 0;
-  /* 모바일 브라우저 UI 완전 숨김 */
   -webkit-overflow-scrolling: touch;
-  /* 상태바 영역 완전 숨김 */
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
 }
@@ -28,30 +26,27 @@ body {
   position: fixed;
   top: 0;
   left: 0;
-  /* 상태바 영역 완전 숨김 */
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* 썬더볼트와 동일한 구조: 캔버스 중앙 배치, 상하 회색 여백 */
+/* 썬더볼트와 동일한 구조: 매우 좁은 상하 회색 여백 */
 #gameCanvas {
   display: block;
   margin: 0 auto;
   background: #000;
   border-radius: 0;
-  width: 100vw; /* 화면 전체 너비 */
-  height: calc(100vh - 200px); /* 상하 각각 100px씩 회색 여백 */
+  width: 100vw;
+  height: calc(100vh - 40px); /* 상하 각각 20px씩 매우 좁은 회색 여백 */
   object-fit: cover;
-  touch-action: none; /* 터치 동작 완전 차단 */
-  cursor: pointer; /* 터치 가능함을 시각적으로 표시 */
-  position: fixed; /* absolute에서 fixed로 변경 */
-  top: 100px; /* 상단 회색 여백 100px */
+  touch-action: none;
+  cursor: pointer;
+  position: fixed;
+  top: 20px; /* 상단 회색 여백 20px */
   left: 0;
-  transform: none; /* transform 제거 */
-  z-index: 1; /* z-index 추가 */
+  transform: none;
+  z-index: 1;
 }
-
-/* 기존 gameCanvas 스타일 제거 - 위에서 재정의됨 */
 
 /* 모바일 터치 컨트롤 스타일 */
 #mobile-controls {
@@ -59,22 +54,21 @@ body {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 80px; /* 높이를 80px로 줄임 */
-  background: rgba(0, 0, 0, 0.8); /* 배경 투명도 강화 */
+  height: 80px;
+  background: rgba(0, 0, 0, 0.8);
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 10px;
   box-sizing: border-box;
-  z-index: 10000; /* 전체화면 모드에서도 보이도록 z-index 높임 */
-  /* 상태바 영역 고려 */
+  z-index: 10000;
   padding-bottom: calc(10px + env(safe-area-inset-bottom));
 }
 
 /* 기능키만 중앙에 배치 */
 #action-buttons {
   display: flex;
-  flex-direction: row; /* 가로 배치로 변경 */
+  flex-direction: row;
   gap: 15px;
   justify-content: center;
 }
@@ -117,7 +111,7 @@ body {
   height: 40px;
   border: none;
   border-radius: 6px;
-  background: rgba(255, 255, 255, 0.95); /* 전체화면에서 더 잘 보이도록 투명도 높임 */
+  background: rgba(255, 255, 255, 0.95);
   color: #000;
   font-size: 10px;
   font-weight: bold;
@@ -126,10 +120,9 @@ body {
   -webkit-user-select: none;
   -webkit-touch-callout: none;
   transition: all 0.2s;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5); /* 전체화면에서 더 잘 보이도록 그림자 강화 */
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
   position: relative;
-  z-index: 10001; /* 버튼 자체의 z-index도 높임 */
-  /* 전체화면 모드에서 터치 이벤트가 제대로 작동하도록 설정 */
+  z-index: 10001;
   touch-action: manipulation;
   -webkit-tap-highlight-color: rgba(255, 255, 255, 0.3);
 }
@@ -163,8 +156,6 @@ body {
     display: none;
   }
   
-  /* 단순화된 구조에 맞게 수정 */
-  
   #gameCanvas {
     width: 392px;
     height: 700px;
@@ -182,12 +173,9 @@ body {
     width: 100vw;
     height: 100vh;
     overflow: hidden;
-    /* 모바일 브라우저 UI 완전 숨김 */
     -webkit-overflow-scrolling: touch;
-    /* safe area 제거하고 완전 전체화면 */
     padding: 0;
     margin: 0;
-    /* iOS Safari 주소창 숨김 */
     -webkit-user-select: none;
     -webkit-touch-callout: none;
     -webkit-tap-highlight-color: transparent;
@@ -217,20 +205,18 @@ body {
   /* 모바일에서 썬더볼트와 동일한 구조 */
   #gameCanvas {
     position: fixed;
-    top: 100px; /* 상단 회색 여백 100px */
+    top: 20px; /* 상단 회색 여백 20px */
     left: 0;
     transform: none;
     width: 100vw;
-    height: calc(100vh - 200px); /* 상하 각각 100px씩 회색 여백 */
+    height: calc(100vh - 40px); /* 상하 각각 20px씩 매우 좁은 회색 여백 */
     max-width: 100%;
-    max-height: calc(100vh - 200px);
+    max-height: calc(100vh - 40px);
     margin: 0;
     padding: 0;
     object-fit: cover;
-    /* iOS Safari에서 추가 설정 */
     -webkit-transform: translateZ(0);
     transform: translateZ(0);
-    /* 상태바 영역 고려 */
     padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
   }
@@ -241,8 +227,7 @@ body {
     bottom: 0;
     left: 0;
     right: 0;
-    z-index: 10000; /* 전체화면 모드에서도 보이도록 z-index 높임 */
-    /* iOS Safari에서 추가 설정 */
+    z-index: 10000;
     -webkit-transform: translateZ(0);
     transform: translateZ(0);
   }

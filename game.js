@@ -231,7 +231,7 @@ function setupFullscreenEventListeners() {
                 // 전체화면 진입 시 캔버스 크기 조정 (썬더볼트 구조)
                 if (isMobile && canvas) {
                     canvas.width = window.innerWidth;
-                    canvas.height = window.innerHeight - 200; // 상하 각각 100px씩 회색 여백
+                    canvas.height = window.innerHeight - 40; // 상하 각각 20px씩 매우 좁은 회색 여백
                     console.log('전체화면 캔버스 크기 조정 (썬더볼트 구조):', canvas.width, 'x', canvas.height);
                 }
                 isFullscreenRequested = false; // 성공 시 플래그 리셋
@@ -289,10 +289,10 @@ function resizeCanvas() {
         return;
     }
     
-    // 썬더볼트와 동일한 구조: 상하 각각 100px씩 회색 여백
+    // 썬더볼트와 동일한 구조: 매우 좁은 상하 회색 여백
     if (isMobile) {
         canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight - 200; // 상하 각각 100px씩 회색 여백
+        canvas.height = window.innerHeight - 40; // 상하 각각 20px씩 매우 좁은 회색 여백
         console.log('모바일 캔버스 크기 설정 (썬더볼트 구조):', canvas.width, 'x', canvas.height);
     } else {
         // 데스크탑에서는 고정 크기
