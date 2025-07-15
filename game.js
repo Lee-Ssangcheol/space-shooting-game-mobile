@@ -3400,6 +3400,7 @@ function drawUI() {
     
     // 충돌 횟수 표시 (붉은색으로)
     ctx.fillStyle = 'red';
+    ctx.font = 'bold 20px Arial';  // 폰트를 진하게 변경
     ctx.fillText(`남은 목숨: ${maxLives - collisionCount}`, 10, 210);
 
     // 제작자 정보 표시
