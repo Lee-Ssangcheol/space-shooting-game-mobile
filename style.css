@@ -1,7 +1,7 @@
 html, body {
   width: 100vw;
   height: 100vh;
-  background: #000000; /* 배경을 검정색으로 변경 */
+  background: #333333; /* 배경을 회색으로 변경 */
   margin: 0;
   padding: 0;
   overflow: hidden;
@@ -19,7 +19,7 @@ html, body {
 body {
   margin: 0;
   padding: 0;
-  background: #000000; /* 배경을 검정색으로 변경 */
+  background: #333333; /* 배경을 회색으로 변경 */
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -40,12 +40,12 @@ body {
   background: #000;
   border-radius: 0;
   width: 100vw; /* 화면 전체 너비로 변경 */
-  height: 100vh; /* 화면 전체 높이로 변경 */
+  height: calc(100vh - 160px); /* 상하 여백을 위한 높이 조정 */
   object-fit: cover; /* 화면을 완전히 덮도록 변경 */
   touch-action: none; /* 터치 동작 완전 차단 */
   cursor: pointer; /* 터치 가능함을 시각적으로 표시 */
   position: fixed; /* absolute에서 fixed로 변경 */
-  top: 0;
+  top: 80px; /* 상단 여백 */
   left: 0;
   transform: none; /* transform 제거 */
   z-index: 1; /* z-index 추가 */
@@ -217,13 +217,13 @@ body {
   /* 모바일에서 캔버스 완전 전체화면 */
   #gameCanvas {
     position: fixed;
-    top: 0;
+    top: 80px; /* 상단 여백 */
     left: 0;
     transform: none;
     width: 100vw;
-    height: 100vh;
+    height: calc(100vh - 160px); /* 상하 여백을 위한 높이 조정 */
     max-width: 100%;
-    max-height: 100%;
+    max-height: calc(100vh - 160px);
     margin: 0;
     padding: 0;
     object-fit: cover;

@@ -227,10 +227,10 @@ function setupFullscreenEventListeners() {
             if (isFullscreen) {
                 console.log('전체화면 모드 진입');
                 
-                // 전체화면 진입 시 캔버스 크기 조정
+                // 전체화면 진입 시 캔버스 크기 조정 (상하 여백 고려)
                 if (isMobile && canvas) {
                     canvas.width = window.innerWidth;
-                    canvas.height = window.innerHeight;
+                    canvas.height = window.innerHeight - 160; // 상하 여백 80px씩 제외
                     console.log('전체화면 캔버스 크기 조정:', canvas.width, 'x', canvas.height);
                 }
                 isFullscreenRequested = false; // 성공 시 플래그 리셋
@@ -288,10 +288,10 @@ function resizeCanvas() {
         return;
     }
     
-    // 모바일에서는 화면 전체 크기로 설정
+    // 모바일에서는 화면 전체 크기로 설정 (상하 여백 고려)
     if (isMobile) {
         canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        canvas.height = window.innerHeight - 160; // 상하 여백 80px씩 제외
         console.log('모바일 캔버스 크기 설정:', canvas.width, 'x', canvas.height);
     } else {
         // 데스크탑에서는 고정 크기
@@ -673,10 +673,10 @@ function setupMobileControls() {
                         // 전체화면 전환 시도 (강화된 버전)
                         console.log('전체화면 전환 시도 시작');
                         
-                        // 캔버스 크기를 화면 전체로 조정
+                        // 캔버스 크기를 화면 전체로 조정 (상하 여백 고려)
                         if (isMobile) {
                             canvas.width = window.innerWidth;
-                            canvas.height = window.innerHeight;
+                            canvas.height = window.innerHeight - 160; // 상하 여백 80px씩 제외
                             console.log('전체화면 캔버스 크기:', canvas.width, 'x', canvas.height);
                         }
                         
