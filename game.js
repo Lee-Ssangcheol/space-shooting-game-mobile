@@ -18,6 +18,7 @@ let fullscreenRequestTime = 0;
 
 // 모바일 전체화면 모드 활성화
 function enableFullscreen() {
+    // 모바일 환경에서만 전체화면 시도
     if (!isMobile) {
         console.log('데스크탑 환경이므로 전체화면 모드 건너뜀');
         return;
@@ -34,9 +35,9 @@ function enableFullscreen() {
         // 이미 전체화면이어도 다시 시도 (전체화면이 종료된 후 재활성화를 위해)
     }
     
-    // 첫화면에서는 전체화면 요청 제한을 완전히 제거하여 확실히 작동하도록 함
+    // 전체화면 요청 제한을 완전히 제거하여 확실히 작동하도록 함
     const now = Date.now();
-    if (isFullscreenRequested && (now - fullscreenRequestTime < 200)) {  // 매우 짧은 시간만 제한
+    if (isFullscreenRequested && (now - fullscreenRequestTime < 100)) {  // 매우 짧은 시간만 제한
         console.log('전체화면 요청 중 - 매우 짧은 대기');
         return;
     }
@@ -555,14 +556,12 @@ function setupMobileControls() {
                 if (isMobile && isStartScreen) {
                     console.log('모바일 첫화면 - 전체화면 전환 시도');
                     
-                    // 전체화면 요청 플래그를 미리 리셋하여 확실히 작동하도록 함
+                    // 전체화면 요청 플래그를 완전히 리셋
                     isFullscreenRequested = false;
                     fullscreenRequestTime = 0;
                     
-                    // 약간의 지연 후 전체화면 시도 (브라우저 안정성을 위해)
-                    setTimeout(() => {
-                        enableFullscreen();
-                    }, 50);
+                    // 즉시 전체화면 시도
+                    enableFullscreen();
                 }
                 
                 // 시작 화면에서 버튼을 누르면 게임 시작
@@ -5504,43 +5503,8 @@ window.addEventListener('DOMContentLoaded', () => {
     // 6. 게임 초기화
     initializeGame();
     
-    // 5. 모바일에서 전체화면 모드 활성화 (한 번만 실행)
-    if (isMobile) {
-        // 사용자 상호작용 후 전체화면 모드 활성화 (iOS Safari 요구사항)
-        let fullscreenRequested = false;
-        
-        const enableFullscreenOnce = () => {
-            if (fullscreenRequested) return; // 이미 요청했다면 무시
-            fullscreenRequested = true;
-            
-            console.log('전체화면 모드 활성화 시도');
-            enableFullscreen();
-            
-            // 이벤트 리스너 제거
-            document.removeEventListener('touchstart', enableFullscreenOnce);
-            document.removeEventListener('click', enableFullscreenOnce);
-            document.removeEventListener('mousedown', enableFullscreenOnce);
-        };
-        
-        // 여러 이벤트에 등록하여 확실히 실행되도록 함
-        document.addEventListener('touchstart', enableFullscreenOnce);
-        document.addEventListener('click', enableFullscreenOnce);
-        document.addEventListener('mousedown', enableFullscreenOnce);
-        
-        // 캔버스에도 이벤트 리스너 추가
-        if (canvas) {
-            canvas.addEventListener('touchstart', enableFullscreenOnce);
-            canvas.addEventListener('click', enableFullscreenOnce);
-        }
-        
-        // 3초 후 자동으로 전체화면 시도 (백업 방법)
-        setTimeout(() => {
-            if (!fullscreenRequested) {
-                console.log('백업 전체화면 모드 활성화');
-                enableFullscreen();
-            }
-        }, 3000);
-    }
+    // 5. 모바일에서 전체화면 모드 활성화는 시작 버튼에서 처리하므로 여기서는 제거
+    // (중복 방지를 위해 페이지 로드 시 자동 전체화면 활성화 제거)
     
     console.log('게임 초기화 완료');
 });
