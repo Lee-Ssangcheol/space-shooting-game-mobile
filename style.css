@@ -68,6 +68,40 @@ body {
   background: #CCCCCC !important;
 }
 
+/* 전체화면 상태에서 모든 요소의 배경색 강제 적용 */
+:fullscreen * {
+  background-color: #CCCCCC !important;
+}
+
+:-webkit-full-screen * {
+  background-color: #CCCCCC !important;
+}
+
+:-moz-full-screen * {
+  background-color: #CCCCCC !important;
+}
+
+:-ms-fullscreen * {
+  background-color: #CCCCCC !important;
+}
+
+/* 전체화면 상태에서 캔버스만 검정색 유지 */
+:fullscreen #gameCanvas {
+  background: #000 !important;
+}
+
+:-webkit-full-screen #gameCanvas {
+  background: #000 !important;
+}
+
+:-moz-full-screen #gameCanvas {
+  background: #000 !important;
+}
+
+:-ms-fullscreen #gameCanvas {
+  background: #000 !important;
+}
+
 /* 썬더볼트와 동일한 구조: 캔버스 중앙 배치, 상하 회색 여백 */
 #gameCanvas {
   display: block;
@@ -214,9 +248,11 @@ body {
     -webkit-overflow-scrolling: touch;
     padding: 0;
     margin: 0;
-    -webkit-user-select: none;
-    -webkit-touch-callout: none;
-    -webkit-tap-highlight-color: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 80px; /* 모바일 키 버튼 패널 공간 확보 */
   }
   
   /* iOS Safari에서 주소창 완전 숨김 */
@@ -247,11 +283,11 @@ body {
     left: auto; /* left 제거 */
     transform: none;
     width: 100vw;
-    height: calc(100vh - 40px); /* 상하 각각 20px씩 매우 좁은 회색 여백 */
-    max-width: 100%;
-    max-height: calc(100vh - 40px);
-    margin: 0;
-    padding: 0;
+    height: calc(100vh - 80px); /* 모바일 키 버튼 패널 공간만큼 높이 조정 */
+    max-width: 100vw;
+    max-height: calc(100vh - 80px);
+    margin: 0 auto;
+    display: block;
     object-fit: cover;
     -webkit-transform: translateZ(0);
     transform: translateZ(0);
