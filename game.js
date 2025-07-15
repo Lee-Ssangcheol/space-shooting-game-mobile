@@ -393,7 +393,8 @@ function setupMobileControls() {
             touchAfterButton = true;  // 버튼을 누른 후 터치했음을 표시
             isStartScreen = false;
             gameStarted = true;
-            
+            document.body.classList.add('in-game');            
+
             // 플레이어 위치 초기화
             if (canvas) {
                 player.x = canvas.width / 2;
@@ -3546,6 +3547,7 @@ window.addEventListener('load', async () => {
         initStartScreen();
         gameStarted = false;  // 게임 시작 상태 초기화 (버튼을 누를 때 true로 변경됨)
         isStartScreen = true;  // 시작 화면 상태 초기화
+        document.body.classList.remove('in-game');
         
         console.log('초기 게임 상태:', { gameStarted, isStartScreen, isGameOver });
         
@@ -5182,6 +5184,7 @@ async function initializeGame() {
         initStartScreen();
         gameStarted = false;  // 게임 시작 상태 초기화 (버튼을 누를 때 true로 변경됨)
         isStartScreen = true;  // 시작 화면 상태 초기화
+        document.body.classList.remove('in-game');
         
         console.log('초기 게임 상태:', { gameStarted, isStartScreen, isGameOver });
         
