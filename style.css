@@ -40,12 +40,12 @@ body {
   background: #000;
   border-radius: 0;
   width: 100vw; /* 화면 전체 너비 */
-  height: calc(100vh - 120px); /* 상하 각각 60px씩 회색 여백 */
+  height: calc(100vh - 200px); /* 상하 각각 100px씩 회색 여백 */
   object-fit: cover;
   touch-action: none; /* 터치 동작 완전 차단 */
   cursor: pointer; /* 터치 가능함을 시각적으로 표시 */
   position: fixed; /* absolute에서 fixed로 변경 */
-  top: 60px; /* 상단 회색 여백 60px */
+  top: 100px; /* 상단 회색 여백 100px */
   left: 0;
   transform: none; /* transform 제거 */
   z-index: 1; /* z-index 추가 */
@@ -217,13 +217,13 @@ body {
   /* 모바일에서 썬더볼트와 동일한 구조 */
   #gameCanvas {
     position: fixed;
-    top: 60px; /* 상단 회색 여백 60px */
+    top: 100px; /* 상단 회색 여백 100px */
     left: 0;
     transform: none;
     width: 100vw;
-    height: calc(100vh - 120px); /* 상하 각각 60px씩 회색 여백 */
+    height: calc(100vh - 200px); /* 상하 각각 100px씩 회색 여백 */
     max-width: 100%;
-    max-height: calc(100vh - 120px);
+    max-height: calc(100vh - 200px);
     margin: 0;
     padding: 0;
     object-fit: cover;
