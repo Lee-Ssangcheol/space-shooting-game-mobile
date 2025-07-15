@@ -359,6 +359,7 @@ function setupMobileControls() {
         
         // 게임 오버 상태에서는 터치로 게임 시작 불가 (버튼으로만 재시작)
         if (isGameOver) {
+            console.log('게임 오버 상태 - 터치 무시');
             return;
         }
         
@@ -479,6 +480,7 @@ function setupMobileControls() {
         
         // 게임 오버 상태에서는 터치 이동으로 게임 시작 불가 (버튼으로만 재시작)
         if (isGameOver) {
+            console.log('게임 오버 상태 - 터치 이동 무시');
             return;
         }
         
@@ -546,31 +548,31 @@ function setupMobileControls() {
                     if (isMobile) {
                         console.log('모바일 첫화면 - 전체화면 전환 후 터치 대기');
                         // 전체화면 전환은 이미 위에서 처리됨
-                        return; // 터치 이벤트를 기다림
-                    }
-                    
-                    // 데스크탑에서는 바로 게임 시작
-                    isStartScreen = false;
-                    gameStarted = true;
-                    
-                    // 오디오 초기화
-                    initAudio();
-                    
-                    // 플레이어 위치 초기화
-                    if (canvas) {
-                        player.x = canvas.width / 2;
-                        player.y = canvas.height - 50;
-                        if (hasSecondPlane) {
-                            secondPlane.x = canvas.width / 2 - 60;
-                            secondPlane.y = canvas.height - 50;
+                        // 터치 이벤트를 기다리므로 여기서는 return하지 않음
+                    } else {
+                        // 데스크탑에서는 바로 게임 시작
+                        isStartScreen = false;
+                        gameStarted = true;
+                        
+                        // 오디오 초기화
+                        initAudio();
+                        
+                        // 플레이어 위치 초기화
+                        if (canvas) {
+                            player.x = canvas.width / 2;
+                            player.y = canvas.height - 50;
+                            if (hasSecondPlane) {
+                                secondPlane.x = canvas.width / 2 - 60;
+                                secondPlane.y = canvas.height - 50;
+                            }
                         }
+                        
+                        console.log('게임 시작 완료');
+                        console.log('게임 상태 업데이트:', { isStartScreen, gameStarted, isGameOver });
+                        
+                        // 게임 루프 시작
+                        startGameLoop();
                     }
-                    
-                    console.log('게임 시작 완료');
-                    console.log('게임 상태 업데이트:', { isStartScreen, gameStarted, isGameOver });
-                    
-                    // 게임 루프 시작
-                    startGameLoop();
                 }
                 
                 // 게임 오버 상태에서 재시작
@@ -579,6 +581,10 @@ function setupMobileControls() {
                     
                     // 게임 재시작
                     restartGame();
+                    
+                    // 재시작 후 상태 초기화
+                    buttonPressed = false;
+                    touchAfterButton = false;
                 }
                 
                 // 1초 후 플래그 리셋
