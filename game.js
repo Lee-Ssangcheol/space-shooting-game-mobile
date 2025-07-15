@@ -128,16 +128,7 @@ function enableFullscreen() {
         isFullscreenRequested = false;
         fullscreenRequestTime = 0; // 시간 제한도 즉시 리셋
     }
-    
-    // iOS Safari에서 주소창 숨김 (전체화면과 별개)
-    if (window.navigator.standalone) {
-        document.body.style.position = 'fixed';
-        document.body.style.top = '0';
-        document.body.style.left = '0';
-        document.body.style.width = '100vw';
-        document.body.style.height = '100vh';
-    }
-    
+       
     // 모바일 브라우저에서 전체화면 효과를 위한 CSS 스타일 적용
     if (isMobile) {
         // body에 전체화면 스타일 적용
@@ -172,12 +163,6 @@ function enableFullscreen() {
             });
         }
     }
-    
-    // 0.1초 후 플래그 리셋 (성공했든 실패했든) - 매우 빠른 반응을 위해
-    //setTimeout(() => {
-    //    isFullscreenRequested = false;
-    //    console.log('전체화면 요청 플래그 리셋됨');
-    //}, 100);
 }
 
 // 전체화면 상태 변화 이벤트 리스너
