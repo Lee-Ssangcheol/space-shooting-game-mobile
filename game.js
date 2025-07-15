@@ -155,6 +155,7 @@ let mobileContinuousFireInterval = null;
 
 // 버튼 눌림 상태 추적 변수
 let buttonPressed = false;
+let touchAfterButton = false;  // 버튼을 누른 후 터치했는지 확인하는 변수
 
 // 캔버스 설정 (DOM 로드 후 초기화)
 let canvas, ctx;
@@ -339,6 +340,7 @@ function setupMobileControls() {
                 return;
             }
             console.log('시작 화면에서 터치 - 게임 시작!');
+            touchAfterButton = true;  // 버튼을 누른 후 터치했음을 표시
             isStartScreen = false;
             gameStarted = true;
             
@@ -458,6 +460,7 @@ function setupMobileControls() {
                 return;
             }
             console.log('시작 화면에서 터치 이동 - 게임 시작!');
+            touchAfterButton = true;  // 버튼을 누른 후 터치했음을 표시
             isStartScreen = false;
             gameStarted = true;
             
@@ -539,6 +542,14 @@ function setupMobileControls() {
                     // 버튼 눌림 상태 설정
                     buttonPressed = true;
                     
+                    // 모바일에서 첫화면에서는 전체화면으로 전환만 하고, 터치 후 게임 시작
+                    if (isMobile) {
+                        console.log('모바일 첫화면 - 전체화면 전환 후 터치 대기');
+                        // 전체화면 전환은 이미 위에서 처리됨
+                        return; // 터치 이벤트를 기다림
+                    }
+                    
+                    // 데스크탑에서는 바로 게임 시작
                     isStartScreen = false;
                     gameStarted = true;
                     
@@ -2672,16 +2683,17 @@ function handleEnemies() {
         };
     }
 
-    // 뱀 패턴 처리
-    if (isSnakePatternActive) {
+    // 뱀 패턴 처리 (모바일에서는 터치 후에만 활성화)
+    if (isSnakePatternActive && (!isMobile || touchAfterButton)) {
         handleSnakePattern();
     }
 
-    // 일반 적 생성 - 시간 기반 생성 로직으로 변경
+    // 일반 적 생성 - 시간 기반 생성 로직으로 변경 (모바일에서는 터치 후에만 생성)
     if (currentTime - lastEnemySpawnTime >= MIN_ENEMY_SPAWN_INTERVAL &&
         Math.random() < currentDifficulty.enemySpawnRate && 
         enemies.length < currentDifficulty.maxEnemies &&
-        !isGameOver) {
+        !isGameOver &&
+        (!isMobile || touchAfterButton)) {  // 모바일에서는 터치 후에만 적 생성
         createEnemy();
         lastEnemySpawnTime = currentTime;
     }
@@ -3793,7 +3805,7 @@ function handleSpreadShot() {
                 y: player.y,
                 width: 10,
                 height: 25,
-                speed: 3,  // 속도를 반으로 줄임 (12 -> 1)
+                speed: 6,  // 속도를 반으로 줄임 (12 -> 1)
                 angle: angle,
                 isSpread: true
             };
@@ -3806,7 +3818,7 @@ function handleSpreadShot() {
                     y: secondPlane.y,
                     width: 10,
                     height: 25,
-                    speed: 3,  // 속도를 반으로 줄임 (12 -> 1)
+                    speed: 6,  // 속도를 반으로 줄임 (12 -> 1)
                     angle: angle,
                     isSpread: true
                 };
