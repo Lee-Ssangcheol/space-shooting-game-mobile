@@ -4865,9 +4865,9 @@ function drawStartScreen() {
     ctx.font = '18px Arial';
     ctx.fillStyle = '#ffffff';
     ctx.textAlign = 'left';
-    ctx.fillText('화면을 터치하고 드래그하여', 50, canvas.height - 150);
-    ctx.fillText('플레이어 비행기를 움직이세요.', 50, canvas.height - 120);
-    ctx.fillText('총알은 자동으로 발사됩니다.', 50, canvas.height - 90);
+    ctx.fillText('화면을 터치하고 드래그하여', 50, canvas.height - 180);
+    ctx.fillText('플레이어 비행기를 움직이세요.', 50, canvas.height - 150);
+    ctx.fillText('총알은 자동으로 발사됩니다.', 50, canvas.height - 120);
 }
 
 // 폭탄 생성 함수 추가
