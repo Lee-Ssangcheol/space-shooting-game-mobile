@@ -174,10 +174,10 @@ function enableFullscreen() {
     }
     
     // 0.1초 후 플래그 리셋 (성공했든 실패했든) - 매우 빠른 반응을 위해
-    setTimeout(() => {
-        isFullscreenRequested = false;
-        console.log('전체화면 요청 플래그 리셋됨');
-    }, 100);
+    //setTimeout(() => {
+    //    isFullscreenRequested = false;
+    //    console.log('전체화면 요청 플래그 리셋됨');
+    //}, 100);
 }
 
 // 전체화면 상태 변화 이벤트 리스너
