@@ -1,23 +1,21 @@
 html, body {
   width: 100vw;
   height: 100vh;
-  background: #CCCCCC; /* 최대한 밝은 회색 배경 */
+  background: #E0E0E0;
   margin: 0;
   padding: 0;
   overflow: hidden;
-  touch-action: manipulation;
+  touch-action: manipulation; /* 터치 동작 허용하되 줌 방지 */
   position: fixed;
   top: 0;
   left: 0;
+  /* 모바일 브라우저 UI 숨김 */
   -webkit-overflow-scrolling: touch;
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
 }
-
 body {
   margin: 0;
   padding: 0;
-  background: #CCCCCC; /* 최대한 밝은 회색 배경 */
+  background: #E0E0E0;
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -26,98 +24,29 @@ body {
   position: fixed;
   top: 0;
   left: 0;
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
 }
-
-/* 전체화면 상태에서 배경색 강제 적용 */
-:fullscreen {
-  background: #CCCCCC !important;
+#canvas-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: calc(100vh - 80px); /* 모바일 컨트롤 높이만큼 제외 */
+  width: 100vw;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
-
-:-webkit-full-screen {
-  background: #CCCCCC !important;
-}
-
-:-moz-full-screen {
-  background: #CCCCCC !important;
-}
-
-:-ms-fullscreen {
-  background: #CCCCCC !important;
-}
-
-/* 전체화면 상태에서 html, body 배경색 강제 적용 */
-:fullscreen html,
-:fullscreen body {
-  background: #CCCCCC !important;
-}
-
-:-webkit-full-screen html,
-:-webkit-full-screen body {
-  background: #CCCCCC !important;
-}
-
-:-moz-full-screen html,
-:-moz-full-screen body {
-  background: #CCCCCC !important;
-}
-
-:-ms-fullscreen html,
-:-ms-fullscreen body {
-  background: #CCCCCC !important;
-}
-
-/* 전체화면 상태에서 모든 요소의 배경색 강제 적용 */
-:fullscreen * {
-  background-color: #CCCCCC !important;
-}
-
-:-webkit-full-screen * {
-  background-color: #CCCCCC !important;
-}
-
-:-moz-full-screen * {
-  background-color: #CCCCCC !important;
-}
-
-:-ms-fullscreen * {
-  background-color: #CCCCCC !important;
-}
-
-/* 전체화면 상태에서 캔버스만 검정색 유지 */
-:fullscreen #gameCanvas {
-  background: #000 !important;
-}
-
-:-webkit-full-screen #gameCanvas {
-  background: #000 !important;
-}
-
-:-moz-full-screen #gameCanvas {
-  background: #000 !important;
-}
-
-:-ms-fullscreen #gameCanvas {
-  background: #000 !important;
-}
-
-/* 썬더볼트와 동일한 구조: 캔버스 중앙 배치, 상하 회색 여백 */
 #gameCanvas {
   display: block;
-  margin: 0 auto;
+  margin: 0;
   background: #000;
   border-radius: 0;
-  width: 100vw;
-  height: calc(100vh - 40px); /* 상하 각각 20px씩 매우 좁은 회색 여백 */
-  object-fit: cover;
-  touch-action: none;
-  cursor: pointer;
-  position: relative; /* fixed에서 relative로 변경하여 flexbox 중앙 정렬 활용 */
-  top: auto; /* top 제거 */
-  left: auto; /* left 제거 */
-  transform: none;
-  z-index: 1;
+  width: 392px;
+  height: 700px;
+  object-fit: contain;
+  touch-action: manipulation; /* 터치 동작 허용하되 줌 방지 */
+  cursor: pointer; /* 터치 가능함을 시각적으로 표시 */
 }
 
 /* 모바일 터치 컨트롤 스타일 */
@@ -126,21 +55,20 @@ body {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 80px;
-  background: transparent; /* 투명색 배경 */
+  height: 80px; /* 높이를 80px로 줄임 */
+  background: rgba(0, 0, 0, 0.3); /* 배경 투명도 줄임 */
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 10px;
   box-sizing: border-box;
-  z-index: 10000;
-  padding-bottom: calc(10px + env(safe-area-inset-bottom));
+  z-index: 1000;
 }
 
 /* 기능키만 중앙에 배치 */
 #action-buttons {
   display: flex;
-  flex-direction: row;
+  flex-direction: row; /* 가로 배치로 변경 */
   gap: 15px;
   justify-content: center;
 }
@@ -179,27 +107,23 @@ body {
 }
 
 .action-btn {
-  width: 60px;
-  height: 40px;
+  width: 70px;
+  height: 45px;
   border: none;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.9);
   color: #000;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: bold;
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
   transition: all 0.2s;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
-  position: relative;
-  z-index: 10001;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
-/* 버튼 순서 배치 */
+/* 특수무기키를 맨 앞으로 배치 */
 #btn-special {
   order: 1;
 }
@@ -228,6 +152,11 @@ body {
     display: none;
   }
   
+  #canvas-container {
+    height: 100vh;
+    width: 100vw;
+  }
+  
   #gameCanvas {
     width: 392px;
     height: 700px;
@@ -245,14 +174,15 @@ body {
     width: 100vw;
     height: 100vh;
     overflow: hidden;
+    /* 모바일 브라우저 UI 완전 숨김 */
     -webkit-overflow-scrolling: touch;
+    /* safe area 제거하고 완전 전체화면 */
     padding: 0;
     margin: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding-bottom: 0; /* 기존 80px에서 0으로 변경 */
+    /* iOS Safari 주소창 숨김 */
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
   }
   
   /* iOS Safari에서 주소창 완전 숨김 */
@@ -276,47 +206,53 @@ body {
     display: none !important;
   }
   
-  /* 모바일에서 썬더볼트와 동일한 구조 */
-  #gameCanvas {
-    position: relative; /* fixed에서 relative로 변경하여 flexbox 중앙 정렬 활용 */
-    top: auto; /* top 제거 */
-    left: auto; /* left 제거 */
-    transform: none;
+  /* 모바일에서 캔버스 컨테이너 완전 전체화면 */
+  #canvas-container {
+    padding: 0;
+    margin: 0;
     width: 100vw;
-    height: calc(100vh - 80px); /* 모바일 키 버튼 패널 공간만큼 높이 조정 */
-    max-width: 100vw;
-    max-height: calc(100vh - 80px);
-    margin: 0 auto;
-    display: block;
-    object-fit: cover;
+    height: calc(100vh - 80px);
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* iOS Safari에서 추가 설정 */
     -webkit-transform: translateZ(0);
     transform: translateZ(0);
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
-    margin-bottom: 80px; /* 버튼 패널 높이만큼 위로 이동 */
+  }
+  
+  /* 모바일에서 캔버스 설정 */
+  #gameCanvas {
+    width: 392px;
+    height: 700px;
+    max-width: 100%;
+    max-height: 100%;
+    margin: 0;
+    padding: 0;
+    object-fit: contain;
+    /* iOS Safari에서 추가 설정 */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
   }
   
   /* 모바일 컨트롤 패널 하단 고정 */
   #mobile-controls {
     position: fixed;
+    bottom: 0;
     left: 0;
     right: 0;
-    height: 80px;
-    bottom: 0; /* 기본적으로 항상 하단에 보이게 */
-    z-index: 10000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 10px;
-    box-sizing: border-box;
-    background: transparent;
-    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+    z-index: 1000;
+    /* iOS Safari에서 추가 설정 */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
   }
-  /* 본 게임 화면(in-game 클래스가 body에 있을 때)에서만 버튼 패널을 아래로 내리고 캔버스를 위로 올림 */
-  body.in-game #gameCanvas {
-    margin-bottom: 80px;
-  }
-  body.in-game #mobile-controls {
-    bottom: -160px;
-  }
+} 
+
+#resetModal button:active {
+  filter: brightness(0.8);
+}
+#resetModal button:focus {
+  outline: 2px solid #00ff00;
 } 
