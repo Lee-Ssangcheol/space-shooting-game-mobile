@@ -613,67 +613,35 @@ function setupMobileControls() {
                     console.log('모바일 환경:', isMobile);
                     console.log('현재 상태:', { isStartScreen, gameStarted, isGameOver });
                     
-                    // 버튼 눌림 상태 설정
-                    buttonPressed = true;
-                    
-                    // 모바일에서 첫화면에서는 전체화면 전환과 게임 시작을 동시에 처리
+                    // 1. 전체화면 요청을 가장 먼저 시도 (모바일에서만, 시작화면일 때)
                     if (isMobile) {
-                        console.log('모바일 첫화면 - 전체화면 전환 및 게임 시작');
-                        
-                        // 전체화면 요청 플래그를 완전히 리셋
-                        isFullscreenRequested = false;
-                        fullscreenRequestTime = 0;
-                        
-                        // 게임 상태를 즉시 변경하여 첫화면으로 돌아가지 않도록 함
-                        isStartScreen = false;
-                        gameStarted = true;
-                        
-                        // 오디오 초기화
-                        initAudio();
-                        
-                        // 플레이어 위치 초기화
-                        if (canvas) {
-                            player.x = canvas.width / 2;
-                            player.y = canvas.height - 50;
-                            if (hasSecondPlane) {
-                                secondPlane.x = canvas.width / 2 - 60;
-                                secondPlane.y = canvas.height - 50;
-                            }
-                        }
-                        
-                        // 전체화면 전환 시도
                         enableFullscreen();
-                        
-                        console.log('모바일 게임 시작 완료');
-                        console.log('게임 상태 업데이트:', { isStartScreen, gameStarted, isGameOver });
-                        
-                        // 게임 루프 시작
-                        startGameLoop();
-                    } else {
-                        // 데스크탑에서는 바로 게임 시작
-                        isStartScreen = false;
-                        gameStarted = true;
-                        
-                        // 오디오 초기화
-                        initAudio();
-                        
-                        // 플레이어 위치 초기화
-                        if (canvas) {
-                            player.x = canvas.width / 2;
-                            player.y = canvas.height - 50;
-                            if (hasSecondPlane) {
-                                secondPlane.x = canvas.width / 2 - 60;
-                                secondPlane.y = canvas.height - 50;
-                            }
-                        }
-                        
-                        console.log('게임 시작 완료');
-                        console.log('게임 상태 업데이트:', { isStartScreen, gameStarted, isGameOver });
-                        
-                        // 게임 루프 시작
-                        startGameLoop();
                     }
-                }
+
+                    // 버튼 눌림 상태 설정 및 게임 시작 처리
+                    buttonPressed = true;
+                    isStartScreen = false;
+                    gameStarted = true;
+
+                    // 오디오 초기화
+                    initAudio();
+
+                    // 플레이어 위치 초기화
+                    if (canvas) {
+                        player.x = canvas.width / 2;
+                        player.y = canvas.height - 50;
+                        if (hasSecondPlane) {
+                            secondPlane.x = canvas.width / 2 - 60;
+                            secondPlane.y = canvas.height - 50;
+                        }
+                    }
+
+                    console.log('게임 시작 완료');
+                    console.log('게임 상태 업데이트:', { isStartScreen, gameStarted, isGameOver });
+
+                    // 게임 루프 시작
+                    startGameLoop();   
+                }                
                 
                 // 게임 오버 상태에서 재시작
                 if (isGameOver) {
