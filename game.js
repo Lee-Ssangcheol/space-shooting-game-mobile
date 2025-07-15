@@ -37,7 +37,7 @@ function enableFullscreen() {
     
     // 전체화면 요청 제한을 완전히 제거하여 확실히 작동하도록 함
     const now = Date.now();
-    if (isFullscreenRequested && (now - fullscreenRequestTime < 100)) {  // 매우 짧은 시간만 제한
+    if (isFullscreenRequested && (now - fullscreenRequestTime < 50)) {  // 매우 짧은 시간만 제한
         console.log('전체화면 요청 중 - 매우 짧은 대기');
         return;
     }
@@ -52,46 +52,64 @@ function enableFullscreen() {
     let fullscreenPromise = null;
     let apiUsed = 'none';
     
-    // 표준 API 우선 시도
-    if (document.documentElement.requestFullscreen) {
-        console.log('표준 전체화면 API 사용');
-        fullscreenPromise = document.documentElement.requestFullscreen();
-        apiUsed = 'standard';
-    }
-    // WebKit API (Safari, Chrome)
-    else if (document.documentElement.webkitRequestFullscreen) {
-        console.log('WebKit 전체화면 API 사용');
-        fullscreenPromise = document.documentElement.webkitRequestFullscreen();
-        apiUsed = 'webkit';
-    }
-    // Mozilla API (Firefox)
-    else if (document.documentElement.mozRequestFullScreen) {
-        console.log('Mozilla 전체화면 API 사용');
-        fullscreenPromise = document.documentElement.mozRequestFullScreen();
-        apiUsed = 'mozilla';
-    }
-    // MS API (IE)
-    else if (document.documentElement.msRequestFullscreen) {
-        console.log('MS 전체화면 API 사용');
-        fullscreenPromise = document.documentElement.msRequestFullscreen();
-        apiUsed = 'ms';
+    // 여러 요소에 대해 전체화면 시도 (documentElement, body, canvas)
+    const elementsToTry = [document.documentElement, document.body, canvas].filter(el => el);
+    
+    for (const element of elementsToTry) {
+        // 표준 API 우선 시도
+        if (element.requestFullscreen) {
+            console.log('표준 전체화면 API 사용 - 요소:', element.tagName);
+            fullscreenPromise = element.requestFullscreen();
+            apiUsed = 'standard-' + element.tagName;
+            break;
+        }
+        // WebKit API (Safari, Chrome)
+        else if (element.webkitRequestFullscreen) {
+            console.log('WebKit 전체화면 API 사용 - 요소:', element.tagName);
+            fullscreenPromise = element.webkitRequestFullscreen();
+            apiUsed = 'webkit-' + element.tagName;
+            break;
+        }
+        // Mozilla API (Firefox)
+        else if (element.mozRequestFullScreen) {
+            console.log('Mozilla 전체화면 API 사용 - 요소:', element.tagName);
+            fullscreenPromise = element.mozRequestFullScreen();
+            apiUsed = 'mozilla-' + element.tagName;
+            break;
+        }
+        // MS API (IE)
+        else if (element.msRequestFullscreen) {
+            console.log('MS 전체화면 API 사용 - 요소:', element.tagName);
+            fullscreenPromise = element.msRequestFullscreen();
+            apiUsed = 'ms-' + element.tagName;
+            break;
+        }
     }
     
-    // 첫 번째 API가 실패하면 다른 API들도 시도
+    // 첫 번째 API가 실패하면 다른 요소들로 재시도
     if (!fullscreenPromise) {
-        console.log('첫 번째 API 실패 - 다른 API들 시도');
+        console.log('첫 번째 API 실패 - 다른 요소들로 재시도');
         
-        // WebKit API 재시도
-        if (document.documentElement.webkitRequestFullscreen) {
-            console.log('WebKit 전체화면 API 재시도');
-            fullscreenPromise = document.documentElement.webkitRequestFullscreen();
-            apiUsed = 'webkit-retry';
+        // 남은 요소들에 대해 WebKit API 재시도
+        for (const element of elementsToTry) {
+            if (element.webkitRequestFullscreen) {
+                console.log('WebKit 전체화면 API 재시도 - 요소:', element.tagName);
+                fullscreenPromise = element.webkitRequestFullscreen();
+                apiUsed = 'webkit-retry-' + element.tagName;
+                break;
+            }
         }
-        // Mozilla API 재시도
-        else if (document.documentElement.mozRequestFullScreen) {
-            console.log('Mozilla 전체화면 API 재시도');
-            fullscreenPromise = document.documentElement.mozRequestFullScreen();
-            apiUsed = 'mozilla-retry';
+        
+        // 여전히 실패하면 Mozilla API 재시도
+        if (!fullscreenPromise) {
+            for (const element of elementsToTry) {
+                if (element.mozRequestFullScreen) {
+                    console.log('Mozilla 전체화면 API 재시도 - 요소:', element.tagName);
+                    fullscreenPromise = element.mozRequestFullScreen();
+                    apiUsed = 'mozilla-retry-' + element.tagName;
+                    break;
+                }
+            }
         }
     }
     
@@ -120,6 +138,31 @@ function enableFullscreen() {
         document.body.style.height = '100vh';
     }
     
+    // 모바일 브라우저에서 전체화면 효과를 위한 CSS 스타일 적용
+    if (isMobile) {
+        // body에 전체화면 스타일 적용
+        document.body.style.position = 'fixed';
+        document.body.style.top = '0';
+        document.body.style.left = '0';
+        document.body.style.width = '100vw';
+        document.body.style.height = '100vh';
+        document.body.style.overflow = 'hidden';
+        document.body.style.margin = '0';
+        document.body.style.padding = '0';
+        
+        // html에도 전체화면 스타일 적용
+        document.documentElement.style.position = 'fixed';
+        document.documentElement.style.top = '0';
+        document.documentElement.style.left = '0';
+        document.documentElement.style.width = '100vw';
+        document.documentElement.style.height = '100vh';
+        document.documentElement.style.overflow = 'hidden';
+        document.documentElement.style.margin = '0';
+        document.documentElement.style.padding = '0';
+        
+        console.log('모바일 전체화면 CSS 스타일 적용됨');
+    }
+    
     // 화면 방향 고정 (세로 모드) - 전체화면과 별개로 실행
     if (screen.orientation && screen.orientation.lock) {
         const lockPromise = screen.orientation.lock('portrait');
@@ -130,11 +173,11 @@ function enableFullscreen() {
         }
     }
     
-    // 0.3초 후 플래그 리셋 (성공했든 실패했든) - 매우 빠른 반응을 위해
+    // 0.1초 후 플래그 리셋 (성공했든 실패했든) - 매우 빠른 반응을 위해
     setTimeout(() => {
         isFullscreenRequested = false;
         console.log('전체화면 요청 플래그 리셋됨');
-    }, 300);
+    }, 100);
 }
 
 // 전체화면 상태 변화 이벤트 리스너
