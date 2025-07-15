@@ -34,9 +34,9 @@ function enableFullscreen() {
         // 이미 전체화면이어도 다시 시도 (전체화면이 종료된 후 재활성화를 위해)
     }
     
-    // 이미 전체화면 요청 중이거나 최근에 요청했다면 중복 실행 방지
+    // 이미 전체화면 요청 중이거나 최근에 요청했다면 중복 실행 방지 (시간 제한 단축)
     const now = Date.now();
-    if (isFullscreenRequested || (now - fullscreenRequestTime < 2000)) {
+    if (isFullscreenRequested || (now - fullscreenRequestTime < 500)) {  // 2초에서 0.5초로 단축
         console.log('전체화면 요청 중이거나 최근에 요청됨');
         return;
     }
@@ -109,10 +109,10 @@ function enableFullscreen() {
         }
     }
     
-    // 3초 후 플래그 리셋 (성공했든 실패했든)
+    // 1초 후 플래그 리셋 (성공했든 실패했든) - 더 빠른 반응을 위해
     setTimeout(() => {
         isFullscreenRequested = false;
-    }, 3000);
+    }, 1000);
 }
 
 // 전체화면 상태 변화 이벤트 리스너
@@ -530,8 +530,9 @@ function setupMobileControls() {
                 
                 console.log('시작/재시작 버튼 처리');
                 
-                // 모바일에서 버튼 클릭 시 전체화면 시도
-                if (isMobile) {
+                // 모바일에서 버튼 클릭 시 전체화면 시도 (첫화면에서만)
+                if (isMobile && isStartScreen) {
+                    console.log('모바일 첫화면 - 전체화면 전환 시도');
                     enableFullscreen();
                 }
                 
@@ -587,10 +588,10 @@ function setupMobileControls() {
                     touchAfterButton = false;
                 }
                 
-                // 1초 후 플래그 리셋
+                // 0.5초 후 플래그 리셋 (더 빠른 반응을 위해)
                 setTimeout(() => {
                     startButtonPressed = false;
-                }, 1000);
+                }, 500);
             };
             
             // 모바일에서는 터치 이벤트만 사용, 데스크탑에서는 클릭 이벤트만 사용
