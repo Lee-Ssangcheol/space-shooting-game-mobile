@@ -302,7 +302,7 @@ body {
     left: 0;
     right: 0;
     height: 80px;
-    bottom: -80px; /* 버튼 패널을 화면 하단에서 80px 아래로 내림 */
+    bottom: 0; /* 기본적으로 항상 하단에 보이게 */
     z-index: 10000;
     display: flex;
     justify-content: center;
@@ -311,5 +311,12 @@ body {
     box-sizing: border-box;
     background: transparent;
     padding-bottom: calc(10px + env(safe-area-inset-bottom));
+  }
+  /* 본 게임 화면(in-game 클래스가 body에 있을 때)에서만 버튼 패널을 아래로 내리고 캔버스를 위로 올림 */
+  body.in-game #gameCanvas {
+    margin-bottom: 80px;
+  }
+  body.in-game #mobile-controls {
+    bottom: -80px;
   }
 } 
