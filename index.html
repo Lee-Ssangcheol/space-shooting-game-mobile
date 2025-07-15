@@ -10,31 +10,28 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="game-container">
-        <div id="canvas-container">
-            <canvas id="gameCanvas" width="392" height="700"></canvas>
+    <!-- 단순화된 구조 - 다른 프로젝트와 동일하게 -->
+    <canvas id="gameCanvas" width="392" height="700"></canvas>
+    
+    <!-- 모바일 터치 컨트롤 -->
+    <div id="mobile-controls">
+        <div id="action-buttons">
+            <button id="btn-special" class="action-btn">특수무기</button>
+            <button id="btn-fire" class="action-btn">시작/재시작</button>
+            <button id="btn-pause" class="action-btn">일시정지</button>
+            <button id="btn-reset" class="action-btn">최고점수 리셋</button>
         </div>
         
-        <!-- 모바일 터치 컨트롤 -->
-        <div id="mobile-controls">
-            <div id="action-buttons">
-                <button id="btn-special" class="action-btn">특수무기</button>
-                <button id="btn-fire" class="action-btn">시작/재시작</button>
-                <button id="btn-pause" class="action-btn">일시정지</button>
-                <button id="btn-reset" class="action-btn">최고점수 리셋</button>
+        <div id="control-pad">
+            <div class="control-row">
+                <button id="btn-up" class="control-btn">↑</button>
             </div>
-            
-            <div id="control-pad">
-                <div class="control-row">
-                    <button id="btn-up" class="control-btn">↑</button>
-                </div>
-                <div class="control-row">
-                    <button id="btn-left" class="control-btn">←</button>
-                    <button id="btn-right" class="control-btn">→</button>
-                </div>
-                <div class="control-row">
-                    <button id="btn-down" class="control-btn">↓</button>
-                </div>
+            <div class="control-row">
+                <button id="btn-left" class="control-btn">←</button>
+                <button id="btn-right" class="control-btn">→</button>
+            </div>
+            <div class="control-row">
+                <button id="btn-down" class="control-btn">↓</button>
             </div>
         </div>
     </div>

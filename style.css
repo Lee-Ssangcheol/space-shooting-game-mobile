@@ -27,22 +27,10 @@ body {
   left: 0;
 }
 
-#canvas-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: calc(100vh - 80px); /* 모바일 컨트롤 높이만큼 제외 */
-  width: 100vw;
-  padding: 0;
-  margin: 0;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
+/* 단순화된 구조에 맞게 캔버스 직접 스타일링 */
 #gameCanvas {
   display: block;
-  margin: 0;
+  margin: 0 auto;
   background: #000;
   border-radius: 0;
   width: 392px;
@@ -50,7 +38,13 @@ body {
   object-fit: contain;
   touch-action: none; /* 터치 동작 완전 차단 */
   cursor: pointer; /* 터치 가능함을 시각적으로 표시 */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
+
+/* 기존 gameCanvas 스타일 제거 - 위에서 재정의됨 */
 
 /* 모바일 터치 컨트롤 스타일 */
 #mobile-controls {
@@ -160,10 +154,7 @@ body {
     display: none;
   }
   
-  #canvas-container {
-    height: 100vh;
-    width: 100vw;
-  }
+  /* 단순화된 구조에 맞게 수정 */
   
   #gameCanvas {
     width: 392px;
@@ -214,21 +205,22 @@ body {
     display: none !important;
   }
   
-  /* 모바일에서 캔버스 컨테이너 완전 전체화면 */
-  #canvas-container {
-    padding: 0;
-    margin: 0;
-    width: 100vw;
-    height: calc(100vh - 80px);
+  /* 모바일에서 캔버스 직접 전체화면 */
+  #gameCanvas {
     position: fixed;
-    top: 0;
-    left: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 392px;
+    height: 700px;
+    max-width: 100%;
+    max-height: 100%;
+    margin: 0;
+    padding: 0;
+    object-fit: contain;
     /* iOS Safari에서 추가 설정 */
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
+    -webkit-transform: translate(-50%, -50%) translateZ(0);
+    transform: translate(-50%, -50%) translateZ(0);
   }
   
   /* 모바일에서 캔버스 설정 */
