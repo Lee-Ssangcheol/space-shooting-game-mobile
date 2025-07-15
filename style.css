@@ -252,7 +252,7 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding-bottom: 80px; /* 모바일 키 버튼 패널 공간 확보 */
+    padding-bottom: 0; /* 기존 80px에서 0으로 변경 */
   }
   
   /* iOS Safari에서 주소창 완전 숨김 */
@@ -293,16 +293,23 @@ body {
     transform: translateZ(0);
     padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
+    margin-bottom: 80px; /* 버튼 패널 높이만큼 위로 이동 */
   }
   
   /* 모바일 컨트롤 패널 하단 고정 */
   #mobile-controls {
     position: fixed;
-    bottom: 0;
     left: 0;
     right: 0;
+    height: 80px;
+    bottom: -80px; /* 버튼 패널을 화면 하단에서 80px 아래로 내림 */
     z-index: 10000;
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    box-sizing: border-box;
+    background: transparent;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
   }
 } 
