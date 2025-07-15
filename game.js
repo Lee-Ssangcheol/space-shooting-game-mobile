@@ -1,5 +1,4 @@
-// game.js 파일 맨 위에 추가
-console.log('게임 파일 수정됨:', new Date().toLocaleString());
+// game.js 파일
 
 // 게임 상수 정의
 const SPECIAL_WEAPON_MAX_CHARGE = 1000;  // 특수무기 최대 충전량
@@ -227,6 +226,10 @@ function setupFullscreenEventListeners() {
             
             if (isFullscreen) {
                 console.log('전체화면 모드 진입');
+                
+                // 전체화면 진입 시 배경색 강제 적용
+                document.documentElement.style.background = '#CCCCCC';
+                document.body.style.background = '#CCCCCC';
                 
                 // 전체화면 진입 시 캔버스 크기 조정 (썬더볼트 구조)
                 if (isMobile && canvas) {

@@ -30,6 +30,44 @@ body {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
+/* 전체화면 상태에서 배경색 강제 적용 */
+:fullscreen {
+  background: #CCCCCC !important;
+}
+
+:-webkit-full-screen {
+  background: #CCCCCC !important;
+}
+
+:-moz-full-screen {
+  background: #CCCCCC !important;
+}
+
+:-ms-fullscreen {
+  background: #CCCCCC !important;
+}
+
+/* 전체화면 상태에서 html, body 배경색 강제 적용 */
+:fullscreen html,
+:fullscreen body {
+  background: #CCCCCC !important;
+}
+
+:-webkit-full-screen html,
+:-webkit-full-screen body {
+  background: #CCCCCC !important;
+}
+
+:-moz-full-screen html,
+:-moz-full-screen body {
+  background: #CCCCCC !important;
+}
+
+:-ms-fullscreen html,
+:-ms-fullscreen body {
+  background: #CCCCCC !important;
+}
+
 /* 썬더볼트와 동일한 구조: 캔버스 중앙 배치, 상하 회색 여백 */
 #gameCanvas {
   display: block;
