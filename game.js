@@ -1,4 +1,5 @@
-// game.js 파일
+// game.js 파일 맨 위에 추가
+console.log('게임 파일 수정됨:', new Date().toLocaleString());
 
 // 게임 상수 정의
 const SPECIAL_WEAPON_MAX_CHARGE = 1000;  // 특수무기 최대 충전량
@@ -14,12 +15,6 @@ const mobileSpeedMultiplier = isMobile ? 0.6 : 1.0;
 // 전체화면 상태 추적 변수
 let isFullscreenRequested = false;
 let fullscreenRequestTime = 0;
-
-// 게임 상태 전역 변수들
-let isStartScreen = true;  // 시작 화면 상태
-let gameStarted = false;  // 게임 시작 상태
-let buttonPressed = false;  // 버튼 눌림 상태
-let touchAfterButton = false;  // 버튼 후 터치 상태
 
 // 모바일 전체화면 모드 활성화
 function enableFullscreen() {
@@ -57,116 +52,95 @@ function enableFullscreen() {
     let fullscreenPromise = null;
     let apiUsed = 'none';
     
-    // 단순화된 구조에 맞게 전체화면 시도
-    const elementsToTry = [
-        document.documentElement, 
-        document.body, 
-        canvas
-    ].filter(el => el);
+    // 여러 요소에 대해 전체화면 시도 (documentElement, body, canvas)
+    const elementsToTry = [document.documentElement, document.body, canvas].filter(el => el);
     
-    console.log('전체화면 시도할 요소들:', elementsToTry.map(el => el.tagName || el.id || 'canvas'));
+    for (const element of elementsToTry) {
+        // 표준 API 우선 시도
+        if (element.requestFullscreen) {
+            console.log('표준 전체화면 API 사용 - 요소:', element.tagName);
+            fullscreenPromise = element.requestFullscreen();
+            apiUsed = 'standard-' + element.tagName;
+            break;
+        }
+        // WebKit API (Safari, Chrome)
+        else if (element.webkitRequestFullscreen) {
+            console.log('WebKit 전체화면 API 사용 - 요소:', element.tagName);
+            fullscreenPromise = element.webkitRequestFullscreen();
+            apiUsed = 'webkit-' + element.tagName;
+            break;
+        }
+        // Mozilla API (Firefox)
+        else if (element.mozRequestFullScreen) {
+            console.log('Mozilla 전체화면 API 사용 - 요소:', element.tagName);
+            fullscreenPromise = element.mozRequestFullScreen();
+            apiUsed = 'mozilla-' + element.tagName;
+            break;
+        }
+        // MS API (IE)
+        else if (element.msRequestFullscreen) {
+            console.log('MS 전체화면 API 사용 - 요소:', element.tagName);
+            fullscreenPromise = element.msRequestFullscreen();
+            apiUsed = 'ms-' + element.tagName;
+            break;
+        }
+    }
     
-    // 강력한 전체화면 요청 - 모든 요소에 대해 모든 API 시도
-    const tryFullscreen = async () => {
+    // 첫 번째 API가 실패하면 다른 요소들로 재시도
+    if (!fullscreenPromise) {
+        console.log('첫 번째 API 실패 - 다른 요소들로 재시도');
+        
+        // 남은 요소들에 대해 WebKit API 재시도
         for (const element of elementsToTry) {
-            // 표준 API 시도
-            if (element.requestFullscreen) {
-                try {
-                    console.log('표준 전체화면 API 시도 - 요소:', element.tagName || element.id || 'canvas');
-                    await element.requestFullscreen();
-                    console.log('표준 전체화면 API 성공!');
-                    return true;
-                } catch (err) {
-                    console.log('표준 API 실패:', err);
-                }
-            }
-            
-            // WebKit API 시도
             if (element.webkitRequestFullscreen) {
-                try {
-                    console.log('WebKit 전체화면 API 시도 - 요소:', element.tagName || element.id || 'canvas');
-                    await element.webkitRequestFullscreen();
-                    console.log('WebKit 전체화면 API 성공!');
-                    return true;
-                } catch (err) {
-                    console.log('WebKit API 실패:', err);
-                }
+                console.log('WebKit 전체화면 API 재시도 - 요소:', element.tagName);
+                fullscreenPromise = element.webkitRequestFullscreen();
+                apiUsed = 'webkit-retry-' + element.tagName;
+                break;
             }
-            
-            // Mozilla API 시도
-            if (element.mozRequestFullScreen) {
-                try {
-                    console.log('Mozilla 전체화면 API 시도 - 요소:', element.tagName || element.id || 'canvas');
-                    await element.mozRequestFullScreen();
-                    console.log('Mozilla 전체화면 API 성공!');
-                    return true;
-                } catch (err) {
-                    console.log('Mozilla API 실패:', err);
-                }
-            }
-            
-            // MS API 시도
-            if (element.msRequestFullscreen) {
-                try {
-                    console.log('MS 전체화면 API 시도 - 요소:', element.tagName || element.id || 'canvas');
-                    await element.msRequestFullscreen();
-                    console.log('MS 전체화면 API 성공!');
-                    return true;
-                } catch (err) {
-                    console.log('MS API 실패:', err);
+        }
+        
+        // 여전히 실패하면 Mozilla API 재시도
+        if (!fullscreenPromise) {
+            for (const element of elementsToTry) {
+                if (element.mozRequestFullScreen) {
+                    console.log('Mozilla 전체화면 API 재시도 - 요소:', element.tagName);
+                    fullscreenPromise = element.mozRequestFullScreen();
+                    apiUsed = 'mozilla-retry-' + element.tagName;
+                    break;
                 }
             }
         }
-        return false;
-    };
+    }
     
-    // 비동기로 전체화면 시도
-    tryFullscreen().then(success => {
-        if (!success) {
-            console.log('모든 전체화면 API 실패 - CSS 전체화면 효과 적용');
-            // API 실패 시 CSS로 전체화면 효과 강화
-            if (isMobile) {
-                document.body.style.position = 'fixed';
-                document.body.style.top = '0';
-                document.body.style.left = '0';
-                document.body.style.width = '100vw';
-                document.body.style.height = '100vh';
-                document.body.style.overflow = 'hidden';
-                document.body.style.margin = '0';
-                document.body.style.padding = '0';
-                document.body.style.zIndex = '9999';
-                
-                // iOS Safari에서 추가 설정
-                if (navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')) {
-                    document.body.style.webkitOverflowScrolling = 'touch';
-                    document.body.style.webkitUserSelect = 'none';
-                    document.body.style.webkitTouchCallout = 'none';
-                }
-            }
-            isFullscreenRequested = false;
-            fullscreenRequestTime = 0;
-        } else {
-            console.log('전체화면 API 성공!');
-        }
-    }).catch(err => {
-        console.log('전체화면 요청 중 오류:', err);
+    console.log('사용된 API:', apiUsed);
+    
+    // 전체화면 요청 처리
+    if (fullscreenPromise && fullscreenPromise.catch) {
+        fullscreenPromise.catch(err => {
+            console.log('전체화면 모드 실패:', err);
+            console.log('사용된 API:', apiUsed);
+            isFullscreenRequested = false; // 실패 시 즉시 플래그 리셋
+            fullscreenRequestTime = 0; // 시간 제한도 즉시 리셋
+        });
+    } else if (!fullscreenPromise) {
+        console.log('지원되는 전체화면 API가 없습니다');
         isFullscreenRequested = false;
-        fullscreenRequestTime = 0;
-    });
+        fullscreenRequestTime = 0; // 시간 제한도 즉시 리셋
+    }
     
-    // iOS Safari에서 주소창 숨김 (전체화면과 별개, 썬더볼트 구조)
+    // iOS Safari에서 주소창 숨김 (전체화면과 별개)
     if (window.navigator.standalone) {
         document.body.style.position = 'fixed';
         document.body.style.top = '0';
         document.body.style.left = '0';
         document.body.style.width = '100vw';
         document.body.style.height = '100vh';
-        document.body.style.background = '#CCCCCC'; // 최대한 밝은 회색
     }
     
-    // 모바일 브라우저에서 전체화면 효과를 위한 CSS 스타일 적용 (썬더볼트 구조)
+    // 모바일 브라우저에서 전체화면 효과를 위한 CSS 스타일 적용
     if (isMobile) {
-        // body에 전체화면 스타일 적용 (최대한 밝은 회색 배경)
+        // body에 전체화면 스타일 적용
         document.body.style.position = 'fixed';
         document.body.style.top = '0';
         document.body.style.left = '0';
@@ -175,9 +149,8 @@ function enableFullscreen() {
         document.body.style.overflow = 'hidden';
         document.body.style.margin = '0';
         document.body.style.padding = '0';
-        document.body.style.background = '#CCCCCC'; // 최대한 밝은 회색
         
-        // html에도 전체화면 스타일 적용 (최대한 밝은 회색 배경)
+        // html에도 전체화면 스타일 적용
         document.documentElement.style.position = 'fixed';
         document.documentElement.style.top = '0';
         document.documentElement.style.left = '0';
@@ -186,9 +159,8 @@ function enableFullscreen() {
         document.documentElement.style.overflow = 'hidden';
         document.documentElement.style.margin = '0';
         document.documentElement.style.padding = '0';
-        document.documentElement.style.background = '#CCCCCC'; // 최대한 밝은 회색
         
-        console.log('모바일 전체화면 CSS 스타일 적용됨 (썬더볼트 구조)');
+        console.log('모바일 전체화면 CSS 스타일 적용됨');
     }
     
     // 화면 방향 고정 (세로 모드) - 전체화면과 별개로 실행
@@ -226,17 +198,6 @@ function setupFullscreenEventListeners() {
             
             if (isFullscreen) {
                 console.log('전체화면 모드 진입');
-                
-                // 전체화면 진입 시 배경색 강제 적용
-                document.documentElement.style.background = '#CCCCCC';
-                document.body.style.background = '#CCCCCC';
-                
-                // 전체화면 진입 시 캔버스 크기 조정 (썬더볼트 구조)
-                if (isMobile && canvas) {
-                    canvas.width = window.innerWidth;
-                    canvas.height = window.innerHeight - 40; // 상하 각각 20px씩 매우 좁은 회색 여백
-                    console.log('전체화면 캔버스 크기 조정 (썬더볼트 구조):', canvas.width, 'x', canvas.height);
-                }
                 isFullscreenRequested = false; // 성공 시 플래그 리셋
             } else {
                 console.log('전체화면 모드 종료 - 재활성화 가능');
@@ -257,7 +218,9 @@ let mobileFireStartTime = 0;
 let isMobileFirePressed = false;
 let mobileContinuousFireInterval = null;
 
-// 버튼 눌림 상태 추적 변수 - 전역 변수로 이미 선언됨
+// 버튼 눌림 상태 추적 변수
+let buttonPressed = false;
+let touchAfterButton = false;  // 버튼을 누른 후 터치했는지 확인하는 변수
 
 // 캔버스 설정 (DOM 로드 후 초기화)
 let canvas, ctx;
@@ -292,15 +255,21 @@ function resizeCanvas() {
         return;
     }
     
-    // 썬더볼트와 동일한 구조: 매우 좁은 상하 회색 여백
-    if (isMobile) {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight - 40; // 상하 각각 20px씩 매우 좁은 회색 여백
-        console.log('모바일 캔버스 크기 설정 (썬더볼트 구조):', canvas.width, 'x', canvas.height);
-    } else {
-        // 데스크탑에서는 고정 크기
-        canvas.width = 392;
-        canvas.height = 700;
+    const container = document.getElementById('canvas-container');
+    if (container) {
+        // 컨테이너 스타일 조정
+        container.style.height = 'calc(100vh - 70px)';  // 모바일 컨트롤 높이만큼 제외
+        container.style.position = 'relative';
+        container.style.overflow = 'hidden';
+        
+        // 캔버스 스타일 조정
+        canvas.style.borderRadius = '0';  // 모서리를 각지게
+        
+        // 캔버스 크기를 모바일 비율에 맞게 설정 (일관성 유지)
+        canvas.width = 392;  // 모바일 비율에 맞춘 가로 크기
+        canvas.height = 700;  // 모바일 비율에 맞춘 세로 크기
+        
+        // CSS에서 설정한 크기와 일치하도록 스타일 설정
         canvas.style.width = '392px';
         canvas.style.height = '700px';
     }
@@ -636,9 +605,7 @@ function setupMobileControls() {
                 if (startButtonPressed) return; // 이미 처리 중이면 무시
                 startButtonPressed = true;
                 
-                console.log('=== 시작/재시작 버튼 처리 시작 ===');
-                console.log('현재 상태:', { isStartScreen, gameStarted, isGameOver, gameLoopRunning });
-                console.log('캔버스 상태:', { canvas: !!canvas, ctx: !!ctx });
+                console.log('시작/재시작 버튼 처리');
                 
                 // 시작 화면에서 버튼을 누르면 게임 시작
                 if (isStartScreen) {
@@ -674,54 +641,14 @@ function setupMobileControls() {
                             }
                         }
                         
-                        // 전체화면 전환 시도 (강화된 버전)
-                        console.log('전체화면 전환 시도 시작');
-                        
-                        // 캔버스 크기를 화면 전체로 조정 (상하 여백 고려)
-                        if (isMobile) {
-                            canvas.width = window.innerWidth;
-                            canvas.height = window.innerHeight - 160; // 상하 여백 80px씩 제외
-                            console.log('전체화면 캔버스 크기:', canvas.width, 'x', canvas.height);
-                        }
-                        
-                        // 즉시 전체화면 시도
+                        // 전체화면 전환 시도
                         enableFullscreen();
-                        
-                        // 추가 전체화면 시도 (지연 후)
-                        setTimeout(() => {
-                            console.log('지연된 전체화면 시도');
-                            enableFullscreen();
-                        }, 100);
-                        
-                        // 한 번 더 시도 (더 지연 후)
-                        setTimeout(() => {
-                            console.log('최종 전체화면 시도');
-                            enableFullscreen();
-                        }, 500);
                         
                         console.log('모바일 게임 시작 완료');
                         console.log('게임 상태 업데이트:', { isStartScreen, gameStarted, isGameOver });
-                        console.log('게임 루프 상태:', { gameLoopRunning });
                         
-                        // 화면에 상태 표시 (모바일 디버깅용)
-                        if (isMobile && canvas && ctx) {
-                            ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-                            ctx.fillRect(0, 0, canvas.width, canvas.height);
-                            ctx.fillStyle = 'white';
-                            ctx.font = 'bold 20px Arial';
-                            ctx.textAlign = 'center';
-                            ctx.fillText('게임 시작됨!', canvas.width/2, canvas.height/2 - 50);
-                            ctx.fillText('전체화면 전환 중...', canvas.width/2, canvas.height/2);
-                            ctx.fillText('터치하여 게임 시작', canvas.width/2, canvas.height/2 + 50);
-                        }
-                        
-                        // 게임 루프가 이미 실행 중인지 확인
-                        if (!gameLoopRunning) {
-                            console.log('게임 루프 재시작');
-                            startGameLoop();
-                        } else {
-                            console.log('게임 루프가 이미 실행 중입니다');
-                        }
+                        // 게임 루프 시작
+                        startGameLoop();
                     } else {
                         // 데스크탑에서는 바로 게임 시작
                         isStartScreen = false;
@@ -742,15 +669,9 @@ function setupMobileControls() {
                         
                         console.log('게임 시작 완료');
                         console.log('게임 상태 업데이트:', { isStartScreen, gameStarted, isGameOver });
-                        console.log('게임 루프 상태:', { gameLoopRunning });
                         
-                        // 게임 루프가 이미 실행 중인지 확인
-                        if (!gameLoopRunning) {
-                            console.log('게임 루프 재시작');
-                            startGameLoop();
-                        } else {
-                            console.log('게임 루프가 이미 실행 중입니다');
-                        }
+                        // 게임 루프 시작
+                        startGameLoop();
                     }
                 }
                 
@@ -993,7 +914,14 @@ function setupMobileControls() {
         mobileControls.btnFire.style.pointerEvents = 'auto';
         mobileControls.btnFire.style.cursor = 'pointer';
         
-        // 중복 이벤트 리스너 제거 - 전체화면 요청 방해 방지
+        // 추가 디버깅을 위한 이벤트
+        mobileControls.btnFire.addEventListener('mousedown', (e) => {
+            console.log('btnFire mousedown 이벤트 발생');
+        });
+        
+        mobileControls.btnFire.addEventListener('pointerdown', (e) => {
+            console.log('btnFire pointerdown 이벤트 발생');
+        });
     }
 }
 
@@ -2672,31 +2600,11 @@ function gameLoop() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     if (isStartScreen && !gameStarted) {
-        console.log('시작 화면 그리기 중...');
         drawStartScreen();
-        
-        // 모바일 디버깅 정보 표시
-        if (isMobile) {
-            ctx.fillStyle = 'white';
-            ctx.font = '14px Arial';
-            ctx.textAlign = 'left';
-            ctx.fillText('시작 화면 상태', 10, 30);
-            ctx.fillText(`isStartScreen: ${isStartScreen}`, 10, 50);
-            ctx.fillText(`gameStarted: ${gameStarted}`, 10, 70);
-            ctx.fillText(`buttonPressed: ${buttonPressed}`, 10, 90);
-            ctx.fillText(`gameLoopRunning: ${gameLoopRunning}`, 10, 110);
-        }
-        
         if (gameLoopRunning) {
             requestAnimationFrame(gameLoop);
         }
         return;
-    }
-    
-    // 게임이 시작되었지만 아직 시작 화면이 그려지고 있는 경우
-    if (!isStartScreen && gameStarted) {
-        console.log('게임 화면으로 전환 중...');
-        // 게임 화면 그리기 시작
     }
 
     if (isGameOver) {
@@ -4912,8 +4820,8 @@ let lastEnemySpawnTime = 0;
 const MIN_ENEMY_SPAWN_INTERVAL = 500; // 최소 적 생성 간격 (밀리초)
 
 // 게임 상태 변수에 추가
-// let isStartScreen = true;  // 시작 화면 상태 - 전역 변수와 충돌 방지
-// let gameStarted = false;  // 게임 시작 상태 - 전역 변수와 충돌 방지
+let isStartScreen = true;  // 시작 화면 상태
+let gameStarted = false;  // 게임 시작 상태
 let startScreenAnimation = 0;  // 시작 화면 애니메이션 변수
 let titleY = -100;  // 제목 Y 위치
 let subtitleY = 800;  // 부제목 Y 위치 (임시값)
