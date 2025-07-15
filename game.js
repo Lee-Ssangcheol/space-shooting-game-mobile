@@ -155,18 +155,19 @@ function enableFullscreen() {
         fullscreenRequestTime = 0;
     });
     
-    // iOS Safari에서 주소창 숨김 (전체화면과 별개)
+    // iOS Safari에서 주소창 숨김 (전체화면과 별개, 썬더볼트 구조)
     if (window.navigator.standalone) {
         document.body.style.position = 'fixed';
         document.body.style.top = '0';
         document.body.style.left = '0';
         document.body.style.width = '100vw';
         document.body.style.height = '100vh';
+        document.body.style.background = '#333333'; // 썬더볼트와 동일한 회색
     }
     
-    // 모바일 브라우저에서 전체화면 효과를 위한 CSS 스타일 적용
+    // 모바일 브라우저에서 전체화면 효과를 위한 CSS 스타일 적용 (썬더볼트 구조)
     if (isMobile) {
-        // body에 전체화면 스타일 적용
+        // body에 전체화면 스타일 적용 (썬더볼트와 동일한 회색 배경)
         document.body.style.position = 'fixed';
         document.body.style.top = '0';
         document.body.style.left = '0';
@@ -175,8 +176,9 @@ function enableFullscreen() {
         document.body.style.overflow = 'hidden';
         document.body.style.margin = '0';
         document.body.style.padding = '0';
+        document.body.style.background = '#333333'; // 썬더볼트와 동일한 회색
         
-        // html에도 전체화면 스타일 적용
+        // html에도 전체화면 스타일 적용 (썬더볼트와 동일한 회색 배경)
         document.documentElement.style.position = 'fixed';
         document.documentElement.style.top = '0';
         document.documentElement.style.left = '0';
@@ -185,10 +187,9 @@ function enableFullscreen() {
         document.documentElement.style.overflow = 'hidden';
         document.documentElement.style.margin = '0';
         document.documentElement.style.padding = '0';
+        document.documentElement.style.background = '#333333'; // 썬더볼트와 동일한 회색
         
-        // 단순화된 구조에 맞게 수정
-        
-        console.log('모바일 전체화면 CSS 스타일 적용됨');
+        console.log('모바일 전체화면 CSS 스타일 적용됨 (썬더볼트 구조)');
     }
     
     // 화면 방향 고정 (세로 모드) - 전체화면과 별개로 실행
@@ -227,11 +228,11 @@ function setupFullscreenEventListeners() {
             if (isFullscreen) {
                 console.log('전체화면 모드 진입');
                 
-                // 전체화면 진입 시 캔버스 크기 조정 (상하 여백 고려)
+                // 전체화면 진입 시 캔버스 크기 조정 (썬더볼트 구조)
                 if (isMobile && canvas) {
                     canvas.width = window.innerWidth;
-                    canvas.height = window.innerHeight - 160; // 상하 여백 80px씩 제외
-                    console.log('전체화면 캔버스 크기 조정:', canvas.width, 'x', canvas.height);
+                    canvas.height = window.innerHeight - 120; // 상하 각각 60px씩 회색 여백
+                    console.log('전체화면 캔버스 크기 조정 (썬더볼트 구조):', canvas.width, 'x', canvas.height);
                 }
                 isFullscreenRequested = false; // 성공 시 플래그 리셋
             } else {
@@ -288,11 +289,11 @@ function resizeCanvas() {
         return;
     }
     
-    // 모바일에서는 화면 전체 크기로 설정 (상하 여백 고려)
+    // 썬더볼트와 동일한 구조: 상하 각각 60px씩 회색 여백
     if (isMobile) {
         canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight - 160; // 상하 여백 80px씩 제외
-        console.log('모바일 캔버스 크기 설정:', canvas.width, 'x', canvas.height);
+        canvas.height = window.innerHeight - 120; // 상하 각각 60px씩 회색 여백
+        console.log('모바일 캔버스 크기 설정 (썬더볼트 구조):', canvas.width, 'x', canvas.height);
     } else {
         // 데스크탑에서는 고정 크기
         canvas.width = 392;
