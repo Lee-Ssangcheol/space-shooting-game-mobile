@@ -52,82 +52,81 @@ function enableFullscreen() {
     let fullscreenPromise = null;
     let apiUsed = 'none';
     
-    // 여러 요소에 대해 전체화면 시도 (documentElement, body, canvas)
-    const elementsToTry = [document.documentElement, document.body, canvas].filter(el => el);
+    // 단순화된 구조에 맞게 전체화면 시도
+    const elementsToTry = [
+        document.documentElement, 
+        document.body, 
+        canvas
+    ].filter(el => el);
     
-    for (const element of elementsToTry) {
-        // 표준 API 우선 시도
-        if (element.requestFullscreen) {
-            console.log('표준 전체화면 API 사용 - 요소:', element.tagName);
-            fullscreenPromise = element.requestFullscreen();
-            apiUsed = 'standard-' + element.tagName;
-            break;
-        }
-        // WebKit API (Safari, Chrome)
-        else if (element.webkitRequestFullscreen) {
-            console.log('WebKit 전체화면 API 사용 - 요소:', element.tagName);
-            fullscreenPromise = element.webkitRequestFullscreen();
-            apiUsed = 'webkit-' + element.tagName;
-            break;
-        }
-        // Mozilla API (Firefox)
-        else if (element.mozRequestFullScreen) {
-            console.log('Mozilla 전체화면 API 사용 - 요소:', element.tagName);
-            fullscreenPromise = element.mozRequestFullScreen();
-            apiUsed = 'mozilla-' + element.tagName;
-            break;
-        }
-        // MS API (IE)
-        else if (element.msRequestFullscreen) {
-            console.log('MS 전체화면 API 사용 - 요소:', element.tagName);
-            fullscreenPromise = element.msRequestFullscreen();
-            apiUsed = 'ms-' + element.tagName;
-            break;
-        }
-    }
+    console.log('전체화면 시도할 요소들:', elementsToTry.map(el => el.tagName || el.id || 'canvas'));
     
-    // 첫 번째 API가 실패하면 다른 요소들로 재시도
-    if (!fullscreenPromise) {
-        console.log('첫 번째 API 실패 - 다른 요소들로 재시도');
-        
-        // 남은 요소들에 대해 WebKit API 재시도
+    // 강력한 전체화면 요청 - 모든 요소에 대해 모든 API 시도
+    const tryFullscreen = async () => {
         for (const element of elementsToTry) {
-            if (element.webkitRequestFullscreen) {
-                console.log('WebKit 전체화면 API 재시도 - 요소:', element.tagName);
-                fullscreenPromise = element.webkitRequestFullscreen();
-                apiUsed = 'webkit-retry-' + element.tagName;
-                break;
+            // 표준 API 시도
+            if (element.requestFullscreen) {
+                try {
+                    console.log('표준 전체화면 API 시도 - 요소:', element.tagName || element.id || 'canvas');
+                    await element.requestFullscreen();
+                    console.log('표준 전체화면 API 성공!');
+                    return true;
+                } catch (err) {
+                    console.log('표준 API 실패:', err);
+                }
             }
-        }
-        
-        // 여전히 실패하면 Mozilla API 재시도
-        if (!fullscreenPromise) {
-            for (const element of elementsToTry) {
-                if (element.mozRequestFullScreen) {
-                    console.log('Mozilla 전체화면 API 재시도 - 요소:', element.tagName);
-                    fullscreenPromise = element.mozRequestFullScreen();
-                    apiUsed = 'mozilla-retry-' + element.tagName;
-                    break;
+            
+            // WebKit API 시도
+            if (element.webkitRequestFullscreen) {
+                try {
+                    console.log('WebKit 전체화면 API 시도 - 요소:', element.tagName || element.id || 'canvas');
+                    await element.webkitRequestFullscreen();
+                    console.log('WebKit 전체화면 API 성공!');
+                    return true;
+                } catch (err) {
+                    console.log('WebKit API 실패:', err);
+                }
+            }
+            
+            // Mozilla API 시도
+            if (element.mozRequestFullScreen) {
+                try {
+                    console.log('Mozilla 전체화면 API 시도 - 요소:', element.tagName || element.id || 'canvas');
+                    await element.mozRequestFullScreen();
+                    console.log('Mozilla 전체화면 API 성공!');
+                    return true;
+                } catch (err) {
+                    console.log('Mozilla API 실패:', err);
+                }
+            }
+            
+            // MS API 시도
+            if (element.msRequestFullscreen) {
+                try {
+                    console.log('MS 전체화면 API 시도 - 요소:', element.tagName || element.id || 'canvas');
+                    await element.msRequestFullscreen();
+                    console.log('MS 전체화면 API 성공!');
+                    return true;
+                } catch (err) {
+                    console.log('MS API 실패:', err);
                 }
             }
         }
-    }
+        return false;
+    };
     
-    console.log('사용된 API:', apiUsed);
-    
-    // 전체화면 요청 처리
-    if (fullscreenPromise && fullscreenPromise.catch) {
-        fullscreenPromise.catch(err => {
-            console.log('전체화면 모드 실패:', err);
-            console.log('사용된 API:', apiUsed);
-            isFullscreenRequested = false; // 실패 시 즉시 플래그 리셋
-            fullscreenRequestTime = 0; // 시간 제한도 즉시 리셋
-        });
-    } else if (!fullscreenPromise) {
-        console.log('지원되는 전체화면 API가 없습니다');
+    // 비동기로 전체화면 시도
+    tryFullscreen().then(success => {
+        if (!success) {
+            console.log('모든 전체화면 API 실패');
+            isFullscreenRequested = false;
+            fullscreenRequestTime = 0;
+        }
+    }).catch(err => {
+        console.log('전체화면 요청 중 오류:', err);
         isFullscreenRequested = false;
-        fullscreenRequestTime = 0; // 시간 제한도 즉시 리셋
-    }
+        fullscreenRequestTime = 0;
+    });
     
     // iOS Safari에서 주소창 숨김 (전체화면과 별개)
     if (window.navigator.standalone) {
@@ -159,6 +158,8 @@ function enableFullscreen() {
         document.documentElement.style.overflow = 'hidden';
         document.documentElement.style.margin = '0';
         document.documentElement.style.padding = '0';
+        
+        // 단순화된 구조에 맞게 수정
         
         console.log('모바일 전체화면 CSS 스타일 적용됨');
     }
@@ -914,14 +915,7 @@ function setupMobileControls() {
         mobileControls.btnFire.style.pointerEvents = 'auto';
         mobileControls.btnFire.style.cursor = 'pointer';
         
-        // 추가 디버깅을 위한 이벤트
-        mobileControls.btnFire.addEventListener('mousedown', (e) => {
-            console.log('btnFire mousedown 이벤트 발생');
-        });
-        
-        mobileControls.btnFire.addEventListener('pointerdown', (e) => {
-            console.log('btnFire pointerdown 이벤트 발생');
-        });
+        // 중복 이벤트 리스너 제거 - 전체화면 요청 방해 방지
     }
 }
 
