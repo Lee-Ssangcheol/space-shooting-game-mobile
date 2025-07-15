@@ -226,6 +226,13 @@ function setupFullscreenEventListeners() {
             
             if (isFullscreen) {
                 console.log('전체화면 모드 진입');
+                
+                // 전체화면 진입 시 캔버스 크기 조정
+                if (isMobile && canvas) {
+                    canvas.width = window.innerWidth;
+                    canvas.height = window.innerHeight;
+                    console.log('전체화면 캔버스 크기 조정:', canvas.width, 'x', canvas.height);
+                }
                 isFullscreenRequested = false; // 성공 시 플래그 리셋
             } else {
                 console.log('전체화면 모드 종료 - 재활성화 가능');
@@ -281,21 +288,15 @@ function resizeCanvas() {
         return;
     }
     
-    const container = document.getElementById('canvas-container');
-    if (container) {
-        // 컨테이너 스타일 조정
-        container.style.height = 'calc(100vh - 70px)';  // 모바일 컨트롤 높이만큼 제외
-        container.style.position = 'relative';
-        container.style.overflow = 'hidden';
-        
-        // 캔버스 스타일 조정
-        canvas.style.borderRadius = '0';  // 모서리를 각지게
-        
-        // 캔버스 크기를 모바일 비율에 맞게 설정 (일관성 유지)
-        canvas.width = 392;  // 모바일 비율에 맞춘 가로 크기
-        canvas.height = 700;  // 모바일 비율에 맞춘 세로 크기
-        
-        // CSS에서 설정한 크기와 일치하도록 스타일 설정
+    // 모바일에서는 화면 전체 크기로 설정
+    if (isMobile) {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        console.log('모바일 캔버스 크기 설정:', canvas.width, 'x', canvas.height);
+    } else {
+        // 데스크탑에서는 고정 크기
+        canvas.width = 392;
+        canvas.height = 700;
         canvas.style.width = '392px';
         canvas.style.height = '700px';
     }
@@ -671,6 +672,13 @@ function setupMobileControls() {
                         
                         // 전체화면 전환 시도 (강화된 버전)
                         console.log('전체화면 전환 시도 시작');
+                        
+                        // 캔버스 크기를 화면 전체로 조정
+                        if (isMobile) {
+                            canvas.width = window.innerWidth;
+                            canvas.height = window.innerHeight;
+                            console.log('전체화면 캔버스 크기:', canvas.width, 'x', canvas.height);
+                        }
                         
                         // 즉시 전체화면 시도
                         enableFullscreen();
