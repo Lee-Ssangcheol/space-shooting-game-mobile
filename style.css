@@ -1,7 +1,7 @@
 html, body {
   width: 100vw;
   height: 100vh;
-  background: #E0E0E0;
+  background: #000000; /* 배경을 검정색으로 변경 */
   margin: 0;
   padding: 0;
   overflow: hidden;
@@ -9,14 +9,17 @@ html, body {
   position: fixed;
   top: 0;
   left: 0;
-  /* 모바일 브라우저 UI 숨김 */
+  /* 모바일 브라우저 UI 완전 숨김 */
   -webkit-overflow-scrolling: touch;
+  /* 상태바 영역 완전 숨김 */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 body {
   margin: 0;
   padding: 0;
-  background: #E0E0E0;
+  background: #000000; /* 배경을 검정색으로 변경 */
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -25,6 +28,9 @@ body {
   position: fixed;
   top: 0;
   left: 0;
+  /* 상태바 영역 완전 숨김 */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* 단순화된 구조에 맞게 캔버스 직접 스타일링 */
@@ -33,15 +39,16 @@ body {
   margin: 0 auto;
   background: #000;
   border-radius: 0;
-  width: 392px;
-  height: 700px;
-  object-fit: contain;
+  width: 100vw; /* 화면 전체 너비로 변경 */
+  height: 100vh; /* 화면 전체 높이로 변경 */
+  object-fit: cover; /* 화면을 완전히 덮도록 변경 */
   touch-action: none; /* 터치 동작 완전 차단 */
   cursor: pointer; /* 터치 가능함을 시각적으로 표시 */
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  position: fixed; /* absolute에서 fixed로 변경 */
+  top: 0;
+  left: 0;
+  transform: none; /* transform 제거 */
+  z-index: 1; /* z-index 추가 */
 }
 
 /* 기존 gameCanvas 스타일 제거 - 위에서 재정의됨 */
@@ -53,13 +60,15 @@ body {
   left: 0;
   right: 0;
   height: 80px; /* 높이를 80px로 줄임 */
-  background: rgba(0, 0, 0, 0.3); /* 배경 투명도 줄임 */
+  background: rgba(0, 0, 0, 0.8); /* 배경 투명도 강화 */
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 10px;
   box-sizing: border-box;
   z-index: 10000; /* 전체화면 모드에서도 보이도록 z-index 높임 */
+  /* 상태바 영역 고려 */
+  padding-bottom: calc(10px + env(safe-area-inset-bottom));
 }
 
 /* 기능키만 중앙에 배치 */
@@ -205,22 +214,25 @@ body {
     display: none !important;
   }
   
-  /* 모바일에서 캔버스 위치 조정 - 컨트롤 패널과 겹치지 않도록 */
+  /* 모바일에서 캔버스 완전 전체화면 */
   #gameCanvas {
     position: fixed;
-    top: calc(50% - 40px); /* 컨트롤 패널 높이의 절반만큼 위로 이동 */
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 392px;
-    height: 700px;
+    top: 0;
+    left: 0;
+    transform: none;
+    width: 100vw;
+    height: 100vh;
     max-width: 100%;
-    max-height: calc(100vh - 80px); /* 컨트롤 패널 높이만큼 제외 */
+    max-height: 100%;
     margin: 0;
     padding: 0;
-    object-fit: contain;
+    object-fit: cover;
     /* iOS Safari에서 추가 설정 */
-    -webkit-transform: translate(-50%, -50%) translateZ(0);
-    transform: translate(-50%, -50%) translateZ(0);
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    /* 상태바 영역 고려 */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
   }
   
   /* 모바일 컨트롤 패널 하단 고정 */
