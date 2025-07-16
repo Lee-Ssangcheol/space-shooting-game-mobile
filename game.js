@@ -190,7 +190,9 @@ function setupFullscreenEventListeners() {
                                 document.webkitFullscreenElement || 
                                 document.mozFullScreenElement || 
                                 document.msFullscreenElement;
-                                resizeCanvasToDisplaySize(); // 전체화면 진입/이탈 시 캔버스 크기 동기화
+                                
+                                // 전체화면 진입/이탈 시 캔버스 크기 동기화
+                                resizeCanvasToDisplaySize(); 
             
             if (isFullscreen) {
                 console.log('전체화면 모드 진입');
