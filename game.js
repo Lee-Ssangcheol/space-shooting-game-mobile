@@ -190,6 +190,7 @@ function setupFullscreenEventListeners() {
                                 document.webkitFullscreenElement || 
                                 document.mozFullScreenElement || 
                                 document.msFullscreenElement;
+                                resizeCanvasToDisplaySize(); // 전체화면 진입/이탈 시 캔버스 크기 동기화
             
             if (isFullscreen) {
                 console.log('전체화면 모드 진입');
@@ -5515,6 +5516,13 @@ let levelBossPatterns = {
 
 // game.js 파일 맨 위에 추가 (임시)
 console.log('게임 파일 로드됨 - 버전:', Date.now());
+
+// 캔버스 크기 조정 함수
+function resizeCanvasToDisplaySize() {
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+}
 
 // 페이지 로드 시 초기화
 window.addEventListener('DOMContentLoaded', () => {
