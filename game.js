@@ -36,14 +36,24 @@ function enableFullscreen() {
     }
     
     // 전체화면 요청 제한을 완전히 제거하여 확실히 작동하도록 함
-    const now = Date.now();
-    if (isFullscreenRequested && (now - fullscreenRequestTime < 50)) {  // 매우 짧은 시간만 제한
-        console.log('전체화면 요청 중 - 매우 짧은 대기');
-        return;
+    function enableFullscreen() {
+        const elementsToTry = [document.documentElement, document.body, canvas].filter(el => el);
+        for (const element of elementsToTry) {
+            if (element.requestFullscreen) {
+                element.requestFullscreen();
+                break;
+            } else if (element.webkitRequestFullscreen) {
+                element.webkitRequestFullscreen();
+                break;
+            } else if (element.mozRequestFullScreen) {
+                element.mozRequestFullScreen();
+                break;
+            } else if (element.msRequestFullscreen) {
+                element.msRequestFullscreen();
+                break;
+            }
+        }
     }
-    
-    isFullscreenRequested = true;
-    fullscreenRequestTime = now;
     
     console.log('모바일 전체화면 모드 활성화 시도');
     console.log('브라우저 정보:', navigator.userAgent);
