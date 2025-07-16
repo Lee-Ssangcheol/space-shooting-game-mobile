@@ -610,9 +610,9 @@ function setupMobileControls() {
                     console.log('현재 상태:', { isStartScreen, gameStarted, isGameOver });
                     
                     // 버튼 눌림 상태 설정 및 게임 시작 처리
-                    buttonPressed = true;
                     isStartScreen = false;
                     gameStarted = true;
+                    buttonPressed = true;
 
                     // 오디오 초기화
                     initAudio();
@@ -629,6 +629,9 @@ function setupMobileControls() {
 
                     console.log('게임 시작 완료');
                     console.log('게임 상태 업데이트:', { isStartScreen, gameStarted, isGameOver });
+
+                    // 전체화면 요청 (상태 변경 후!)
+                    enableFullscreen();
 
                     // 게임 루프 시작
                     startGameLoop();   
@@ -659,16 +662,16 @@ function setupMobileControls() {
                 mobileControls.btnFire.addEventListener('touchstart', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    handleStartButton(); // 그 다음에 게임 시작 처리                    
-                    enableFullscreen(); // 전체화면 요청을 가장 먼저 직접 호출
+                    handleStartButton(); // 게임 상태 먼저 변경경                    
+                    enableFullscreen(); // 전체화면 요청
                 }, { passive: false });
             } else {
                 // 클릭 이벤트 (데스크탑용)
                 mobileControls.btnFire.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    enableFullscreen(); // 전체화면 요청을 가장 먼저 직접 호출
-                    handleStartButton(); // 그 다음에 게임 시작 처리
+                    handleStartButton(); // 게임 상태 먼저 변경
+                    enableFullscreen(); // 전체화면 요청
                 });
             }
         
