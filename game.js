@@ -599,11 +599,6 @@ function setupMobileControls() {
                     console.log('모바일 환경:', isMobile);
                     console.log('현재 상태:', { isStartScreen, gameStarted, isGameOver });
                     
-                    // 1. 전체화면 요청을 가장 먼저 시도 (모바일에서만, 시작화면일 때)
-                    if (isMobile) {
-                        enableFullscreen();
-                    }
-
                     // 버튼 눌림 상태 설정 및 게임 시작 처리
                     buttonPressed = true;
                     isStartScreen = false;
@@ -649,21 +644,22 @@ function setupMobileControls() {
             };
             
             // 모바일에서는 터치 이벤트만 사용, 데스크탑에서는 클릭 이벤트만 사용
-            if (isMobile) {
-                // 터치 이벤트 (모바일용)
-                mobileControls.btnFire.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleStartButton();
-                }, { passive: false });
-            } else {
-                // 클릭 이벤트 (데스크탑용)
-                mobileControls.btnFire.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleStartButton();
-                });
-            }
+    // 터치 이벤트 (모바일용)
+    mobileControls.btnFire.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        enableFullscreen(); // 전체화면 요청을 가장 먼저 직접 호출
+        handleStartButton(); // 그 다음에 게임 시작 처리
+    }, { passive: false });
+} else {
+    // 클릭 이벤트 (데스크탑용)
+    mobileControls.btnFire.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        enableFullscreen(); // 전체화면 요청을 가장 먼저 직접 호출
+        handleStartButton(); // 그 다음에 게임 시작 처리
+    });
+}
         
         mobileControls.btnFire.addEventListener('touchend', (e) => {
             e.preventDefault();
