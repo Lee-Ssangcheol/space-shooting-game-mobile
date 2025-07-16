@@ -644,22 +644,23 @@ function setupMobileControls() {
             };
             
             // 모바일에서는 터치 이벤트만 사용, 데스크탑에서는 클릭 이벤트만 사용
-    // 터치 이벤트 (모바일용)
-    mobileControls.btnFire.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        enableFullscreen(); // 전체화면 요청을 가장 먼저 직접 호출
-        handleStartButton(); // 그 다음에 게임 시작 처리
-    }, { passive: false });
-} else {
-    // 클릭 이벤트 (데스크탑용)
-    mobileControls.btnFire.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        enableFullscreen(); // 전체화면 요청을 가장 먼저 직접 호출
-        handleStartButton(); // 그 다음에 게임 시작 처리
-    });
-}
+            if (isMobile) {
+                // 터치 이벤트 (모바일용)
+                mobileControls.btnFire.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    enableFullscreen(); // 전체화면 요청을 가장 먼저 직접 호출
+                    handleStartButton(); // 그 다음에 게임 시작 처리
+                }, { passive: false });
+            } else {
+                // 클릭 이벤트 (데스크탑용)
+                mobileControls.btnFire.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    enableFullscreen(); // 전체화면 요청을 가장 먼저 직접 호출
+                    handleStartButton(); // 그 다음에 게임 시작 처리
+                });
+            }
         
         mobileControls.btnFire.addEventListener('touchend', (e) => {
             e.preventDefault();
