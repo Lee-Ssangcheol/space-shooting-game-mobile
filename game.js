@@ -5265,7 +5265,7 @@ async function initializeGame() {
         spacePressTime = 0;
         fireDelay = 600;
         continuousFireDelay = 50;
-        bulletSpeed = 12 * mobileSpeedMultiplier;
+        bulletSpeed = 10 * mobileSpeedMultiplier;
         baseBulletSize = 5.0;
         isContinuousFire = false;
         canFire = true;
