@@ -16,6 +16,9 @@ const mobileSpeedMultiplier = isMobile ? 0.6 : 1.0;
 let isFullscreenRequested = false;
 let fullscreenRequestTime = 0;
 
+// 추가 비행기 점수 초기화
+let lastSecondPlaneScore = 0;
+
 // 모바일 전체화면 모드 활성화
 function enableFullscreen() {
     // 모바일 환경에서만 전체화면 시도
@@ -3847,7 +3850,11 @@ function updateScore(points) {
 
 // 두 번째 비행기 처리 함수 추가
 function handleSecondPlane() {
-    if (score >= 4000 && score % 4000 === 0 && !hasSecondPlane) {
+    // 4000점 단위 경계를 넘어섰을 때만 추가 비행기 지급
+    const prevPlaneCount = Math.floor(lastSecondPlaneScore / 4000);
+    const currentPlaneCount = Math.floor(score / 4000);
+
+    if (currentPlaneCount > prevPlaneCount && !hasSecondPlane) {
         hasSecondPlane = true;
         secondPlane.x = player.x - 60;
         secondPlane.y = player.y;
@@ -3857,6 +3864,8 @@ function handleSecondPlane() {
         ctx.font = '40px Arial';
         ctx.fillText('추가 비행기 획득!', canvas.width/2 - 150, canvas.height/2);
     }
+
+    lastSecondPlaneScore = score; // 항상 최신 점수로 갱신
 
     if (hasSecondPlane) {
         const elapsedTime = Date.now() - secondPlaneTimer;
