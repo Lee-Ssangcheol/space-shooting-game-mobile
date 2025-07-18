@@ -16,9 +16,6 @@ const mobileSpeedMultiplier = isMobile ? 0.6 : 1.0;
 let isFullscreenRequested = false;
 let fullscreenRequestTime = 0;
 
-// 추가 비행기 점수 초기화
-let lastSecondPlaneScore = 0;
-
 // 모바일 전체화면 모드 활성화
 function enableFullscreen() {
     // 모바일 환경에서만 전체화면 시도
@@ -963,6 +960,7 @@ let highScore = 0;       // 최고 점수 (초기값 0으로 설정)
 let scoreForSpread = 0;   // 확산탄을 위한 점수
 let hasSecondPlane = false;  // 두 번째 비행기 보유 여부
 let secondPlaneTimer = 0;    // 두 번째 비행기 타이머
+let lastSecondPlaneScore = 0;
 let isPaused = false;     // 일시정지 상태
 let collisionCount = 0;   // 충돌 횟수
 let isGameOver = false;   // 게임 오버 상태
