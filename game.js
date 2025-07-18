@@ -5103,9 +5103,9 @@ let isSoundControlActive = false;
 function handleGameInput(e) {
     if (waitingForTouch) {
         waitingForTouch = false;
-        
-        return;
+        return; // 대기 해제 후, 아래 기존 입력 처리는 무시
     }
+
     // 시작 화면에서는 키보드 입력 무시
     if (isStartScreen) {
         return;
