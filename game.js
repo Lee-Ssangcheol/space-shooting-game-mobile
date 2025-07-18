@@ -1652,7 +1652,7 @@ async function initializeGame() {
         fireDelay = 600;
         continuousFireDelay = 50;
         bulletSpeed = 12 * mobileSpeedMultiplier;
-        baseBulletSize = 4.5;
+        baseBulletSize = 5.0;
         isContinuousFire = false;
         canFire = true;
         lastReleaseTime = 0;
@@ -1782,7 +1782,7 @@ function restartGame() {
     fireDelay = 600;
     continuousFireDelay = 50;
     bulletSpeed = 12 * mobileSpeedMultiplier;
-    baseBulletSize = 4.5;
+    baseBulletSize = 5.0;
     isContinuousFire = false;
     canFire = true;
     lastReleaseTime = 0;
@@ -4755,7 +4755,7 @@ let spacePressTime = 0;  // 스페이스바를 처음 누른 시간
 let fireDelay = 600;  // 기본 발사 딜레이 (끊어서 발사할 때 - 더 느리게)
 let continuousFireDelay = 50;  // 연속 발사 딜레이 (빠르게)
 let bulletSpeed = 12 * mobileSpeedMultiplier;  // 총알 속도
-let baseBulletSize = 4.5;  // 기본 총알 크기 (1.5배 증가)
+let baseBulletSize = 5.0;  // 기본 총알 크기 (1.5배 증가)
 let isContinuousFire = false;  // 연속 발사 상태
 let canFire = true;  // 발사 가능 상태 추가
 let lastReleaseTime = 0;  // 마지막 스페이스바 해제 시간
@@ -5266,7 +5266,7 @@ async function initializeGame() {
         fireDelay = 600;
         continuousFireDelay = 50;
         bulletSpeed = 12 * mobileSpeedMultiplier;
-        baseBulletSize = 4.5;
+        baseBulletSize = 5.0;
         isContinuousFire = false;
         canFire = true;
         lastReleaseTime = 0;
@@ -5418,7 +5418,7 @@ function restartGame() {
     fireDelay = 600;
     continuousFireDelay = 50;
     bulletSpeed = 12 * mobileSpeedMultiplier;
-    baseBulletSize = 4.5;
+    baseBulletSize = 5.0;
     isContinuousFire = false;
     canFire = true;
     lastReleaseTime = 0;
