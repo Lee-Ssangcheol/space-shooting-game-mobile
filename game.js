@@ -5329,6 +5329,8 @@ function handleGameOver() {
     if (!isGameOver) {
         isGameOver = true;
         gameOverStartTime = Date.now();
+
+        waitingForTouch = true; // 게임 오버 후 터치 대기 상태로 전환
         
         // 최고 점수 저장
         const finalScore = Math.max(score, highScore);
