@@ -12,9 +12,6 @@ const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/
 // 모바일 속도 조절 (60% 속도)
 const mobileSpeedMultiplier = isMobile ? 0.6 : 1.0;
 
-// 화면 터치 대기기
-let waitingForTouch = false;
-
 // 전체화면 상태 추적 변수
 let isFullscreenRequested = false;
 let fullscreenRequestTime = 0;
@@ -2557,9 +2554,12 @@ function drawAirplane(x, y, width, height, color, isEnemy = false) {
 
 // 게임 루프 수정
 function gameLoop() {
-    if (waitingForTouch) {
-        drawUI();
-        requestAnimationFrame(gameLoop);
+    if (!gameLoopRunning) return;
+    
+    if (isPaused) {
+        if (gameLoopRunning) {
+            requestAnimationFrame(gameLoop);
+        }
         return;
     }
 
@@ -3807,8 +3807,6 @@ function handleGameOver() {
     if (!isGameOver) {
         isGameOver = true;
         gameOverStartTime = Date.now();
-
-        waitingForTouch = true; // 게임 오버 후 터치 대기 상태로 전환
         
         // 최고 점수 저장
         const finalScore = Math.max(score, highScore);
@@ -4808,8 +4806,6 @@ let stars = [];  // 배경 별들
 // 시작 화면 초기화 함수
 function initStartScreen() {
     if (!canvas) return;
-
-    waitingForTouch = true; // 시작화면에서 터치 대기 상태로 전환
     
     // 부제목 위치 초기화
     subtitleY = canvas.height + 100;
@@ -5101,10 +5097,12 @@ let isSoundControlActive = false;
 
 // 키보드 입력 처리 함수
 function handleGameInput(e) {
-    if (waitingForTouch) {
-        waitingForTouch = false;
-        return; // 대기 해제 후, 아래 기존 입력 처리는 무시
-    }
+    // 게임 오버 상태에서 스페이스바로 재시작 (버튼으로만 재시작하도록 제거)
+    // if (isGameOver && e.code === 'Space') {
+    //     e.preventDefault();
+    //     restartGame();
+    //     return;
+    // }
 
     // 시작 화면에서는 키보드 입력 무시
     if (isStartScreen) {
@@ -5329,8 +5327,6 @@ function handleGameOver() {
     if (!isGameOver) {
         isGameOver = true;
         gameOverStartTime = Date.now();
-
-        waitingForTouch = true; // 게임 오버 후 터치 대기 상태로 전환
         
         // 최고 점수 저장
         const finalScore = Math.max(score, highScore);
