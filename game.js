@@ -2627,18 +2627,6 @@ function gameLoop() {
         return;
     }
 
-        // "시작/재시작" 버튼을 누른 후, 터치 전 대기 화면
-        if (gameStarted && !touchAfterButton) {
-            // 게임 화면(플레이어만) 그리기
-            ctx.fillStyle = '#000';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            // 플레이어만 그림
-            drawAirplane(player.x, player.y, player.width, player.height, 'white');
-            if (gameLoopRunning) {
-                requestAnimationFrame(gameLoop);
-            }
-            return;
-        }  
     try {
 
         
