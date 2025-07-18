@@ -2627,6 +2627,15 @@ function gameLoop() {
         return;
     }
 
+    // 모바일에서 터치 전에는 적 생성/게임 진행을 멈춤
+    if (isMobile && !touchAfterButton) {
+        // 터치 전에는 시작화면만 유지
+        drawStartScreen();
+        if (gameLoopRunning) {
+            requestAnimationFrame(gameLoop);
+        }
+        return;
+    }    
     try {
 
         
