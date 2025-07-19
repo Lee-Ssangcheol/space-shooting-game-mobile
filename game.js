@@ -15,6 +15,29 @@ const mobileSpeedMultiplier = isMobile ? 0.6 : 1.0;
 // 전체화면 상태 추적 변수
 let isFullscreenRequested = false;
 let fullscreenRequestTime = 0;
+let startButtonPressed = false;
+function handleStartButton() {
+    if (startButtonPressed) return; // 이미 처리 중이면 무시
+    startButtonPressed = true;
+    console.log('시작/재시작 버튼 처리');
+    // 시작 화면에서 버튼을 누르면 게임 시작 준비
+    if (isStartScreen) {
+        isStartScreen = false;
+        gameStarted = false; // 화면 터치 대기 상태
+        console.log('모바일에서 게임 시작 준비 - 화면 터치 대기');
+    }
+    // 게임 오버 상태에서 재시작
+    if (isGameOver) {
+        console.log('게임 오버 상태에서 버튼 터치로 게임 재시작!');
+        restartGame();
+        gameStarted = false; // 재시작 후 화면 터치 대기
+        console.log('게임 재시작 - 화면 터치 대기');
+    }
+    setTimeout(() => {
+        startButtonPressed = false;
+        console.log('시작 버튼 플래그 리셋됨');
+    }, 200);
+}
 
 // 모바일 전체화면 모드 활성화
 function enableFullscreen() {
@@ -564,52 +587,14 @@ function setupMobileControls() {
                     // 시작/재시작 버튼 이벤트
         if (mobileControls.btnFire) {
             console.log('btnFire 요소 발견, 이벤트 리스너 등록 중...');
-            
-            // 시작/재시작 버튼 함수 (중복 방지)
-            let startButtonPressed = false;
-            
-            const handleStartButton = () => {
-                if (startButtonPressed) return; // 이미 처리 중이면 무시
-                startButtonPressed = true;
-                
-                console.log('시작/재시작 버튼 처리');
-                
-                // 시작 화면에서 버튼을 누르면 게임 시작 준비
-                if (isStartScreen) {
-                    isStartScreen = false;
-                    gameStarted = false; // 화면 터치 대기 상태
-                    console.log('모바일에서 게임 시작 준비 - 화면 터치 대기');
-                }                
-                
-                // 게임 오버 상태에서 재시작
-                if (isGameOver) {
-                    console.log('게임 오버 상태에서 버튼 터치로 게임 재시작!');
-                    
-                    // 게임 재시작
-                    restartGame();
-                    gameStarted = false; // 재시작 후 화면 터치 대기
-                    console.log('게임 재시작 - 화면 터치 대기');
-                }
-                
-                // 0.2초 후 플래그 리셋 (매우 빠른 반응을 위해)
-                setTimeout(() => {
-                    startButtonPressed = false;
-                    console.log('시작 버튼 플래그 리셋됨');
-                }, 200);
-            };
-            
+                        
             // 모바일에서는 터치 이벤트만 사용, 데스크탑에서는 클릭 이벤트만 사용
             if (isMobile) {
                 // 터치 이벤트 (모바일용) - 전체화면과 게임 상태 변경을 동시에 처리
                 mobileControls.btnFire.addEventListener('touchstart', (e) => {
                     e.preventDefault();
-                    e.stopPropagation();
-                    
-                    // 사용자 상호작용의 직접적인 결과로 전체화면 요청
+                    e.stopPropagat
                     enableFullscreen();
-                    
-                    // 즉시 게임 상태 변경 (지연 없이)
-                    handleStartButton();
                 }, { passive: false });
             } else {
                 // 클릭 이벤트 (데스크탑용)
@@ -802,6 +787,7 @@ function setupMobileControls() {
                 e.preventDefault();
                 e.stopPropagation();
                 resetHighScore();
+                enableFullscreen();
             }, { passive: false });
         } else {
             // 클릭 이벤트 (데스크탑용)
@@ -809,6 +795,7 @@ function setupMobileControls() {
                 e.preventDefault();
                 e.stopPropagation();
                 resetHighScore();
+                handleStartButton();
             });
         }
     } else {
@@ -867,6 +854,20 @@ function initAudio() {
         collisionSound = { play: () => Promise.resolve(), currentTime: 0 };
     }
 }
+
+
+// 전체화면 이벤트 리스너너
+function onFullscreenChange() {
+    const isFullscreen = document.fullscreenElement ||
+        document.webkitFullscreenElement ||
+        document.mozFullScreenElement ||
+        document.msFullscreenElement;
+    if (isFullscreen && isStartScreen) {
+        handleStartButton();
+    }
+}
+['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange']
+    .forEach(eventName => document.addEventListener(eventName, onFullscreenChange));
 
 // 충돌 사운드 재생 시간 제어를 위한 변수 추가
 let lastCollisionTime = 0;
