@@ -616,6 +616,25 @@ function setupMobileControls() {
         console.error('현재 mobileControls:', mobileControls);
     }
     
+    // 최고 점수 리셋 버튼 이벤트 등록
+    if (mobileControls.btnReset) {
+        if (isMobile) {
+            mobileControls.btnReset.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                resetHighScore();
+            }, { passive: false });
+        } else {
+            mobileControls.btnReset.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                resetHighScore();
+            });
+        }
+    } else {
+        console.error('btnReset 요소를 찾을 수 없습니다!');
+    }
+
     if (mobileControls.btnSpecial) {
         mobileControls.btnSpecial.addEventListener('touchstart', (e) => {
             e.preventDefault();
@@ -809,6 +828,9 @@ function setupMobileControls() {
     }
     
     console.log('모바일 컨트롤 설정 완료');
+
+
+
     
     // 버튼 클릭 테스트를 위한 추가 이벤트 리스너
     if (mobileControls.btnFire) {
