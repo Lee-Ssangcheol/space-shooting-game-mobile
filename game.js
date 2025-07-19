@@ -371,9 +371,6 @@ function setupMobileControls() {
                 }
             }
 
-            // 전체화면 요청
-            enableFullscreen();
-
             // 게임 루프 시작
             startGameLoop();
             
@@ -501,9 +498,6 @@ function setupMobileControls() {
                 }
             }
 
-            // 전체화면 요청
-            enableFullscreen();
-
             // 게임 루프 시작
             startGameLoop();
             
@@ -613,7 +607,6 @@ function setupMobileControls() {
                     e.preventDefault();
                     e.stopPropagation();
                     handleStartButton(); // 게임 상태 먼저 변경
-                    enableFullscreen(); // 전체화면 요청
                 });
             }
         
