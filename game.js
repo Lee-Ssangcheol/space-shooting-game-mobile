@@ -786,25 +786,21 @@ function setupMobileControls() {
             mobileControls.btnFire.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                resetHighScore();
                 const isCurrentlyFullscreen = document.fullscreenElement ||
                     document.webkitFullscreenElement ||
                     document.mozFullScreenElement ||
                     document.msFullscreenElement;
                 if (isCurrentlyFullscreen) {
-                    // 이미 전체화면이면 바로 handleStartButton 호출
                     handleStartButton();
                 } else {
                     enableFullscreen();
-                    // handleStartButton()은 전체화면 진입 이벤트에서 호출
                 }
             }, { passive: false });
         } else {
             // 클릭 이벤트 (데스크탑용)
-            mobileControls.btnReset.addEventListener('click', (e) => {
+            mobileControls.btnFire.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                resetHighScore();
                 handleStartButton();
             });
         }
