@@ -396,17 +396,13 @@ function setupMobileControls() {
         e.preventDefault();
         e.stopPropagation();
         
-        // 시작 화면에서 터치 시 게임 시작 (버튼을 누른 후에만 가능)
-        if (isStartScreen && !gameStarted) {
-            if (!buttonPressed) {
-                console.log('버튼을 먼저 눌러주세요!');
-                return;
-            }
-            console.log('시작 화면에서 터치 - 게임 시작!');
-            touchAfterButton = true;  // 버튼을 누른 후 터치했음을 표시
-            isStartScreen = false;
+        // 모바일에서 화면 터치로 게임 시작
+        if (isMobile && !gameStarted && !isStartScreen && !isGameOver) {
             gameStarted = true;
-            document.body.classList.add('in-game');            
+            console.log('모바일 화면 터치로 게임 본격 시작!');
+            
+            // 오디오 초기화
+            initAudio();
 
             // 플레이어 위치 초기화
             if (canvas) {
@@ -417,6 +413,12 @@ function setupMobileControls() {
                     secondPlane.y = canvas.height - 50;
                 }
             }
+
+            // 전체화면 요청
+            enableFullscreen();
+
+            // 게임 루프 시작
+            startGameLoop();
             
             return;
         }
@@ -524,17 +526,14 @@ function setupMobileControls() {
     canvas.addEventListener('touchmove', (e) => {
         e.preventDefault();
         
-        // 시작 화면에서 터치 이동 시 게임 시작 (버튼을 누른 후에만 가능)
-        if (isStartScreen && !gameStarted) {
-            if (!buttonPressed) {
-                console.log('버튼을 먼저 눌러주세요!');
-                return;
-            }
-            console.log('시작 화면에서 터치 이동 - 게임 시작!');
-            touchAfterButton = true;  // 버튼을 누른 후 터치했음을 표시
-            isStartScreen = false;
+        // 모바일에서 화면 터치 이동으로 게임 시작
+        if (isMobile && !gameStarted && !isStartScreen && !isGameOver) {
             gameStarted = true;
+            console.log('모바일 화면 터치 이동으로 게임 본격 시작!');
             
+            // 오디오 초기화
+            initAudio();
+
             // 플레이어 위치 초기화
             if (canvas) {
                 player.x = canvas.width / 2;
@@ -544,6 +543,12 @@ function setupMobileControls() {
                     secondPlane.y = canvas.height - 50;
                 }
             }
+
+            // 전체화면 요청
+            enableFullscreen();
+
+            // 게임 루프 시작
+            startGameLoop();
             
             return;
         }
@@ -606,38 +611,11 @@ function setupMobileControls() {
                 
                 console.log('시작/재시작 버튼 처리');
                 
-                // 시작 화면에서 버튼을 누르면 게임 시작
+                // 시작 화면에서 버튼을 누르면 게임 시작 준비
                 if (isStartScreen) {
-                    console.log('시작/재시작 버튼으로 게임 시작!');
-                    console.log('모바일 환경:', isMobile);
-                    console.log('현재 상태:', { isStartScreen, gameStarted, isGameOver });
-                    
-                    // 버튼 눌림 상태 설정 및 게임 시작 처리
                     isStartScreen = false;
-                    gameStarted = true;
-                    buttonPressed = true;
-
-                    // 오디오 초기화
-                    initAudio();
-
-                    // 플레이어 위치 초기화
-                    if (canvas) {
-                        player.x = canvas.width / 2;
-                        player.y = canvas.height - 50;
-                        if (hasSecondPlane) {
-                            secondPlane.x = canvas.width / 2 - 60;
-                            secondPlane.y = canvas.height - 50;
-                        }
-                    }
-
-                    console.log('게임 시작 완료');
-                    console.log('게임 상태 업데이트:', { isStartScreen, gameStarted, isGameOver });
-
-                    // 전체화면 요청 (상태 변경 후!)
-                    enableFullscreen();
-
-                    // 게임 루프 시작
-                    startGameLoop();   
+                    gameStarted = false; // 화면 터치 대기 상태
+                    console.log('모바일에서 게임 시작 준비 - 화면 터치 대기');
                 }                
                 
                 // 게임 오버 상태에서 재시작
@@ -646,10 +624,8 @@ function setupMobileControls() {
                     
                     // 게임 재시작
                     restartGame();
-                    
-                    // 재시작 후 상태 초기화
-                    buttonPressed = false;
-                    touchAfterButton = false;
+                    gameStarted = false; // 재시작 후 화면 터치 대기
+                    console.log('게임 재시작 - 화면 터치 대기');
                 }
                 
                 // 0.2초 후 플래그 리셋 (매우 빠른 반응을 위해)
@@ -2735,6 +2711,9 @@ function handlePlayerMovement() {
 
 // 적 처리 함수 수정
 function handleEnemies() {
+    // 모바일과 데스크탑 모두에서 gameStarted 체크
+    if (!gameStarted) return;
+    
     const currentTime = Date.now();
     // 현재 난이도 설정 가져오기 - 레벨이 계속 올라가도록 수정
     let currentDifficulty;
@@ -2758,17 +2737,16 @@ function handleEnemies() {
         };
     }
 
-    // 뱀 패턴 처리 (모바일에서는 터치 후에만 활성화)
-    if (isSnakePatternActive && (!isMobile || touchAfterButton)) {
+    // 뱀 패턴 처리
+    if (isSnakePatternActive) {
         handleSnakePattern();
     }
 
-    // 일반 적 생성 - 시간 기반 생성 로직으로 변경 (모바일에서는 터치 후에만 생성)
+    // 일반 적 생성 - 시간 기반 생성 로직으로 변경
     if (currentTime - lastEnemySpawnTime >= MIN_ENEMY_SPAWN_INTERVAL &&
         Math.random() < currentDifficulty.enemySpawnRate && 
         enemies.length < currentDifficulty.maxEnemies &&
-        !isGameOver &&
-        (!isMobile || touchAfterButton)) {  // 모바일에서는 터치 후에만 적 생성
+        !isGameOver) {
         createEnemy();
         lastEnemySpawnTime = currentTime;
     }
@@ -2788,6 +2766,9 @@ function handleEnemies() {
 
 // 뱀 패턴 처리 함수 수정
 function handleSnakePattern() {
+    // 모바일과 데스크탑 모두에서 gameStarted 체크
+    if (!gameStarted) return;
+    
     const currentTime = Date.now();
     
     // 새로운 그룹 생성 체크
@@ -4103,6 +4084,9 @@ let lastBossSpawnTime = Date.now();  // 마지막 보스 출현 시간을 현재
 
 // 보스 생성 함수 수정
 function createBoss() {
+    // 모바일과 데스크탑 모두에서 gameStarted 체크
+    if (!gameStarted) return;
+    
     console.log('보스 생성 함수 호출됨');
     
     // 이미 보스가 존재하는 경우
@@ -4661,6 +4645,9 @@ const POWERUP_TYPES = {
 
 // 파워업 아이템 생성 함수
 function createPowerUp() {
+    // 모바일과 데스크탑 모두에서 gameStarted 체크
+    if (!gameStarted) return;
+    
     const types = Object.values(POWERUP_TYPES);
     const type = types[Math.floor(Math.random() * types.length)];
     
@@ -4681,6 +4668,9 @@ function createPowerUp() {
 
 // 파워업 아이템 처리 함수
 function handlePowerUps() {
+    // 모바일과 데스크탑 모두에서 gameStarted 체크
+    if (!gameStarted) return;
+    
     powerUps = powerUps.filter(powerUp => {
         // 파워업 아이템 이동
         powerUp.y += powerUp.speed;
@@ -4881,7 +4871,11 @@ function drawStartScreen() {
     if (isVisible) {
         ctx.font = 'bold 20px Arial';
         ctx.fillStyle = '#ffff00';
-        ctx.fillText('시작/재시작 버튼 누른 후 터치하여 시작', canvas.width/2, subtitleY);
+        if (isStartScreen) {
+            ctx.fillText('시작/재시작 버튼을 눌러주세요', canvas.width/2, subtitleY);
+        } else {
+            ctx.fillText('화면을 터치하여 게임을 시작하세요', canvas.width/2, subtitleY);
+        }
     }
 
     // 조작법 안내
