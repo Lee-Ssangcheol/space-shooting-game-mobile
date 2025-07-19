@@ -584,7 +584,7 @@ function setupMobileControls() {
         handleBulletFiring();
     }, { passive: false });
     
-                    // 시작/재시작 버튼 이벤트
+        // 시작/재시작 버튼 이벤트
         if (mobileControls.btnFire) {
             console.log('btnFire 요소 발견, 이벤트 리스너 등록 중...');
                         
@@ -604,7 +604,28 @@ function setupMobileControls() {
                     handleStartButton(); // 게임 상태 먼저 변경
                 });
             }
-        
+
+
+        // === 여기에 btnReset 이벤트 등록 ===
+        if (mobileControls.btnReset) {
+            if (isMobile) {
+                mobileControls.btnReset.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    resetHighScore();
+                }, { passive: false });
+            } else {
+                mobileControls.btnReset.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    resetHighScore();
+                });
+            }
+        } else {
+            console.error('btnReset 요소를 찾을 수 없습니다!');
+        }        
+
+       
         mobileControls.btnFire.addEventListener('touchend', (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -616,24 +637,6 @@ function setupMobileControls() {
         console.error('현재 mobileControls:', mobileControls);
     }
     
-    // 최고 점수 리셋 버튼 이벤트 등록
-    if (mobileControls.btnReset) {
-        if (isMobile) {
-            mobileControls.btnReset.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                resetHighScore();
-            }, { passive: false });
-        } else {
-            mobileControls.btnReset.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                resetHighScore();
-            });
-        }
-    } else {
-        console.error('btnReset 요소를 찾을 수 없습니다!');
-    }
 
     if (mobileControls.btnSpecial) {
         mobileControls.btnSpecial.addEventListener('touchstart', (e) => {
