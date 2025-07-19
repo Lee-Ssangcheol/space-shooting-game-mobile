@@ -786,7 +786,7 @@ function setupMobileControls() {
             mobileControls.btnFire.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                resetHighScore();
+                  //setHighScore();
                 const isCurrentlyFullscreen = document.fullscreenElement ||
                     document.webkitFullscreenElement ||
                     document.mozFullScreenElement ||
@@ -804,7 +804,7 @@ function setupMobileControls() {
             mobileControls.btnReset.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                resetHighScore();
+               // resetHighScore();
                 handleStartButton();
             });
         }
