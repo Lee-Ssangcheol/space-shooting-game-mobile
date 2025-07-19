@@ -15,29 +15,6 @@ const mobileSpeedMultiplier = isMobile ? 0.6 : 1.0;
 // 전체화면 상태 추적 변수
 let isFullscreenRequested = false;
 let fullscreenRequestTime = 0;
-let startButtonPressed = false;
-function handleStartButton() {
-    if (startButtonPressed) return; // 이미 처리 중이면 무시
-    startButtonPressed = true;
-    console.log('시작/재시작 버튼 처리');
-    // 시작 화면에서 버튼을 누르면 게임 시작 준비
-    if (isStartScreen) {
-        isStartScreen = false;
-        gameStarted = false; // 화면 터치 대기 상태
-        console.log('모바일에서 게임 시작 준비 - 화면 터치 대기');
-    }
-    // 게임 오버 상태에서 재시작
-    if (isGameOver) {
-        console.log('게임 오버 상태에서 버튼 터치로 게임 재시작!');
-        restartGame();
-        gameStarted = false; // 재시작 후 화면 터치 대기
-        console.log('게임 재시작 - 화면 터치 대기');
-    }
-    setTimeout(() => {
-        startButtonPressed = false;
-        console.log('시작 버튼 플래그 리셋됨');
-    }, 200);
-}
 
 // 모바일 전체화면 모드 활성화
 function enableFullscreen() {
@@ -65,50 +42,43 @@ function enableFullscreen() {
     let fullscreenPromise = null;
     let apiUsed = 'none';
     
-    // 모바일 크롬에서 가장 확실한 방법: 여러 요소에 대해 순차적으로 시도
+    // 여러 요소에 대해 전체화면 시도 (documentElement, body, canvas)
     const elementsToTry = [document.documentElement, document.body, canvas].filter(el => el);
     
-    for (const element of elementsToTry) {
-        if (element.webkitRequestFullscreen) {
-            console.log('WebKit 전체화면 API 사용 - 요소:', element.tagName);
-            try {
-                fullscreenPromise = element.webkitRequestFullscreen();
-                apiUsed = 'webkit-' + element.tagName;
-                break; // 성공하면 루프 종료
-            } catch (error) {
-                console.log('WebKit 전체화면 API 호출 실패:', error);
-                continue; // 다음 요소 시도
-            }
-        } else if (element.requestFullscreen) {
-            console.log('표준 전체화면 API 사용 - 요소:', element.tagName);
-            try {
-                fullscreenPromise = element.requestFullscreen();
-                apiUsed = 'standard-' + element.tagName;
-                break; // 성공하면 루프 종료
-            } catch (error) {
-                console.log('표준 전체화면 API 호출 실패:', error);
-                continue; // 다음 요소 시도
-            }
-        } else if (element.mozRequestFullScreen) {
-            console.log('Mozilla 전체화면 API 사용 - 요소:', element.tagName);
-            try {
-                fullscreenPromise = element.mozRequestFullScreen();
-                apiUsed = 'mozilla-' + element.tagName;
-                break; // 성공하면 루프 종료
-            } catch (error) {
-                console.log('Mozilla 전체화면 API 호출 실패:', error);
-                continue; // 다음 요소 시도
-            }
-        } else if (element.msRequestFullscreen) {
-            console.log('MS 전체화면 API 사용 - 요소:', element.tagName);
-            try {
-                fullscreenPromise = element.msRequestFullscreen();
-                apiUsed = 'ms-' + element.tagName;
-                break; // 성공하면 루프 종료
-            } catch (error) {
-                console.log('MS 전체화면 API 호출 실패:', error);
-                continue; // 다음 요소 시도
-            }
+    // 모바일 크롬에서 가장 확실한 방법: document.documentElement에 대해 webkitRequestFullscreen 사용
+    const targetElement = document.documentElement;
+    
+    if (targetElement.webkitRequestFullscreen) {
+        console.log('WebKit 전체화면 API 사용 - document.documentElement');
+        try {
+            fullscreenPromise = targetElement.webkitRequestFullscreen();
+            apiUsed = 'webkit-documentElement';
+        } catch (error) {
+            console.log('WebKit 전체화면 API 호출 실패:', error);
+        }
+    } else if (targetElement.requestFullscreen) {
+        console.log('표준 전체화면 API 사용 - document.documentElement');
+        try {
+            fullscreenPromise = targetElement.requestFullscreen();
+            apiUsed = 'standard-documentElement';
+        } catch (error) {
+            console.log('표준 전체화면 API 호출 실패:', error);
+        }
+    } else if (targetElement.mozRequestFullScreen) {
+        console.log('Mozilla 전체화면 API 사용 - document.documentElement');
+        try {
+            fullscreenPromise = targetElement.mozRequestFullScreen();
+            apiUsed = 'mozilla-documentElement';
+        } catch (error) {
+            console.log('Mozilla 전체화면 API 호출 실패:', error);
+        }
+    } else if (targetElement.msRequestFullscreen) {
+        console.log('MS 전체화면 API 사용 - document.documentElement');
+        try {
+            fullscreenPromise = targetElement.msRequestFullscreen();
+            apiUsed = 'ms-documentElement';
+        } catch (error) {
+            console.log('MS 전체화면 API 호출 실패:', error);
         }
     }
     
@@ -121,11 +91,6 @@ function enableFullscreen() {
         }).catch(err => {
             console.log('전체화면 모드 실패:', err);
             console.log('사용된 API:', apiUsed);
-            // 실패 시 다른 요소로 재시도
-            setTimeout(() => {
-                console.log('전체화면 재시도...');
-                enableFullscreen();
-            }, 100);
         });
     } else if (fullscreenPromise) {
         console.log('전체화면 요청 완료 (Promise가 아닌 경우):', apiUsed);
@@ -587,26 +552,57 @@ function setupMobileControls() {
                     // 시작/재시작 버튼 이벤트
         if (mobileControls.btnFire) {
             console.log('btnFire 요소 발견, 이벤트 리스너 등록 중...');
-                        
+            
+            // 시작/재시작 버튼 함수 (중복 방지)
+            let startButtonPressed = false;
+            
+            const handleStartButton = () => {
+                if (startButtonPressed) return; // 이미 처리 중이면 무시
+                startButtonPressed = true;
+                
+                console.log('시작/재시작 버튼 처리');
+                
+                // 시작 화면에서 버튼을 누르면 게임 시작 준비
+                if (isStartScreen) {
+                    isStartScreen = false;
+                    gameStarted = false; // 화면 터치 대기 상태
+                    console.log('모바일에서 게임 시작 준비 - 화면 터치 대기');
+                }                
+                
+                // 게임 오버 상태에서 재시작
+                if (isGameOver) {
+                    console.log('게임 오버 상태에서 버튼 터치로 게임 재시작!');
+                    
+                    // 게임 재시작
+                    restartGame();
+                    gameStarted = false; // 재시작 후 화면 터치 대기
+                    console.log('게임 재시작 - 화면 터치 대기');
+                }
+                
+                // 0.2초 후 플래그 리셋 (매우 빠른 반응을 위해)
+                setTimeout(() => {
+                    startButtonPressed = false;
+                    console.log('시작 버튼 플래그 리셋됨');
+                }, 200);
+            };
+            
             // 모바일에서는 터치 이벤트만 사용, 데스크탑에서는 클릭 이벤트만 사용
             if (isMobile) {
-                // 터치 이벤트 (모바일용) - 전체화면과 게임 상태 변경을 동시에 처리
+                // 터치 이벤트 (모바일용) - 전체화면을 먼저 요청
                 mobileControls.btnFire.addEventListener('touchstart', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    const isCurrentlyFullscreen = document.fullscreenElement ||
-                        document.webkitFullscreenElement ||
-                        document.mozFullScreenElement ||
-                        document.msFullscreenElement;
-                    if (isCurrentlyFullscreen) {
-                        // 이미 전체화면이면 바로 게임 상태 변경
+                    
+                    // 전체화면을 먼저 요청 (사용자 상호작용의 직접적인 결과로)
+                    enableFullscreen();
+                    
+                    // 약간의 지연 후 게임 상태 변경
+                    setTimeout(() => {
                         handleStartButton();
-                    } else {
-                        // 전체화면 진입 시에만 게임 상태 변경
-                        enableFullscreen();
-                    }
+                    }, 100);
                 }, { passive: false });
             } else {
+                // 클릭 이벤트 (데스크탑용)
                 mobileControls.btnFire.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -792,26 +788,17 @@ function setupMobileControls() {
         // 모바일에서는 터치 이벤트만 사용, 데스크탑에서는 클릭 이벤트만 사용
         if (isMobile) {
             // 터치 이벤트 (모바일용)
-            mobileControls.btnFire.addEventListener('touchstart', (e) => {
+            mobileControls.btnReset.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                const isCurrentlyFullscreen = document.fullscreenElement ||
-                    document.webkitFullscreenElement ||
-                    document.mozFullScreenElement ||
-                    document.msFullscreenElement;
-                if (isCurrentlyFullscreen) {
-                    // 이미 전체화면이면 바로 게임 상태 변경
-                    handleStartButton();
-                } else {
-                    // 전체화면 진입 시에만 게임 상태 변경
-                    enableFullscreen();
-                }
+                resetHighScore();
             }, { passive: false });
         } else {
-            mobileControls.btnFire.addEventListener('click', (e) => {
+            // 클릭 이벤트 (데스크탑용)
+            mobileControls.btnReset.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                handleStartButton(); // 게임 상태 먼저 변경
+                resetHighScore();
             });
         }
     } else {
@@ -870,20 +857,6 @@ function initAudio() {
         collisionSound = { play: () => Promise.resolve(), currentTime: 0 };
     }
 }
-
-
-// 전체화면 이벤트 리스너너
-function onFullscreenChange() {
-    const isFullscreen = document.fullscreenElement ||
-        document.webkitFullscreenElement ||
-        document.mozFullScreenElement ||
-        document.msFullscreenElement;
-    if (isFullscreen && isStartScreen) {
-        handleStartButton();
-    }
-}
-['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange']
-    .forEach(eventName => document.addEventListener(eventName, onFullscreenChange));
 
 // 충돌 사운드 재생 시간 제어를 위한 변수 추가
 let lastCollisionTime = 0;
