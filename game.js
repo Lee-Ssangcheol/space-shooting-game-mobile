@@ -786,6 +786,7 @@ function setupMobileControls() {
             mobileControls.btnFire.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                setHighScore();
                 const isCurrentlyFullscreen = document.fullscreenElement ||
                     document.webkitFullscreenElement ||
                     document.mozFullScreenElement ||
