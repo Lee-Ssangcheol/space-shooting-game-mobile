@@ -593,7 +593,7 @@ function setupMobileControls() {
                 // 터치 이벤트 (모바일용) - 전체화면과 게임 상태 변경을 동시에 처리
                 mobileControls.btnFire.addEventListener('touchstart', (e) => {
                     e.preventDefault();
-                    e.stopPropagat
+                    e.stopPropagation();
                     enableFullscreen();
                 }, { passive: false });
             } else {
