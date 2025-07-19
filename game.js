@@ -339,12 +339,6 @@ function setupMobileControls() {
         return;
     }
     
-    const mobileControls = {
-        btnFire: document.getElementById('btn-fire'),
-        btnReset: document.getElementById('btn-reset'),
-        // ... 기타 버튼 ...
-    };
-
     // DOM 로드 후 컨트롤 요소 초기화
     initializeMobileControls();
     
@@ -590,7 +584,7 @@ function setupMobileControls() {
         handleBulletFiring();
     }, { passive: false });
     
-        // 시작/재시작 버튼 이벤트
+                    // 시작/재시작 버튼 이벤트
         if (mobileControls.btnFire) {
             console.log('btnFire 요소 발견, 이벤트 리스너 등록 중...');
                         
@@ -610,29 +604,7 @@ function setupMobileControls() {
                     handleStartButton(); // 게임 상태 먼저 변경
                 });
             }
-
-
-        // === 여기에 btnReset 이벤트 등록 ===
-        if (mobileControls.btnReset) {
-            if (isMobile) {
-                mobileControls.btnReset.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    resetHighScore();
-                }, { passive: false });
-            } else {
-                mobileControls.btnReset.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    resetHighScore();
-                });
-            }
-        } else {
-            console.log('btnReset:', mobileControls.btnReset);
-            console.error('btnReset 요소를 찾을 수 없습니다!');
-        }        
-
-       
+        
         mobileControls.btnFire.addEventListener('touchend', (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -644,7 +616,6 @@ function setupMobileControls() {
         console.error('현재 mobileControls:', mobileControls);
     }
     
-
     if (mobileControls.btnSpecial) {
         mobileControls.btnSpecial.addEventListener('touchstart', (e) => {
             e.preventDefault();
@@ -812,24 +783,18 @@ function setupMobileControls() {
         // 모바일에서는 터치 이벤트만 사용, 데스크탑에서는 클릭 이벤트만 사용
         if (isMobile) {
             // 터치 이벤트 (모바일용)
-            mobileControls.btnFire.addEventListener('touchstart', (e) => {
+            mobileControls.btnReset.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                const isCurrentlyFullscreen = document.fullscreenElement ||
-                    document.webkitFullscreenElement ||
-                    document.mozFullScreenElement ||
-                    document.msFullscreenElement;
-                if (isCurrentlyFullscreen) {
-                    handleStartButton();
-                } else {
-                    enableFullscreen();
-                }
+                resetHighScore();
+                enableFullscreen();
             }, { passive: false });
         } else {
             // 클릭 이벤트 (데스크탑용)
-            mobileControls.btnFire.addEventListener('click', (e) => {
+            mobileControls.btnReset.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                resetHighScore();
                 handleStartButton();
             });
         }
@@ -838,9 +803,6 @@ function setupMobileControls() {
     }
     
     console.log('모바일 컨트롤 설정 완료');
-
-
-
     
     // 버튼 클릭 테스트를 위한 추가 이벤트 리스너
     if (mobileControls.btnFire) {
