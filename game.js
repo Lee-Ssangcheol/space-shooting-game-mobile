@@ -339,6 +339,12 @@ function setupMobileControls() {
         return;
     }
     
+    const mobileControls = {
+        btnFire: document.getElementById('btn-fire'),
+        btnReset: document.getElementById('btn-reset'),
+        // ... 기타 버튼 ...
+    };
+
     // DOM 로드 후 컨트롤 요소 초기화
     initializeMobileControls();
     
@@ -622,6 +628,7 @@ function setupMobileControls() {
                 });
             }
         } else {
+            console.log('btnReset:', mobileControls.btnReset);
             console.error('btnReset 요소를 찾을 수 없습니다!');
         }        
 
