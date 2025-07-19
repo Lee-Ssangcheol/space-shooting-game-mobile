@@ -786,7 +786,7 @@ function setupMobileControls() {
             mobileControls.btnFire.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                setHighScore();
+                resetHighScore();
                 const isCurrentlyFullscreen = document.fullscreenElement ||
                     document.webkitFullscreenElement ||
                     document.mozFullScreenElement ||
@@ -803,7 +803,8 @@ function setupMobileControls() {
             // 클릭 이벤트 (데스크탑용)
             mobileControls.btnReset.addEventListener('click', (e) => {
                 e.preventDefault();
-                e.stopPropagation();
+                e.stopPropagation();\
+                resetHighScore();
                 handleStartButton();
             });
         }
