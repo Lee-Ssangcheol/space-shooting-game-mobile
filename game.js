@@ -803,7 +803,7 @@ function setupMobileControls() {
             // 클릭 이벤트 (데스크탑용)
             mobileControls.btnReset.addEventListener('click', (e) => {
                 e.preventDefault();
-                e.stopPropagation();\
+                e.stopPropagation();
                 resetHighScore();
                 handleStartButton();
             });
