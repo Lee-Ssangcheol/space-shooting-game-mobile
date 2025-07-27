@@ -12,66 +12,174 @@ const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/
 // 모바일 속도 조절 (60% 속도)
 const mobileSpeedMultiplier = isMobile ? 0.6 : 1.0;
 
-// 전체화면 상태 추적 변수
-let isFullscreenRequested = false;
-let fullscreenRequestTime = 0;
+// 전체화면 상태 추적 변수 (종이비행기 게임과 동일하게)
+let isFullscreenActive = false;
+let fullscreenReactivationPending = false;
+let lastFullscreenAttempt = 0;
+const FULLSCREEN_COOLDOWN = 1000; // 전체화면 재시도 간격 (1초)
 
-// 안드로이드 크롬 전체화면 함수
+// 전체화면 상태 확인 함수 (종이비행기 게임과 동일하게)
+function checkFullscreenState() {
+    const isFullscreen = !!(document.fullscreenElement || 
+                           document.webkitFullscreenElement || 
+                           document.mozFullScreenElement || 
+                           document.msFullscreenElement);
+    
+    if (isFullscreen !== isFullscreenActive) {
+        isFullscreenActive = isFullscreen;
+        console.log('전체화면 상태 변경:', isFullscreenActive);
+        
+        // 전체화면이 종료되었고 재활성화가 대기 중인 경우
+        if (!isFullscreenActive && fullscreenReactivationPending) {
+            console.log('전체화면 재활성화 대기 중...');
+        }
+    }
+    
+    return isFullscreenActive;
+}
+
+// 전체화면 재활성화 함수 (종이비행기 게임과 동일하게)
+function reactivateFullscreen() {
+    if (!isMobile) {
+        return;
+    }
+    
+    // 쿨다운 체크 제거 - 즉시 재활성화 시도
+    const currentTime = Date.now();
+    lastFullscreenAttempt = currentTime;
+    
+    console.log('전체화면 재활성화 시도');
+    fullscreenReactivationPending = true;
+    
+    // 약간의 지연 후 전체화면 활성화
+    setTimeout(() => {
+        if (fullscreenReactivationPending) {
+            enableFullscreenForAndroid();
+        }
+    }, 500);
+}
+
+// 안드로이드 크롬 전체화면 함수 (종이비행기 게임 방식으로 수정)
 function enableFullscreenForAndroid() {
     if (!isMobile) {
-        console.log('데스크탑 환경이므로 전체화면 건너뜀');
+        console.log('데스크탑 환경이므로 전체화면 모드 건너뜀');
         return;
     }
+
+    const currentTime = Date.now();
+    lastFullscreenAttempt = currentTime;
+
+    console.log('모바일 전체화면 모드 활성화 시도');
     
-    console.log('안드로이드 크롬 전체화면 시도');
-    console.log('브라우저 정보:', navigator.userAgent);
-    
-    // 이미 전체화면 모드인지 확인
-    const isCurrentlyFullscreen = document.fullscreenElement || 
-                                 document.webkitFullscreenElement || 
-                                 document.mozFullScreenElement || 
-                                 document.msFullscreenElement;
-    
-    if (isCurrentlyFullscreen) {
-        console.log('이미 전체화면 모드입니다');
-        return;
+    // 현재 전체화면 상태 확인 - 이미 전체화면이어도 강제로 시도
+    const currentFullscreenState = checkFullscreenState();
+    if (currentFullscreenState) {
+        console.log('이미 전체화면 모드가 활성화되어 있지만, 강제로 재시도합니다.');
+        // return 제거 - 이미 전체화면이어도 계속 진행
     }
-    
-    // 안드로이드 크롬에서 가장 확실한 방법: document.documentElement에 대해 webkitRequestFullscreen 사용
-    const targetElement = document.documentElement;
-    
-    if (targetElement.webkitRequestFullscreen) {
-        console.log('WebKit 전체화면 API 사용 - document.documentElement');
-        try {
-            targetElement.webkitRequestFullscreen().then(() => {
-                console.log('안드로이드 크롬 전체화면 성공');
-            }).catch(err => {
-                console.log('안드로이드 크롬 전체화면 실패:', err);
-                // 실패 시 CSS 최적화 적용
-                applyMobileCSSOptimization();
-            });
-        } catch (error) {
-            console.log('WebKit 전체화면 API 호출 실패:', error);
-            // 실패 시 CSS 최적화 적용
-            applyMobileCSSOptimization();
+
+    try {
+        // 모든 가능한 전체화면 API를 순차적으로 시도
+        console.log('전체화면 API 시도 시작...');
+        
+        // 1. 표준 requestFullscreen API
+        if (document.documentElement.requestFullscreen) {
+            console.log('표준 requestFullscreen API 시도...');
+            const result = document.documentElement.requestFullscreen();
+            if (result && typeof result.then === 'function') {
+                result.then(() => {
+                    isFullscreenActive = true;
+                    fullscreenReactivationPending = false;
+                    console.log('전체화면 모드 활성화 성공 (requestFullscreen)');
+                }).catch(err => {
+                    console.log('표준 API 실패, webkit으로 재시도:', err);
+                    // 실패 시 webkit 방식으로 재시도
+                    if (document.documentElement.webkitRequestFullscreen) {
+                        document.documentElement.webkitRequestFullscreen();
+                        isFullscreenActive = true;
+                        fullscreenReactivationPending = false;
+                        console.log('webkit 방식으로 재시도 성공');
+                    }
+                });
+            } else {
+                isFullscreenActive = true;
+                fullscreenReactivationPending = false;
+                console.log('전체화면 모드 활성화 성공 (requestFullscreen, non-promise)');
+            }
         }
-    } else if (targetElement.requestFullscreen) {
-        console.log('표준 전체화면 API 사용 - document.documentElement');
-        try {
-            targetElement.requestFullscreen().then(() => {
-                console.log('안드로이드 크롬 전체화면 성공');
-            }).catch(err => {
-                console.log('안드로이드 크롬 전체화면 실패:', err);
-                // 실패 시 CSS 최적화 적용
-                applyMobileCSSOptimization();
-            });
-        } catch (error) {
-            console.log('표준 전체화면 API 호출 실패:', error);
-            // 실패 시 CSS 최적화 적용
-            applyMobileCSSOptimization();
+        // 2. webkitRequestFullscreen API
+        else if (document.documentElement.webkitRequestFullscreen) {
+            console.log('webkitRequestFullscreen API 시도...');
+            document.documentElement.webkitRequestFullscreen();
+            isFullscreenActive = true;
+            fullscreenReactivationPending = false;
+            console.log('전체화면 모드 활성화 성공 (webkitRequestFullscreen)');
         }
-    } else {
-        console.log('지원되는 전체화면 API가 없습니다 - CSS 최적화 적용');
+        // 3. mozRequestFullScreen API
+        else if (document.documentElement.mozRequestFullScreen) {
+            console.log('mozRequestFullScreen API 시도...');
+            document.documentElement.mozRequestFullScreen();
+            isFullscreenActive = true;
+            fullscreenReactivationPending = false;
+            console.log('전체화면 모드 활성화 성공 (mozRequestFullScreen)');
+        }
+        // 4. msRequestFullscreen API
+        else if (document.documentElement.msRequestFullscreen) {
+            console.log('msRequestFullscreen API 시도...');
+            document.documentElement.msRequestFullscreen();
+            isFullscreenActive = true;
+            fullscreenReactivationPending = false;
+            console.log('전체화면 모드 활성화 성공 (msRequestFullscreen)');
+        }
+        // 5. 모든 API가 실패한 경우
+        else {
+            console.log('모든 전체화면 API가 지원되지 않음');
+        }
+
+        // iOS Safari에서 주소창 숨김 및 모바일 전체화면 강화
+        if (window.navigator.standalone || isMobile) {
+            // 강제 전체화면 CSS 적용
+            document.body.style.position = 'fixed';
+            document.body.style.top = '0';
+            document.body.style.left = '0';
+            document.body.style.width = '100vw';
+            document.body.style.height = '100vh';
+            document.body.style.overflow = 'hidden';
+            document.body.style.margin = '0';
+            document.body.style.padding = '0';
+            document.body.style.zIndex = '9999';
+            
+            // HTML 요소도 전체화면으로 설정
+            document.documentElement.style.position = 'fixed';
+            document.documentElement.style.top = '0';
+            document.documentElement.style.left = '0';
+            document.documentElement.style.width = '100vw';
+            document.documentElement.style.height = '100vh';
+            document.documentElement.style.overflow = 'hidden';
+            document.documentElement.style.margin = '0';
+            document.documentElement.style.padding = '0';
+            
+            isFullscreenActive = true;
+            fullscreenReactivationPending = false;
+            console.log('모바일 강제 전체화면 CSS 적용 완료');
+        }
+        
+        // 추가적인 모바일 전체화면 강화
+        const viewportMeta = document.querySelector('meta[name="viewport"]');
+        if (viewportMeta) {
+            viewportMeta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover');
+        }
+        
+        // 모바일 브라우저에서 전체화면 효과를 위한 추가 스타일
+        document.body.style.webkitOverflowScrolling = 'touch';
+        document.body.style.webkitUserSelect = 'none';
+        document.body.style.webkitTouchCallout = 'none';
+        
+        console.log('모바일 전체화면 강화 완료');
+        
+    } catch (error) {
+        console.log('전체화면 활성화 중 오류 발생:', error);
+        // 오류 발생 시에도 CSS 최적화 적용
         applyMobileCSSOptimization();
     }
 }
@@ -115,26 +223,45 @@ function applyMobileCSSOptimization() {
     console.log('CSS 기반 모바일 최적화 완료');
 }
 
-// 모바일 최적화 이벤트 리스너
-function setupMobileOptimization() {
-    // 화면 크기 변화 시 모바일 최적화 재적용
-    window.addEventListener('resize', () => {
-        if (isMobile) {
-            console.log('화면 크기 변화 - 모바일 최적화 재적용');
-            applyMobileCSSOptimization();
-            resizeCanvasToDisplaySize();
-        }
-    });
+// 전체화면 상태 변화 이벤트 리스너 (종이비행기 게임과 동일하게)
+function setupFullscreenEventListeners() {
+    const fullscreenChangeEvents = [
+        'fullscreenchange',
+        'webkitfullscreenchange',
+        'mozfullscreenchange',
+        'MSFullscreenChange'
+    ];
     
-    // 화면 방향 변화 시 모바일 최적화 재적용
-    window.addEventListener('orientationchange', () => {
-        if (isMobile) {
-            console.log('화면 방향 변화 - 모바일 최적화 재적용');
-            setTimeout(() => {
-                applyMobileCSSOptimization();
+    fullscreenChangeEvents.forEach(eventName => {
+        document.addEventListener(eventName, () => {
+            const wasFullscreen = isFullscreenActive;
+            const isFullscreen = !!(document.fullscreenElement || 
+                                   document.webkitFullscreenElement || 
+                                   document.mozFullScreenElement || 
+                                   document.msFullscreenElement);
+            
+            if (isFullscreen !== wasFullscreen) {
+                isFullscreenActive = isFullscreen;
+                console.log('전체화면 상태 변경:', isFullscreenActive);
+                
+                // 전체화면 진입/이탈 시 캔버스 크기 동기화
                 resizeCanvasToDisplaySize();
-            }, 100);
-        }
+                
+                if (isFullscreen) {
+                    console.log('전체화면 모드 진입');
+                    fullscreenReactivationPending = false;
+                } else {
+                    console.log('전체화면 모드 종료');
+                    // 전체화면이 종료되었을 때 재활성화 시도
+                    if (isMobile) {
+                        console.log('전체화면 재활성화 시도');
+                        setTimeout(() => {
+                            reactivateFullscreen();
+                        }, 100);
+                    }
+                }
+            }
+        });
     });
 }
 
@@ -528,71 +655,59 @@ function setupMobileControls() {
         if (mobileControls.btnFire) {
             console.log('btnFire 요소 발견, 이벤트 리스너 등록 중...');
             
-            // 시작/재시작 버튼 함수 (중복 방지)
-            let startButtonPressed = false;
-            let lastButtonPressTime = 0;
             
-            const handleStartButton = () => {
-                const currentTime = Date.now();
-                
-                // 중복 클릭 방지 (0.5초 내 중복 클릭 무시)
-                if (startButtonPressed || (currentTime - lastButtonPressTime < 500)) {
-                    console.log('중복 버튼 클릭 무시');
-                    return;
-                }
-                
-                startButtonPressed = true;
-                lastButtonPressTime = currentTime;
-                
-                console.log('시작/재시작 버튼 처리');
-                
-                // 시작 화면에서 버튼을 누르면 게임 시작 준비
-                if (isStartScreen) {
-                    isStartScreen = false;
-                    gameStarted = false; // 화면 터치 대기 상태
-                    console.log('모바일에서 게임 시작 준비 - 화면 터치 대기');
-                }                
-                
-                // 게임 오버 상태에서 재시작
-                if (isGameOver) {
-                    console.log('게임 오버 상태에서 버튼 터치로 게임 재시작!');
-                    
-                    // 게임 재시작
-                    restartGame();
-                    gameStarted = false; // 재시작 후 화면 터치 대기
-                    console.log('게임 재시작 - 화면 터치 대기');
-                }
-                
-                // 0.5초 후 플래그 리셋 (중복 방지를 위해 시간 증가)
-                setTimeout(() => {
-                    startButtonPressed = false;
-                    console.log('시작 버튼 플래그 리셋됨');
-                }, 500);
-            };
             
                             // 모바일에서는 터치 이벤트만 사용, 데스크탑에서는 클릭 이벤트만 사용
             if (isMobile) {
-                // 터치 이벤트 (모바일용) - 안드로이드 크롬 전체화면 및 게임 상태 처리
+                // 터치 이벤트 (모바일용) - 종이비행기 게임과 동일하게
                 mobileControls.btnFire.addEventListener('touchstart', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
+                    console.log('시작/재시작 버튼 터치');
                     
-                    console.log('모바일 시작 버튼 터치 - 안드로이드 크롬 전체화면 및 게임 상태 처리 시작');
+                    // 전체화면 활성화 시도 (모바일에서만)
+                    if (isMobile) {
+                        console.log('전체화면 활성화 시도 - 현재 상태:', isFullscreenActive);
+                        enableFullscreenForAndroid();
+                    }
                     
-                    // 안드로이드 크롬 전체화면 시도 (사용자 상호작용의 직접적인 결과로)
-                    enableFullscreenForAndroid();
+                    // 시작 화면에서 버튼을 누르면 게임 시작 준비
+                    if (isStartScreen) {
+                        isStartScreen = false;
+                        gameStarted = false; // 화면 터치 대기 상태
+                        console.log('모바일에서 게임 시작 준비 - 화면 터치 대기');
+                    }
                     
-                    // 약간의 지연 후 게임 상태 변경 (전체화면 요청이 처리될 시간을 줌)
-                    setTimeout(() => {
-                        handleStartButton();
-                    }, 100);
+                    // 게임 오버 상태에서 재시작
+                    if (isGameOver) {
+                        restartGame();
+                        return;
+                    }
                 }, { passive: false });
             } else {
                 // 클릭 이벤트 (데스크탑용)
                 mobileControls.btnFire.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    handleStartButton(); // 게임 상태 먼저 변경
+                    console.log('시작/재시작 버튼 클릭');
+                    
+                    // 전체화면 활성화 시도 (모바일에서만) - 항상 먼저 실행
+                    if (isMobile) {
+                        console.log('전체화면 활성화 시도 - 현재 상태:', isFullscreenActive);
+                        enableFullscreenForAndroid();
+                    }
+                    
+                    if (isStartScreen) {
+                        isStartScreen = false;
+                        gameStarted = false; // 화면 터치 대기 상태
+                        console.log('모바일에서 게임 시작 준비 - 화면 터치 대기');
+                    }
+                    
+                    // 게임 오버 상태에서 재시작
+                    if (isGameOver) {
+                        restartGame();
+                        return;
+                    }
                 });
             }
         
@@ -5488,8 +5603,8 @@ window.addEventListener('DOMContentLoaded', () => {
     // 4. 모바일 컨트롤 설정
     setupMobileControls();
     
-    // 5. 모바일 최적화 이벤트 리스너 설정
-    setupMobileOptimization();
+    // 5. 전체화면 이벤트 리스너 설정
+    setupFullscreenEventListeners();
     
     // 6. 게임 초기화
     initializeGame();
