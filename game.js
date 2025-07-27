@@ -5584,6 +5584,21 @@ function resizeCanvasToDisplaySize() {
     canvas.height = rect.height;
 }
 
+// 페이지 로드 시 모바일 전체화면 모드 활성화 (종이비행기 게임과 동일하게)
+window.addEventListener('DOMContentLoaded', () => {
+    // 모바일에서 전체화면 모드 활성화
+    if (isMobile) {
+        // 사용자 상호작용 후 전체화면 모드 활성화 (iOS Safari 요구사항)
+        document.addEventListener('touchstart', () => {
+            enableFullscreenForAndroid();
+        }, { once: true });
+        
+        document.addEventListener('click', () => {
+            enableFullscreenForAndroid();
+        }, { once: true });
+    }
+});
+
 // 페이지 로드 시 초기화
 window.addEventListener('DOMContentLoaded', () => {
     console.log('DOM 로드 완료 - 게임 초기화 시작');
@@ -5608,9 +5623,6 @@ window.addEventListener('DOMContentLoaded', () => {
     
     // 6. 게임 초기화
     initializeGame();
-    
-    // 5. 모바일에서 전체화면 모드 활성화는 시작 버튼에서 처리하므로 여기서는 제거
-    // (중복 방지를 위해 페이지 로드 시 자동 전체화면 활성화 제거)
     
     console.log('게임 초기화 완료');
 });
