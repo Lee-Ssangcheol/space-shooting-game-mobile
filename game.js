@@ -153,6 +153,20 @@ function enableFullscreen() {
             
             console.log('모바일 강제 전체화면 CSS 적용 완료');
         }
+        
+        // 추가적인 모바일 전체화면 강화
+        // iOS Safari에서 주소창 숨김을 위한 메타 태그 동적 추가
+        const viewportMeta = document.querySelector('meta[name="viewport"]');
+        if (viewportMeta) {
+            viewportMeta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover');
+        }
+        
+        // 모바일 브라우저에서 전체화면 효과를 위한 추가 스타일
+        document.body.style.webkitOverflowScrolling = 'touch';
+        document.body.style.webkitUserSelect = 'none';
+        document.body.style.webkitTouchCallout = 'none';
+        
+        console.log('모바일 전체화면 강화 완료');
     }
     
     // 화면 방향 고정 (세로 모드) - 전체화면과 별개로 실행
@@ -587,10 +601,19 @@ function setupMobileControls() {
             
             // 시작/재시작 버튼 함수 (중복 방지)
             let startButtonPressed = false;
+            let lastButtonPressTime = 0;
             
             const handleStartButton = () => {
-                if (startButtonPressed) return; // 이미 처리 중이면 무시
+                const currentTime = Date.now();
+                
+                // 중복 클릭 방지 (0.5초 내 중복 클릭 무시)
+                if (startButtonPressed || (currentTime - lastButtonPressTime < 500)) {
+                    console.log('중복 버튼 클릭 무시');
+                    return;
+                }
+                
                 startButtonPressed = true;
+                lastButtonPressTime = currentTime;
                 
                 console.log('시작/재시작 버튼 처리');
                 
@@ -611,27 +634,25 @@ function setupMobileControls() {
                     console.log('게임 재시작 - 화면 터치 대기');
                 }
                 
-                // 0.2초 후 플래그 리셋 (매우 빠른 반응을 위해)
+                // 0.5초 후 플래그 리셋 (중복 방지를 위해 시간 증가)
                 setTimeout(() => {
                     startButtonPressed = false;
                     console.log('시작 버튼 플래그 리셋됨');
-                }, 200);
+                }, 500);
             };
             
                             // 모바일에서는 터치 이벤트만 사용, 데스크탑에서는 클릭 이벤트만 사용
             if (isMobile) {
-                // 터치 이벤트 (모바일용) - 전체화면을 먼저 요청
+                // 터치 이벤트 (모바일용) - 전체화면과 게임 상태를 동시에 처리
                 mobileControls.btnFire.addEventListener('touchstart', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     
-                    // 전체화면을 먼저 요청 (사용자 상호작용의 직접적인 결과로)
-                    enableFullscreen();
+                    console.log('모바일 시작 버튼 터치 - 전체화면 및 게임 상태 처리 시작');
                     
-                    // 더 빠른 반응을 위해 지연 시간 단축
-                    setTimeout(() => {
-                        handleStartButton();
-                    }, 50);
+                    // 전체화면 요청과 게임 상태 변경을 동시에 처리
+                    enableFullscreen();
+                    handleStartButton();
                 }, { passive: false });
             } else {
                 // 클릭 이벤트 (데스크탑용)
