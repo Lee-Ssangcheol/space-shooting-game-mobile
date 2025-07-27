@@ -16,11 +16,20 @@ const mobileSpeedMultiplier = isMobile ? 0.6 : 1.0;
 let isFullscreenRequested = false;
 let fullscreenRequestTime = 0;
 
+// 전체화면 전환 상태 추적
+let isFullscreenRequestInProgress = false;
+
 // 모바일 전체화면 모드 활성화
 function enableFullscreen() {
     // 모바일 환경에서만 전체화면 시도
     if (!isMobile) {
         console.log('데스크탑 환경이므로 전체화면 모드 건너뜀');
+        return;
+    }
+    
+    // 이미 전체화면 전환 요청 중이면 무시
+    if (isFullscreenRequestInProgress) {
+        console.log('전체화면 전환 요청이 이미 진행 중입니다');
         return;
     }
     
@@ -37,6 +46,9 @@ function enableFullscreen() {
         console.log('이미 전체화면 모드입니다');
         return;
     }
+    
+    // 전체화면 전환 요청 시작
+    isFullscreenRequestInProgress = true;
     
     // 브라우저별 전체화면 API 호출 (모든 가능한 API 시도)
     let fullscreenPromise = null;
@@ -88,14 +100,30 @@ function enableFullscreen() {
     if (fullscreenPromise && typeof fullscreenPromise.then === 'function') {
         fullscreenPromise.then(() => {
             console.log('전체화면 모드 성공:', apiUsed);
+            // 전체화면 전환 완료 후 상태 리셋
+            setTimeout(() => {
+                isFullscreenRequestInProgress = false;
+            }, 500);
         }).catch(err => {
             console.log('전체화면 모드 실패:', err);
             console.log('사용된 API:', apiUsed);
+            // 실패 시에도 상태 리셋
+            setTimeout(() => {
+                isFullscreenRequestInProgress = false;
+            }, 500);
         });
     } else if (fullscreenPromise) {
         console.log('전체화면 요청 완료 (Promise가 아닌 경우):', apiUsed);
+        // Promise가 아닌 경우에도 상태 리셋
+        setTimeout(() => {
+            isFullscreenRequestInProgress = false;
+        }, 500);
     } else {
         console.log('지원되는 전체화면 API가 없습니다');
+        // API가 없는 경우에도 상태 리셋
+        setTimeout(() => {
+            isFullscreenRequestInProgress = false;
+        }, 500);
     }
        
     // 모바일 브라우저에서 전체화면 효과를 위한 CSS 스타일 적용
@@ -156,8 +184,12 @@ function setupFullscreenEventListeners() {
             
             if (isFullscreen) {
                 console.log('전체화면 모드 진입');
+                // 전체화면 진입 시 상태 리셋
+                isFullscreenRequestInProgress = false;
             } else {
                 console.log('전체화면 모드 종료');
+                // 전체화면 종료 시에도 상태 리셋
+                isFullscreenRequestInProgress = false;
             }
         });
     });
@@ -586,7 +618,7 @@ function setupMobileControls() {
                 }, 200);
             };
             
-            // 모바일에서는 터치 이벤트만 사용, 데스크탑에서는 클릭 이벤트만 사용
+                            // 모바일에서는 터치 이벤트만 사용, 데스크탑에서는 클릭 이벤트만 사용
             if (isMobile) {
                 // 터치 이벤트 (모바일용) - 전체화면을 먼저 요청
                 mobileControls.btnFire.addEventListener('touchstart', (e) => {
@@ -596,10 +628,10 @@ function setupMobileControls() {
                     // 전체화면을 먼저 요청 (사용자 상호작용의 직접적인 결과로)
                     enableFullscreen();
                     
-                    // 약간의 지연 후 게임 상태 변경
+                    // 더 빠른 반응을 위해 지연 시간 단축
                     setTimeout(() => {
                         handleStartButton();
-                    }, 100);
+                    }, 50);
                 }, { passive: false });
             } else {
                 // 클릭 이벤트 (데스크탑용)
