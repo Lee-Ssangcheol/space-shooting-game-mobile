@@ -16,196 +16,77 @@ const mobileSpeedMultiplier = isMobile ? 0.6 : 1.0;
 let isFullscreenRequested = false;
 let fullscreenRequestTime = 0;
 
-// 전체화면 전환 상태 추적
-let isFullscreenRequestInProgress = false;
-
-// 모바일 전체화면 모드 활성화
-function enableFullscreen() {
-    // 모바일 환경에서만 전체화면 시도
+// 모바일 최적화 함수 (전체화면 API 대신 CSS 최적화 사용)
+function optimizeForMobile() {
     if (!isMobile) {
-        console.log('데스크탑 환경이므로 전체화면 모드 건너뜀');
+        console.log('데스크탑 환경이므로 모바일 최적화 건너뜀');
         return;
     }
     
-    // 이미 전체화면 전환 요청 중이면 무시
-    if (isFullscreenRequestInProgress) {
-        console.log('전체화면 전환 요청이 이미 진행 중입니다');
-        return;
-    }
+    console.log('모바일 최적화 적용 시작');
     
-    console.log('모바일 전체화면 모드 활성화 시도');
-    console.log('브라우저 정보:', navigator.userAgent);
-    
-    // 이미 전체화면 모드인지 확인
-    const isCurrentlyFullscreen = document.fullscreenElement || 
-                                 document.webkitFullscreenElement || 
-                                 document.mozFullScreenElement || 
-                                 document.msFullscreenElement;
-    
-    if (isCurrentlyFullscreen) {
-        console.log('이미 전체화면 모드입니다');
-        return;
-    }
-    
-    // 전체화면 전환 요청 시작
-    isFullscreenRequestInProgress = true;
-    
-    // 브라우저별 전체화면 API 호출 (모든 가능한 API 시도)
-    let fullscreenPromise = null;
-    let apiUsed = 'none';
-    
-    // 여러 요소에 대해 전체화면 시도 (documentElement, body, canvas)
-    const elementsToTry = [document.documentElement, document.body, canvas].filter(el => el);
-    
-    // 모바일 크롬에서 가장 확실한 방법: document.documentElement에 대해 webkitRequestFullscreen 사용
-    const targetElement = document.documentElement;
-    
-    if (targetElement.webkitRequestFullscreen) {
-        console.log('WebKit 전체화면 API 사용 - document.documentElement');
-        try {
-            fullscreenPromise = targetElement.webkitRequestFullscreen();
-            apiUsed = 'webkit-documentElement';
-        } catch (error) {
-            console.log('WebKit 전체화면 API 호출 실패:', error);
-        }
-    } else if (targetElement.requestFullscreen) {
-        console.log('표준 전체화면 API 사용 - document.documentElement');
-        try {
-            fullscreenPromise = targetElement.requestFullscreen();
-            apiUsed = 'standard-documentElement';
-        } catch (error) {
-            console.log('표준 전체화면 API 호출 실패:', error);
-        }
-    } else if (targetElement.mozRequestFullScreen) {
-        console.log('Mozilla 전체화면 API 사용 - document.documentElement');
-        try {
-            fullscreenPromise = targetElement.mozRequestFullScreen();
-            apiUsed = 'mozilla-documentElement';
-        } catch (error) {
-            console.log('Mozilla 전체화면 API 호출 실패:', error);
-        }
-    } else if (targetElement.msRequestFullscreen) {
-        console.log('MS 전체화면 API 사용 - document.documentElement');
-        try {
-            fullscreenPromise = targetElement.msRequestFullscreen();
-            apiUsed = 'ms-documentElement';
-        } catch (error) {
-            console.log('MS 전체화면 API 호출 실패:', error);
-        }
-    }
-    
-    console.log('사용된 API:', apiUsed);
-    
-    // 전체화면 요청 처리
-    if (fullscreenPromise && typeof fullscreenPromise.then === 'function') {
-        fullscreenPromise.then(() => {
-            console.log('전체화면 모드 성공:', apiUsed);
-            // 전체화면 전환 완료 후 상태 리셋
-            setTimeout(() => {
-                isFullscreenRequestInProgress = false;
-            }, 500);
-        }).catch(err => {
-            console.log('전체화면 모드 실패:', err);
-            console.log('사용된 API:', apiUsed);
-            // 실패 시에도 상태 리셋
-            setTimeout(() => {
-                isFullscreenRequestInProgress = false;
-            }, 500);
-        });
-    } else if (fullscreenPromise) {
-        console.log('전체화면 요청 완료 (Promise가 아닌 경우):', apiUsed);
-        // Promise가 아닌 경우에도 상태 리셋
-        setTimeout(() => {
-            isFullscreenRequestInProgress = false;
-        }, 500);
-    } else {
-        console.log('지원되는 전체화면 API가 없습니다');
-        // API가 없는 경우에도 상태 리셋
-        setTimeout(() => {
-            isFullscreenRequestInProgress = false;
-        }, 500);
-    }
-       
     // 모바일 브라우저에서 전체화면 효과를 위한 CSS 스타일 적용
-    if (isMobile) {
-        // iOS Safari에서 주소창 숨김 및 모바일 전체화면 강화
-        if (window.navigator.standalone || isMobile) {
-            // 강제 전체화면 CSS 적용
-            document.body.style.position = 'fixed';
-            document.body.style.top = '0';
-            document.body.style.left = '0';
-            document.body.style.width = '100vw';
-            document.body.style.height = '100vh';
-            document.body.style.overflow = 'hidden';
-            document.body.style.margin = '0';
-            document.body.style.padding = '0';
-            document.body.style.zIndex = '9999';
-            
-            // HTML 요소도 전체화면으로 설정
-            document.documentElement.style.position = 'fixed';
-            document.documentElement.style.top = '0';
-            document.documentElement.style.left = '0';
-            document.documentElement.style.width = '100vw';
-            document.documentElement.style.height = '100vh';
-            document.documentElement.style.overflow = 'hidden';
-            document.documentElement.style.margin = '0';
-            document.documentElement.style.padding = '0';
-            
-            console.log('모바일 강제 전체화면 CSS 적용 완료');
-        }
+    // iOS Safari에서 주소창 숨김 및 모바일 전체화면 강화
+    if (window.navigator.standalone || isMobile) {
+        // 강제 전체화면 CSS 적용
+        document.body.style.position = 'fixed';
+        document.body.style.top = '0';
+        document.body.style.left = '0';
+        document.body.style.width = '100vw';
+        document.body.style.height = '100vh';
+        document.body.style.overflow = 'hidden';
+        document.body.style.margin = '0';
+        document.body.style.padding = '0';
+        document.body.style.zIndex = '9999';
         
-        // 추가적인 모바일 전체화면 강화
-        // iOS Safari에서 주소창 숨김을 위한 메타 태그 동적 추가
-        const viewportMeta = document.querySelector('meta[name="viewport"]');
-        if (viewportMeta) {
-            viewportMeta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover');
-        }
+        // HTML 요소도 전체화면으로 설정
+        document.documentElement.style.position = 'fixed';
+        document.documentElement.style.top = '0';
+        document.documentElement.style.left = '0';
+        document.documentElement.style.width = '100vw';
+        document.documentElement.style.height = '100vh';
+        document.documentElement.style.overflow = 'hidden';
+        document.documentElement.style.margin = '0';
+        document.documentElement.style.padding = '0';
         
-        // 모바일 브라우저에서 전체화면 효과를 위한 추가 스타일
-        document.body.style.webkitOverflowScrolling = 'touch';
-        document.body.style.webkitUserSelect = 'none';
-        document.body.style.webkitTouchCallout = 'none';
-        
-        console.log('모바일 전체화면 강화 완료');
+        console.log('모바일 강제 전체화면 CSS 적용 완료');
     }
     
-    // 화면 방향 고정 (세로 모드) - 전체화면과 별개로 실행
-    if (screen.orientation && screen.orientation.lock) {
-        screen.orientation.lock('portrait').catch(err => {
-            console.log('화면 방향 고정 실패:', err);
-        });
+    // 추가적인 모바일 전체화면 강화
+    // iOS Safari에서 주소창 숨김을 위한 메타 태그 동적 추가
+    const viewportMeta = document.querySelector('meta[name="viewport"]');
+    if (viewportMeta) {
+        viewportMeta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover');
     }
+    
+    // 모바일 브라우저에서 전체화면 효과를 위한 추가 스타일
+    document.body.style.webkitOverflowScrolling = 'touch';
+    document.body.style.webkitUserSelect = 'none';
+    document.body.style.webkitTouchCallout = 'none';
+    
+    console.log('모바일 최적화 완료');
 }
 
-// 전체화면 상태 변화 이벤트 리스너
-function setupFullscreenEventListeners() {
-    const fullscreenChangeEvents = [
-        'fullscreenchange',
-        'webkitfullscreenchange',
-        'mozfullscreenchange',
-        'MSFullscreenChange'
-    ];
+// 모바일 최적화 이벤트 리스너
+function setupMobileOptimization() {
+    // 화면 크기 변화 시 모바일 최적화 재적용
+    window.addEventListener('resize', () => {
+        if (isMobile) {
+            console.log('화면 크기 변화 - 모바일 최적화 재적용');
+            optimizeForMobile();
+            resizeCanvasToDisplaySize();
+        }
+    });
     
-    fullscreenChangeEvents.forEach(eventName => {
-        document.addEventListener(eventName, () => {
-            const isFullscreen = document.fullscreenElement || 
-                                document.webkitFullscreenElement || 
-                                document.mozFullScreenElement || 
-                                document.msFullscreenElement;
-                                
-            // 전체화면 진입/이탈 시 캔버스 크기 동기화
-            resizeCanvasToDisplaySize(); 
-            
-            if (isFullscreen) {
-                console.log('전체화면 모드 진입');
-                // 전체화면 진입 시 상태 리셋
-                isFullscreenRequestInProgress = false;
-            } else {
-                console.log('전체화면 모드 종료');
-                // 전체화면 종료 시에도 상태 리셋
-                isFullscreenRequestInProgress = false;
-            }
-        });
+    // 화면 방향 변화 시 모바일 최적화 재적용
+    window.addEventListener('orientationchange', () => {
+        if (isMobile) {
+            console.log('화면 방향 변화 - 모바일 최적화 재적용');
+            setTimeout(() => {
+                optimizeForMobile();
+                resizeCanvasToDisplaySize();
+            }, 100);
+        }
     });
 }
 
@@ -643,15 +524,17 @@ function setupMobileControls() {
             
                             // 모바일에서는 터치 이벤트만 사용, 데스크탑에서는 클릭 이벤트만 사용
             if (isMobile) {
-                // 터치 이벤트 (모바일용) - 전체화면과 게임 상태를 동시에 처리
+                // 터치 이벤트 (모바일용) - 모바일 최적화와 게임 상태 처리
                 mobileControls.btnFire.addEventListener('touchstart', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     
-                    console.log('모바일 시작 버튼 터치 - 전체화면 및 게임 상태 처리 시작');
+                    console.log('모바일 시작 버튼 터치 - 모바일 최적화 및 게임 상태 처리 시작');
                     
-                    // 전체화면 요청과 게임 상태 변경을 동시에 처리
-                    enableFullscreen();
+                    // 모바일 최적화 적용
+                    optimizeForMobile();
+                    
+                    // 게임 상태 변경
                     handleStartButton();
                 }, { passive: false });
             } else {
@@ -5555,8 +5438,8 @@ window.addEventListener('DOMContentLoaded', () => {
     // 4. 모바일 컨트롤 설정
     setupMobileControls();
     
-    // 5. 전체화면 이벤트 리스너 설정
-    setupFullscreenEventListeners();
+    // 5. 모바일 최적화 이벤트 리스너 설정
+    setupMobileOptimization();
     
     // 6. 게임 초기화
     initializeGame();
