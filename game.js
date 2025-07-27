@@ -550,11 +550,11 @@ function setupMobileControls() {
         
 
         
-        // 플레이어 위치 업데이트 - 터치점과 플레이어 기준점을 일치시킴
+        // 플레이어 위치 업데이트 - 터치점과 플레이어 기준점 사이를 플레이어 몸통 길이만큼 벌림
         if (!canvas) return;
         player.x = Math.max(0, Math.min(canvas.width - player.width, x - player.width / 2));
-        // Y축에서 터치점과 플레이어 기준점을 완전히 일치시킴
-        player.y = Math.max(0, Math.min(canvas.height - player.height, y - player.height));
+        // Y축에서 터치점과 플레이어 기준점 사이를 플레이어 몸통 길이만큼 벌림
+        player.y = Math.max(0, Math.min(canvas.height - player.height, y - player.height - player.height));
         
         // 디버깅 정보를 화면에 표시하기 위한 전역 변수
         window.debugInfo = {
@@ -650,11 +650,11 @@ function setupMobileControls() {
         const x = (touch.clientX - rect.left) * scaleX;
         const y = (touch.clientY - rect.top) * scaleY;
         
-        // 플레이어 위치 업데이트 - 터치점과 플레이어 기준점을 일치시킴
+        // 플레이어 위치 업데이트 - 터치점과 플레이어 기준점 사이를 플레이어 몸통 길이만큼 벌림
         if (!canvas) return;
         player.x = Math.max(0, Math.min(canvas.width - player.width, x - player.width / 2));
-        // Y축에서 터치점과 플레이어 기준점을 완전히 일치시킴
-        player.y = Math.max(0, Math.min(canvas.height - player.height, y - player.height));
+        // Y축에서 터치점과 플레이어 기준점 사이를 플레이어 몸통 길이만큼 벌림
+        player.y = Math.max(0, Math.min(canvas.height - player.height, y - player.height - player.height));
         
         // 두 번째 비행기가 있으면 함께 이동
         if (hasSecondPlane) {
