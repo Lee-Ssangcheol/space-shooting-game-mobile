@@ -3967,7 +3967,7 @@ function handleSpreadShot() {
                 y: player.y - player.height/2,  // 비행기 앞부분 Y좌표
                 width: 10,
                 height: 25,
-                speed: 8,  // 속도를 14.4에서 8로 감소
+                speed: 4,  // 속도를 8에서 4로 50% 감소
                 angle: angle,
                 isSpread: true
             };
@@ -3980,7 +3980,7 @@ function handleSpreadShot() {
                     y: secondPlane.y - secondPlane.height/2,  // 두 번째 비행기 앞부분 Y좌표
                     width: 10,
                     height: 25,
-                    speed: 8,  // 속도를 14.4에서 8로 감소
+                    speed: 4,  // 속도를 8에서 4로 50% 감소
                     angle: angle,
                     isSpread: true
                 };
