@@ -3958,7 +3958,7 @@ function handleSecondPlane() {
 
 // 확산탄 처리 함수 추가
 function handleSpreadShot() {
-    if (scoreForSpread >= 500) {  // 2000에서 500으로 변경
+    if (scoreForSpread >= 2000) {  // 500에서 2000으로 변경
         // 24발의 확산탄을 원형으로 발사 (8발에서 3배 증가)
         for (let i = 0; i < 24; i++) {
             const angle = (i * 15) * (Math.PI / 180); // 360도를 24등분 (360/24 = 15도)
