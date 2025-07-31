@@ -4089,7 +4089,7 @@ function handleBullets() {
             // 확산탄 이동
             bullet.x += Math.sin(bullet.angle) * bullet.speed;
             bullet.y -= Math.cos(bullet.angle) * bullet.speed;
-            ctx.fillStyle = 'skyblue';  // 스카이블루로 변경
+            ctx.fillStyle = '#00CED1';
             ctx.fillRect(bullet.x - bullet.width/2, bullet.y - bullet.height/2, bullet.width, bullet.height);
         } else {
             // 일반 총알 이동
