@@ -964,7 +964,7 @@ function setupMobileControls() {
 }
 
 // 오디오 요소 생성 (안전하게)
-let shootSound, explosionSound, collisionSound;
+let shootSound, explosionSound, collisionSound, warningSound;
 let audioInitialized = false;
 
 // 사운드 초기화 함수
@@ -974,11 +974,13 @@ function initAudio() {
             shootSound = new Audio('sounds/shoot.mp3');
             explosionSound = new Audio('sounds/explosion.mp3');
             collisionSound = new Audio('sounds/collision.mp3');
+            warningSound = new Audio('sounds/warning.mp3');
 
             // 사운드 설정
             shootSound.volume = 0.4;
             explosionSound.volume = 0.6;
             collisionSound.volume = 0.5;
+            warningSound.volume = 0.7;
 
             // 충돌 사운드 길이 제어
             collisionSound.addEventListener('loadedmetadata', () => {
@@ -994,6 +996,7 @@ function initAudio() {
         shootSound = { play: () => Promise.resolve(), currentTime: 0 };
         explosionSound = { play: () => Promise.resolve(), currentTime: 0 };
         collisionSound = { play: () => Promise.resolve(), currentTime: 0 };
+        warningSound = { play: () => Promise.resolve(), currentTime: 0 };
     }
 }
 
@@ -1037,6 +1040,9 @@ let collisionCount = 0;   // 충돌 횟수
 let isGameOver = false;   // 게임 오버 상태
 let flashTimer = 0;       // 깜박임 효과 타이머
 let flashDuration = 500;  // 깜박임 지속 시간
+let lifeWarningTimer = 0; // 목숨 경고 깜박임 타이머
+let lifeWarningDuration = 2000; // 목숨 경고 깜박임 지속 시간 (2초)
+let lifeWarningBlinkSpeed = 200; // 목숨 경고 깜박임 속도 (200ms)
 let gameOverStartTime = null;  // 게임 오버 시작 시간
 let isSnakePatternActive = false;  // 뱀 패턴 활성화 상태
 let snakePatternTimer = 0;  // 뱀 패턴 타이머
@@ -1683,6 +1689,7 @@ async function initializeGame() {
         isGameOver = false;
         isPaused = false;
         flashTimer = 0;
+        lifeWarningTimer = 0;
         gameOverStartTime = null;
         
         // 4. 뱀 패턴 상태 초기화
@@ -1815,6 +1822,7 @@ function restartGame() {
     // 4. 게임 타이머 및 상태 초기화
     gameOverStartTime = null;
     flashTimer = 0;
+    lifeWarningTimer = 0;
     lastEnemySpawnTime = 0;
     lastBossSpawnTime = Date.now();
     
@@ -2326,6 +2334,18 @@ function handleCollision() {
     collisionCount++;
     flashTimer = flashDuration;
     
+    // 목숨 감소 시 경고음 재생 및 경고 깜박임 타이머 시작
+    if (collisionCount < maxLives) {
+        // 경고음 재생
+        warningSound.currentTime = 0;
+        warningSound.play().catch(error => {
+            console.log('경고음 재생 실패:', error);
+        });
+        
+        // 목숨 경고 깜박임 타이머 시작
+        lifeWarningTimer = lifeWarningDuration;
+    }
+    
     if (currentTime - lastCollisionTime >= collisionSoundCooldown) {
         collisionSound.currentTime = 0;
         explosionSound.currentTime = 0;
@@ -2706,6 +2726,11 @@ function gameLoop() {
             ctx.fillStyle = 'rgba(255, 0, 0, 0.3)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             flashTimer -= 16;
+        }
+        
+        // 목숨 경고 깜박임 타이머 업데이트
+        if (lifeWarningTimer > 0) {
+            lifeWarningTimer -= 16;
         }
 
         // 플레이어 이동 처리
@@ -3491,8 +3516,24 @@ function drawUI() {
         ctx.fillText(`추가 비행기 남은 시간: ${remainingTime}초`, 10, 180);
     }
     
-    // 충돌 횟수 표시 (붉은색으로)
-    ctx.fillStyle = 'red';
+    // 충돌 횟수 표시 (목숨 경고 깜박임 효과 포함)
+    if (lifeWarningTimer > 0) {
+        // 경고 깜박임 효과 - 경고음에 맞춰 깜박임
+        const blinkState = Math.floor((lifeWarningDuration - lifeWarningTimer) / lifeWarningBlinkSpeed) % 2;
+        if (blinkState === 0) {
+            // 흰 배경에 빨간 텍스트 (반전 효과)
+            ctx.fillStyle = 'white';
+            ctx.fillRect(5, 195, 200, 25);
+            ctx.fillStyle = 'red';
+        } else {
+            // 기본 빨간색
+            ctx.fillStyle = 'red';
+        }
+    } else {
+        // 기본 빨간색
+        ctx.fillStyle = 'red';
+    }
+    
     ctx.font = 'bold 20px Arial';  // 폰트를 진하게 변경
     ctx.fillText(`남은 목숨: ${maxLives - collisionCount}`, 10, 210);
 
@@ -5295,6 +5336,7 @@ async function initializeGame() {
         isGameOver = false;
         isPaused = false;
         flashTimer = 0;
+        lifeWarningTimer = 0;
         gameOverStartTime = null;
         
         // 4. 뱀 패턴 상태 초기화
@@ -5447,6 +5489,7 @@ function restartGame() {
     // 4. 게임 타이머 및 상태 초기화
     gameOverStartTime = null;
     flashTimer = 0;
+    lifeWarningTimer = 0;
     lastEnemySpawnTime = 0;
     lastBossSpawnTime = Date.now();
     
