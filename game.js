@@ -1838,7 +1838,6 @@ function restartGame() {
     levelUpScore = 1000;
     
     // 6. 특수무기 관련 상태 초기화
-    specialWeaponCharged = false;
     specialWeaponCharge = 0;
     specialWeaponCount = 0;
     specialWeaponUsedCount = 0;
@@ -5529,7 +5528,6 @@ function restartGame() {
     levelUpScore = 1000;
     
     // 6. 특수무기 관련 상태 초기화
-    specialWeaponCharged = false;
     specialWeaponCharge = 0;
     specialWeaponCount = 0;
     specialWeaponUsedCount = 0;
