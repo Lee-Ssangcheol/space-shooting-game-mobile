@@ -3432,7 +3432,7 @@ function handleBulletFiring() {
 
 // 특수 무기 처리 함수 수정
 function handleSpecialWeapon() {
-    if ((specialWeaponCharged || specialWeaponCount > 0) && keys.KeyB) {  // 보유 개수도 확인
+    if (keys.KeyB && specialWeaponCount > 0) {  // 보유 개수만 확인
         // 특수 무기 발사 - 더 많은 총알과 강력한 효과
         for (let i = 0; i < 360; i += 5) { // 각도 간격을 10도에서 5도로 감소
             const angle = (i * Math.PI) / 180;
@@ -3469,15 +3469,14 @@ function handleSpecialWeapon() {
             }
         }
         
-        // 특수무기 사용 처리
-        if (specialWeaponCharged) {
-            // 충전된 특수무기 사용
-            specialWeaponCharged = false;
-            specialWeaponCharge = 0;
-        } else if (specialWeaponCount > 0) {
-            // 보유 개수 사용
-            specialWeaponUsedCount++;
-        }
+        // 특수무기 사용 처리 (보유 개수만 사용)
+        console.log(`특수무기 사용 전 - 보유: ${specialWeaponCount}, 사용: ${specialWeaponUsedCount}, 점수: ${score}`);
+        specialWeaponCount--; // 보유 개수 직접 감소
+        specialWeaponUsedCount++;
+        console.log(`특수무기 사용 후 - 보유: ${specialWeaponCount}, 사용: ${specialWeaponUsedCount}, 점수: ${score}`);
+        
+        // 키 입력 상태 리셋 (연속 발사 방지)
+        keys.KeyB = false;
         
         // 특수 무기 발사 효과음
         if (shootSound && audioInitialized) {
@@ -3560,8 +3559,15 @@ function drawUI() {
 
     
     // 특수 무기 게이지 표시
-    if (!specialWeaponCharged && specialWeaponCount === 0) {
-        // 게이지 바 배경
+    const canUseSpecialWeapon = specialWeaponCount > 0;
+    
+    // 디버깅용 로그 (개발 시에만 사용)
+    if (Math.floor(Date.now() / 1000) % 5 === 0) { // 5초마다 한 번씩 로그
+        console.log(`특수무기 상태 - 충전: ${specialWeaponCharged}, 보유: ${specialWeaponCount}, 사용: ${specialWeaponUsedCount}, 점수: ${score}`);
+    }
+    
+    if (!canUseSpecialWeapon) {
+        // 충전 중인 상태 - 게이지 바 표시
         ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
         ctx.fillRect(10, 250, 200, 20);
         
@@ -3573,10 +3579,10 @@ function drawUI() {
         ctx.fillStyle = 'white';
         ctx.font = 'bold 16px Arial';
         ctx.textAlign = 'center';
-        const percentText = `특수 무기 : ${Math.floor((specialWeaponCharge / SPECIAL_WEAPON_MAX_CHARGE) * 100)}%`;
+        const percentText = `특수무기: ${Math.floor((specialWeaponCharge / SPECIAL_WEAPON_MAX_CHARGE) * 100)}%(보유:${specialWeaponCount}개)`;
         ctx.fillText(percentText, 110, 265);
     } else {
-        // 깜빡이는 효과를 위한 시간 계산
+        // 사용 가능한 상태 - 깜빡이는 효과
         const blinkSpeed = 500; // 깜빡임 속도 (밀리초)
         const currentTime = Date.now();
         const isRed = Math.floor(currentTime / blinkSpeed) % 2 === 0;
@@ -3594,10 +3600,7 @@ function drawUI() {
         ctx.fillStyle = isRed ? 'red' : 'cyan';
         ctx.font = 'bold 16px Arial';
         ctx.textAlign = 'center';
-        let percentText = `특수 무기 : ${Math.floor((specialWeaponCharge / SPECIAL_WEAPON_MAX_CHARGE) * 100)}%`;
-        if (specialWeaponCount > 0) {
-            percentText += ` (보유: ${specialWeaponCount}개)`;
-        }
+        const percentText = `특수무기: ${Math.floor((specialWeaponCharge / SPECIAL_WEAPON_MAX_CHARGE) * 100)}%(보유:${specialWeaponCount}개)`;
         ctx.fillText(percentText, 110, 265);
         
         // 준비 완료 메시지 배경
@@ -3608,10 +3611,7 @@ function drawUI() {
         ctx.fillStyle = isRed ? 'red' : 'cyan';
         ctx.font = 'bold 20px Arial';
         ctx.textAlign = 'left';
-        let statusText = '특수무기 사용준비 완료';
-        if (specialWeaponCount > 0) {
-            statusText += ` (보유: ${specialWeaponCount}개)`;
-        }
+        let statusText = '특수무기 발사(알파벳 "B"키 클릭)';
         ctx.fillText(statusText, 15, 290);
     }
     
@@ -3948,17 +3948,14 @@ function updateScore(points) {
     levelScore += points;
     
     // 특수 무기 게이지 증가
-    if (!specialWeaponCharged) {
-        specialWeaponCharge += points;
-        if (specialWeaponCharge >= SPECIAL_WEAPON_MAX_CHARGE) {
-            specialWeaponCharged = true;
-            specialWeaponCharge = SPECIAL_WEAPON_MAX_CHARGE;
-        }
+    specialWeaponCharge += points;
+    if (specialWeaponCharge >= SPECIAL_WEAPON_MAX_CHARGE) {
+        // 충전이 100%가 되면 보유 개수에 추가
+        specialWeaponCount++;
+        specialWeaponCharge = 0; // 충전 게이지 리셋
     }
     
-    // 보유 개수 계산 (3000점 단위로, 사용한 개수 차감)
-    const totalSpecialWeaponCount = Math.floor(score / SPECIAL_WEAPON_MAX_CHARGE);
-    specialWeaponCount = Math.max(0, totalSpecialWeaponCount - specialWeaponUsedCount);
+    // 특수무기는 충전으로만 획득 (점수 기반 계산 제거)
     
     // 최고 점수 즉시 업데이트 및 저장
     if (score > highScore) {
