@@ -2,7 +2,7 @@
 console.log('게임 파일 수정됨:', new Date().toLocaleString());
 
 // 게임 상수 정의
-const SPECIAL_WEAPON_MAX_CHARGE = 1000;  // 특수무기 최대 충전량
+const SPECIAL_WEAPON_MAX_CHARGE = 3000;  // 특수무기 최대 충전량
 const SPECIAL_WEAPON_CHARGE_RATE = 10;   // 특수무기 충전 속도
 const TOP_EFFECT_ZONE = 20;  // 상단 효과 무시 영역 (픽셀)
 
@@ -1065,6 +1065,8 @@ let bossDestroyed = false;  // 보스 파괴 상태
 let bossPattern = 0;
 let specialWeaponCharged = false;
 let specialWeaponCharge = 0;
+let specialWeaponCount = 0;  // 특수무기 보유 개수
+let specialWeaponUsedCount = 0;  // 특수무기 사용 횟수
 
 // 게임 활성화 상태 변수
 let isGameActive = true;
@@ -1742,6 +1744,8 @@ async function initializeGame() {
         // 10. 특수무기 관련 상태 초기화
         specialWeaponCharged = false;
         specialWeaponCharge = 0;
+        specialWeaponCount = 0;
+        specialWeaponUsedCount = 0;
         
         // 11. 키보드 입력 상태 초기화
         Object.keys(keys).forEach(key => {
@@ -1836,6 +1840,8 @@ function restartGame() {
     // 6. 특수무기 관련 상태 초기화
     specialWeaponCharged = false;
     specialWeaponCharge = 0;
+    specialWeaponCount = 0;
+    specialWeaponUsedCount = 0;
     
     // 7. 보스 관련 상태 완전 초기화
     bossActive = false;
@@ -2445,7 +2451,7 @@ class Explosion {
                             enemy.x + enemy.width/2,
                             enemy.y + enemy.height/2
                         ));
-                        updateScore(20);
+                        // 폭발로 인한 적 처치는 점수 없이 처리 (충돌 시 중복 점수 방지)
                     }
                 }
             });
@@ -3426,7 +3432,7 @@ function handleBulletFiring() {
 
 // 특수 무기 처리 함수 수정
 function handleSpecialWeapon() {
-    if (specialWeaponCharged && keys.KeyB) {  // KeyB를 KeyB로 변경
+    if ((specialWeaponCharged || specialWeaponCount > 0) && keys.KeyB) {  // 보유 개수도 확인
         // 특수 무기 발사 - 더 많은 총알과 강력한 효과
         for (let i = 0; i < 360; i += 5) { // 각도 간격을 10도에서 5도로 감소
             const angle = (i * Math.PI) / 180;
@@ -3463,8 +3469,15 @@ function handleSpecialWeapon() {
             }
         }
         
-        specialWeaponCharged = false;
-        specialWeaponCharge = 0;
+        // 특수무기 사용 처리
+        if (specialWeaponCharged) {
+            // 충전된 특수무기 사용
+            specialWeaponCharged = false;
+            specialWeaponCharge = 0;
+        } else if (specialWeaponCount > 0) {
+            // 보유 개수 사용
+            specialWeaponUsedCount++;
+        }
         
         // 특수 무기 발사 효과음
         if (shootSound && audioInitialized) {
@@ -3547,7 +3560,7 @@ function drawUI() {
 
     
     // 특수 무기 게이지 표시
-    if (!specialWeaponCharged) {
+    if (!specialWeaponCharged && specialWeaponCount === 0) {
         // 게이지 바 배경
         ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
         ctx.fillRect(10, 250, 200, 20);
@@ -3577,11 +3590,14 @@ function drawUI() {
         ctx.lineWidth = 2;
         ctx.strokeRect(10, 250, 200, 20);
         
-        // 게이지 바 위에 텍스트 표시
+        // 게이지 바 위에 텍스트 표시 (충전율과 보유 개수)
         ctx.fillStyle = isRed ? 'red' : 'cyan';
         ctx.font = 'bold 16px Arial';
         ctx.textAlign = 'center';
-        const percentText = `특수 무기 : ${Math.floor((specialWeaponCharge / SPECIAL_WEAPON_MAX_CHARGE) * 100)}%`;
+        let percentText = `특수 무기 : ${Math.floor((specialWeaponCharge / SPECIAL_WEAPON_MAX_CHARGE) * 100)}%`;
+        if (specialWeaponCount > 0) {
+            percentText += ` (보유: ${specialWeaponCount}개)`;
+        }
         ctx.fillText(percentText, 110, 265);
         
         // 준비 완료 메시지 배경
@@ -3592,7 +3608,11 @@ function drawUI() {
         ctx.fillStyle = isRed ? 'red' : 'cyan';
         ctx.font = 'bold 20px Arial';
         ctx.textAlign = 'left';
-        ctx.fillText('특수무기 사용준비 완료', 15, 290);
+        let statusText = '특수무기 사용준비 완료';
+        if (specialWeaponCount > 0) {
+            statusText += ` (보유: ${specialWeaponCount}개)`;
+        }
+        ctx.fillText(statusText, 15, 290);
     }
     
     // 보스 체력 표시 개선
@@ -3935,6 +3955,10 @@ function updateScore(points) {
             specialWeaponCharge = SPECIAL_WEAPON_MAX_CHARGE;
         }
     }
+    
+    // 보유 개수 계산 (3000점 단위로, 사용한 개수 차감)
+    const totalSpecialWeaponCount = Math.floor(score / SPECIAL_WEAPON_MAX_CHARGE);
+    specialWeaponCount = Math.max(0, totalSpecialWeaponCount - specialWeaponUsedCount);
     
     // 최고 점수 즉시 업데이트 및 저장
     if (score > highScore) {
@@ -5387,6 +5411,8 @@ async function initializeGame() {
         // 10. 특수무기 관련 상태 초기화
         specialWeaponCharged = false;
         specialWeaponCharge = 0;
+        specialWeaponCount = 0;
+        specialWeaponUsedCount = 0;
         
         // 11. 키보드 입력 상태 초기화
         Object.keys(keys).forEach(key => {
@@ -5503,6 +5529,8 @@ function restartGame() {
     // 6. 특수무기 관련 상태 초기화
     specialWeaponCharged = false;
     specialWeaponCharge = 0;
+    specialWeaponCount = 0;
+    specialWeaponUsedCount = 0;
     
     // 7. 보스 관련 상태 완전 초기화
     bossActive = false;
