@@ -3609,9 +3609,9 @@ function drawUI() {
         
         // 텍스트 색상 설정
         ctx.fillStyle = isRed ? 'red' : 'cyan';
-        ctx.font = 'bold 20px Arial';
+        ctx.font = 'bold 15px Arial';
         ctx.textAlign = 'left';
-        let statusText = '특수무기 발사(알파벳 "B"키 클릭)';
+        let statusText = '아래 [특수무기]버튼을 터치하세요.';
         ctx.fillText(statusText, 15, 290);
     }
     
@@ -3950,9 +3950,14 @@ function updateScore(points) {
     // 특수 무기 게이지 증가
     specialWeaponCharge += points;
     if (specialWeaponCharge >= SPECIAL_WEAPON_MAX_CHARGE) {
-        // 충전이 100%가 되면 보유 개수에 추가
-        specialWeaponCount++;
-        specialWeaponCharge = 0; // 충전 게이지 리셋
+        // 충전이 100%가 되면 보유 개수에 추가 (최대 5개 제한)
+        if (specialWeaponCount < 5) {
+            specialWeaponCount++;
+            specialWeaponCharge = 0; // 충전 게이지 리셋
+        } else {
+            // 최대 개수에 도달한 경우 충전 게이지 유지
+            specialWeaponCharge = SPECIAL_WEAPON_MAX_CHARGE;
+        }
     }
     
     // 특수무기는 충전으로만 획득 (점수 기반 계산 제거)
