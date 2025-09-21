@@ -891,7 +891,6 @@ function setupMobileControls() {
                             highScore = 0;
                             score = 0;
                             levelScore = 0;
-                            scoreForSpread = 0;
                             gameLevel = 1;
                             
                             // localStorage 완전 클리어
@@ -1031,7 +1030,6 @@ let levelScore = 0;       // 레벨 점수
 let levelUpScore = 1000;  // 레벨업에 필요한 점수
 let score = 0;           // 현재 점수
 let highScore = 0;       // 최고 점수 (초기값 0으로 설정)
-let scoreForSpread = 0;   // 확산탄을 위한 점수
 let hasSecondPlane = false;  // 두 번째 비행기 보유 여부
 let secondPlaneTimer = 0;    // 두 번째 비행기 타이머
 let lastSecondPlaneScore = 0;
@@ -1454,7 +1452,6 @@ const ScoreManager = {
             // 현재 점수 초기화
             score = 0;
             levelScore = 0;
-            scoreForSpread = 0;
             
             console.log('초기화 완료 - 현재 최고 점수:', highScore);
         } catch (error) {
@@ -1542,7 +1539,6 @@ const ScoreManager = {
             // 5. 메모리 변수 리셋
             score = 0;
             levelScore = 0;
-            scoreForSpread = 0;
             gameLevel = 1;
             highScore = 0;
             
@@ -1553,7 +1549,6 @@ const ScoreManager = {
             highScore = 0;
             score = 0;
             levelScore = 0;
-            scoreForSpread = 0;
             gameLevel = 1;
         }
     }
@@ -1677,7 +1672,6 @@ async function initializeGame() {
         // 2. 모든 배열 완전 초기화
         score = 0;
         levelScore = 0;
-        scoreForSpread = 0;
         bullets = [];           // 총알 배열 초기화
         enemies = [];           // 적 비행기 배열 초기화
         explosions = [];        // 폭발 효과 배열 초기화
@@ -1721,7 +1715,6 @@ async function initializeGame() {
         lastEnemySpawnTime = 0;
         
         // 8. 파워업 상태 초기화
-        hasSpreadShot = false;
         hasShield = false;
         damageMultiplier = 1;
         fireRateMultiplier = 1;
@@ -1833,7 +1826,6 @@ function restartGame() {
     // 5. 점수 및 레벨 초기화 (게임 오버 후 재시작이므로 레벨도 리셋)
     score = 0;
     levelScore = 0;
-    scoreForSpread = 0;
     gameLevel = 1; // 게임 오버 후 재시작이므로 레벨 1로 리셋
     levelUpScore = 1000;
     
@@ -1855,7 +1847,6 @@ function restartGame() {
     lastSnakeGroupTime = 0;
     
     // 9. 파워업 상태 초기화
-    hasSpreadShot = false;
     hasShield = false;
     damageMultiplier = 1;
     fireRateMultiplier = 1;
@@ -2774,8 +2765,6 @@ function gameLoop() {
         // 총알 이동 및 충돌 체크
         handleBullets();
 
-        // 확산탄 처리
-        handleSpreadShot();
 
         // 두 번째 비행기 처리
         handleSecondPlane();
@@ -3337,9 +3326,7 @@ function checkEnemyCollisions(enemy) {
 function handleBulletFiring() {
     const currentTime = Date.now();
     const currentFireDelay = isContinuousFire ? continuousFireDelay : fireDelay;
-    // 확산탄일 때 발사 속도를 80%로 줄이기 위해 딜레이를 1.25배로 늘림
-    const spreadShotDelayMultiplier = hasSpreadShot ? 1.25 : 1.0;
-    const adjustedFireDelay = (currentFireDelay * spreadShotDelayMultiplier) / fireRateMultiplier;
+    const adjustedFireDelay = currentFireDelay / fireRateMultiplier;
     const currentBulletSize = calculateBulletSize();
     
     // 연속 발사 상태 체크
@@ -3369,62 +3356,27 @@ function handleBulletFiring() {
         lastFireTime = currentTime;
         
         // 총알 발사
-        if (hasSpreadShot) {
-            // 확산탄 발사 - 24발 (겹치지 않게)
-            for (let i = -11; i <= 12; i++) {
-                const angle = (i * 3.91) * (Math.PI / 180); // 3.91도 간격으로 24발 (90도 범위)
-                const bullet = {
-                    x: player.x + player.width/2,
-                    y: player.y,
-                    width: currentBulletSize,
-                    height: currentBulletSize * 2,
-                    speed: bulletSpeed * 0.8, // 발사 속도를 80%로 줄임
-                    angle: angle,
-                    damage: 100 * damageMultiplier
-                };
-                bullets.push(bullet);
-            }
-        } else {
-            // 일반 총알 발사
+        const bullet = {
+            x: player.x + player.width/2,
+            y: player.y,
+            width: currentBulletSize,
+            height: currentBulletSize * 2,
+            speed: bulletSpeed,
+            damage: 100 * damageMultiplier
+        };
+        bullets.push(bullet);
+        
+        // 두 번째 비행기 발사
+        if (hasSecondPlane) {
             const bullet = {
-                x: player.x + player.width/2,
-                y: player.y,
+                x: secondPlane.x + secondPlane.width/2,
+                y: secondPlane.y,
                 width: currentBulletSize,
                 height: currentBulletSize * 2,
                 speed: bulletSpeed,
                 damage: 100 * damageMultiplier
             };
             bullets.push(bullet);
-        }
-        
-        // 두 번째 비행기 발사
-        if (hasSecondPlane) {
-            if (hasSpreadShot) {
-                // 확산탄 발사 - 24발 (겹치지 않게)
-                for (let i = -11; i <= 12; i++) {
-                    const angle = (i * 3.91) * (Math.PI / 180); // 3.91도 간격으로 24발 (90도 범위)
-                    const bullet = {
-                        x: secondPlane.x + secondPlane.width/2,
-                        y: secondPlane.y,
-                        width: currentBulletSize,
-                        height: currentBulletSize * 2,
-                        speed: bulletSpeed * 0.8, // 발사 속도를 80%로 줄임
-                        angle: angle,
-                        damage: 100 * damageMultiplier
-                    };
-                    bullets.push(bullet);
-                }
-            } else {
-                const bullet = {
-                    x: secondPlane.x + secondPlane.width/2,
-                    y: secondPlane.y,
-                    width: currentBulletSize,
-                    height: currentBulletSize * 2,
-                    speed: bulletSpeed,
-                    damage: 100 * damageMultiplier
-                };
-                bullets.push(bullet);
-            }
         }
     }
 }
@@ -3518,7 +3470,6 @@ function drawUI() {
     ctx.fillText(`레벨: ${gameLevel} (${getDifficultyName(gameLevel)})`, 10, 60);
     ctx.fillText(`다음 레벨까지: ${Math.max(0, levelUpScore - levelScore)}`, 10, 90);
     ctx.fillText(`최고 점수: ${highScore}`, 10, 120);
-    ctx.fillText(`다음 확산탄까지: ${2000 - scoreForSpread}점`, 10, 150);
     if (!hasSecondPlane) {
         const nextPlaneScore = Math.ceil(score / 4000) * 4000;
         ctx.fillText(`다음 추가 비행기까지: ${nextPlaneScore - score}점`, 10, 180);
@@ -3943,7 +3894,6 @@ function handleGameOver() {
 // 점수 증가 함수 수정
 function updateScore(points) {
     score += points;
-    scoreForSpread += points;
     levelScore += points;
     
     // 특수 무기 게이지 증가
@@ -3999,42 +3949,6 @@ function handleSecondPlane() {
     }
 }
 
-// 확산탄 처리 함수 추가
-function handleSpreadShot() {
-    if (scoreForSpread >= 2000) {  // 500에서 2000으로 변경
-        // 24발의 확산탄을 원형으로 발사 (8발에서 3배 증가)
-        for (let i = 0; i < 24; i++) {
-            const angle = (i * 15) * (Math.PI / 180); // 360도를 24등분 (360/24 = 15도)
-            const missile = {
-                x: player.x + player.width/2,  // 비행기 중앙 X좌표
-                y: player.y - player.height/2,  // 비행기 앞부분 Y좌표
-                width: 10,
-                height: 25,
-                speed: 4,  // 속도를 8에서 4로 50% 감소
-                angle: angle,
-                isSpread: true
-            };
-            bullets.push(missile);
-
-            // 두 번째 비행기가 있으면 확산탄 발사
-            if (hasSecondPlane) {
-                const secondMissile = {
-                    x: secondPlane.x + secondPlane.width/2,  // 두 번째 비행기 중앙 X좌표
-                    y: secondPlane.y - secondPlane.height/2,  // 두 번째 비행기 앞부분 Y좌표
-                    width: 10,
-                    height: 25,
-                    speed: 4,  // 속도를 8에서 4로 50% 감소
-                    angle: angle,
-                    isSpread: true
-                };
-                bullets.push(secondMissile);
-            }
-        }
-        // 확산탄 발사음도 제거 (적기에 맞았을 때만 재생)
-        // safePlay(shootSound);
-        scoreForSpread = 0;
-    }
-}
 
 // 총알 이동 및 충돌 체크 함수 수정
 function handleBullets() {
@@ -4128,10 +4042,6 @@ function handleBullets() {
             // 총알 지속 시간 감소
             bullet.life--;
             if (bullet.life <= 0) return false;
-        } else if (bullet.isSpread) {
-            // 확산탄 이동
-            bullet.x += Math.sin(bullet.angle) * bullet.speed;
-            bullet.y -= Math.cos(bullet.angle) * bullet.speed;
             ctx.fillStyle = '#00CED1';
             ctx.fillRect(bullet.x - bullet.width/2, bullet.y - bullet.height/2, bullet.width, bullet.height);
         } else {
@@ -4608,10 +4518,7 @@ function executeBossPattern(boss, pattern, currentTime) {
             if (currentTime - boss.lastShot >= 400) {  // 0.4초마다 발사
                 // 플레이어를 향해 3발 연속 발사
                 const angleToPlayer = Math.atan2(player.y - boss.y, player.x - boss.x);
-                for (let i = -1; i <= 1; i++) {
-                    const spreadAngle = angleToPlayer + (i * Math.PI / 12);  // ±15도 스프레드
-                    createBossBullet(boss, spreadAngle);
-                }
+                createBossBullet(boss, angleToPlayer);
                 boss.lastShot = currentTime;
             }
             break;
@@ -4770,7 +4677,6 @@ const ENEMY_PATTERNS = {
 // 파워업 아이템 타입 상수 추가
 const POWERUP_TYPES = {
     SPEED_UP: 'speed_up',
-    SPREAD_SHOT: 'spread_shot',
     SHIELD: 'shield',
     DOUBLE_DAMAGE: 'double_damage',
     RAPID_FIRE: 'rapid_fire'
@@ -4852,10 +4758,6 @@ function applyPowerUp(type) {
             player.speed *= 1.5;
             setTimeout(() => player.speed /= 1.5, 10000);
             break;
-        case POWERUP_TYPES.SPREAD_SHOT:
-            hasSpreadShot = true;
-            setTimeout(() => hasSpreadShot = false, 10000);
-            break;
         case POWERUP_TYPES.SHIELD:
             hasShield = true;
             setTimeout(() => hasShield = false, 10000);
@@ -4875,7 +4777,6 @@ function applyPowerUp(type) {
 let bombs = [];  // 폭탄 배열
 let dynamites = [];  // 다이나마이트 배열
 let powerUps = [];
-let hasSpreadShot = false;
 let hasShield = false;
 let damageMultiplier = 1;
 let fireRateMultiplier = 1;
@@ -5347,7 +5248,6 @@ async function initializeGame() {
         // 2. 모든 배열 완전 초기화
         score = 0;
         levelScore = 0;
-        scoreForSpread = 0;
         bullets = [];           // 총알 배열 초기화
         enemies = [];           // 적 비행기 배열 초기화
         explosions = [];        // 폭발 효과 배열 초기화
@@ -5389,7 +5289,6 @@ async function initializeGame() {
         lastEnemySpawnTime = 0;
         
         // 8. 파워업 상태 초기화
-        hasSpreadShot = false;
         hasShield = false;
         damageMultiplier = 1;
         fireRateMultiplier = 1;
@@ -5523,7 +5422,6 @@ function restartGame() {
     // 5. 점수 및 레벨 초기화 (게임 오버 후 재시작이므로 레벨도 리셋)
     score = 0;
     levelScore = 0;
-    scoreForSpread = 0;
     gameLevel = 1; // 게임 오버 후 재시작이므로 레벨 1로 리셋
     levelUpScore = 1000;
     
@@ -5545,7 +5443,6 @@ function restartGame() {
     lastSnakeGroupTime = 0;
     
     // 9. 파워업 상태 초기화
-    hasSpreadShot = false;
     hasShield = false;
     damageMultiplier = 1;
     fireRateMultiplier = 1;
