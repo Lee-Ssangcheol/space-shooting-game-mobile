@@ -3519,18 +3519,18 @@ function drawUI() {
     if (!canUseSpecialWeapon) {
         // 충전 중인 상태 - 게이지 바 표시
         ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-        ctx.fillRect(10, 250, 200, 20);
+        ctx.fillRect(10, 220, 200, 20);
         
         // 게이지 바
         ctx.fillStyle = 'rgba(0, 255, 255, 0.8)';
-        ctx.fillRect(10, 250, (specialWeaponCharge / SPECIAL_WEAPON_MAX_CHARGE) * 200, 20);
+        ctx.fillRect(10, 220, (specialWeaponCharge / SPECIAL_WEAPON_MAX_CHARGE) * 200, 20);
         
         // 게이지 바 위에 텍스트 표시
         ctx.fillStyle = 'white';
         ctx.font = 'bold 16px Arial';
         ctx.textAlign = 'center';
         const percentText = `특수무기: ${Math.floor((specialWeaponCharge / SPECIAL_WEAPON_MAX_CHARGE) * 100)}%(보유:${specialWeaponCount}/5개)`;
-        ctx.fillText(percentText, 110, 265);
+        ctx.fillText(percentText, 110, 235);
     } else {
         // 사용 가능한 상태 - 깜빡이는 효과
         const blinkSpeed = 500; // 깜빡임 속도 (밀리초)
@@ -3539,30 +3539,30 @@ function drawUI() {
         
         // 배경색 설정 (게이지 바)
         ctx.fillStyle = isRed ? 'rgba(255, 0, 0, 0.3)' : 'rgba(0, 0, 255, 0.3)';
-        ctx.fillRect(10, 250, 200, 20);
+        ctx.fillRect(10, 220, 200, 20);
         
         // 테두리 효과
         ctx.strokeStyle = isRed ? 'red' : 'cyan';
         ctx.lineWidth = 2;
-        ctx.strokeRect(10, 250, 200, 20);
+        ctx.strokeRect(10, 220, 200, 20);
         
         // 게이지 바 위에 텍스트 표시 (충전율과 보유 개수)
         ctx.fillStyle = isRed ? 'red' : 'cyan';
         ctx.font = 'bold 16px Arial';
         ctx.textAlign = 'center';
         const percentText = `특수무기: ${Math.floor((specialWeaponCharge / SPECIAL_WEAPON_MAX_CHARGE) * 100)}%(보유:${specialWeaponCount}/5개)`;
-        ctx.fillText(percentText, 110, 265);
+        ctx.fillText(percentText, 110, 235);
         
         // 준비 완료 메시지 배경
         ctx.fillStyle = isRed ? 'rgba(255, 0, 0, 0.2)' : 'rgba(0, 0, 255, 0.2)';
-        ctx.fillRect(10, 270, 300, 30);
+        ctx.fillRect(10, 240, 300, 30);
         
         // 텍스트 색상 설정
         ctx.fillStyle = isRed ? 'red' : 'cyan';
         ctx.font = 'bold 15px Arial';
         ctx.textAlign = 'left';
         let statusText = '아래 [특수무기]버튼을 터치하세요.';
-        ctx.fillText(statusText, 15, 290);
+        ctx.fillText(statusText, 15, 260);
     }
     
     // 보스 체력 표시 개선
