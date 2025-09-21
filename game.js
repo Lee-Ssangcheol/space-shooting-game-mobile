@@ -3472,10 +3472,10 @@ function drawUI() {
     ctx.fillText(`최고 점수: ${highScore}`, 10, 120);
     if (!hasSecondPlane) {
         const nextPlaneScore = Math.ceil(score / 4000) * 4000;
-        ctx.fillText(`다음 추가 비행기까지: ${nextPlaneScore - score}점`, 10, 180);
+        ctx.fillText(`다음 추가 비행기까지: ${nextPlaneScore - score}점`, 10, 150);
     } else {
         const remainingTime = Math.ceil((10000 - (Date.now() - secondPlaneTimer)) / 1000);
-        ctx.fillText(`추가 비행기 남은 시간: ${remainingTime}초`, 10, 180);
+        ctx.fillText(`추가 비행기 남은 시간: ${remainingTime}초`, 10, 150);
     }
     
     // 충돌 횟수 표시 (목숨 경고 깜박임 효과 포함)
@@ -3485,7 +3485,7 @@ function drawUI() {
         if (blinkState === 0) {
             // 흰 배경에 빨간 텍스트 (반전 효과)
             ctx.fillStyle = 'white';
-            ctx.fillRect(5, 195, 200, 25);
+            ctx.fillRect(5, 175, 200, 25);
             ctx.fillStyle = 'red';
         } else {
             // 기본 빨간색
@@ -3497,7 +3497,7 @@ function drawUI() {
     }
     
     ctx.font = 'bold 20px Arial';  // 폰트를 진하게 변경
-    ctx.fillText(`남은 목숨: ${maxLives - collisionCount}`, 10, 210);
+    ctx.fillText(`남은 목숨: ${maxLives - collisionCount}`, 10, 190);
 
     // 제작자 정보 표시
     ctx.fillStyle = 'white';
