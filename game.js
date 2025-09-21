@@ -3467,15 +3467,15 @@ function drawUI() {
     ctx.font = '20px Arial';
     ctx.textAlign = 'left';
     ctx.fillText(`점수: ${score}`, 10, 30);
-    ctx.fillText(`레벨: ${gameLevel} (${getDifficultyName(gameLevel)})`, 10, 60);
-    ctx.fillText(`다음 레벨까지: ${Math.max(0, levelUpScore - levelScore)}`, 10, 90);
-    ctx.fillText(`최고 점수: ${highScore}`, 10, 120);
+    ctx.fillText(`레벨: ${gameLevel} (${getDifficultyName(gameLevel)})`, 10, 55);
+    ctx.fillText(`다음 레벨까지: ${Math.max(0, levelUpScore - levelScore)}`, 10, 80);
+    ctx.fillText(`최고 점수: ${highScore}`, 10, 105);
     if (!hasSecondPlane) {
         const nextPlaneScore = Math.ceil(score / 4000) * 4000;
-        ctx.fillText(`다음 추가 비행기까지: ${nextPlaneScore - score}점`, 10, 150);
+        ctx.fillText(`다음 추가 비행기까지: ${nextPlaneScore - score}점`, 10, 130);
     } else {
         const remainingTime = Math.ceil((10000 - (Date.now() - secondPlaneTimer)) / 1000);
-        ctx.fillText(`추가 비행기 남은 시간: ${remainingTime}초`, 10, 150);
+        ctx.fillText(`추가 비행기 남은 시간: ${remainingTime}초`, 10, 130);
     }
     
     // 충돌 횟수 표시 (목숨 경고 깜박임 효과 포함)
@@ -3485,7 +3485,7 @@ function drawUI() {
         if (blinkState === 0) {
             // 흰 배경에 빨간 텍스트 (반전 효과)
             ctx.fillStyle = 'white';
-            ctx.fillRect(5, 175, 200, 25);
+            ctx.fillRect(5, 150, 200, 25);
             ctx.fillStyle = 'red';
         } else {
             // 기본 빨간색
@@ -3497,7 +3497,7 @@ function drawUI() {
     }
     
     ctx.font = 'bold 20px Arial';  // 폰트를 진하게 변경
-    ctx.fillText(`남은 목숨: ${maxLives - collisionCount}`, 10, 190);
+    ctx.fillText(`남은 목숨: ${maxLives - collisionCount}`, 10, 170);
 
     // 제작자 정보 표시
     ctx.fillStyle = 'white';
@@ -3519,18 +3519,18 @@ function drawUI() {
     if (!canUseSpecialWeapon) {
         // 충전 중인 상태 - 게이지 바 표시
         ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-        ctx.fillRect(10, 220, 200, 20);
+        ctx.fillRect(10, 190, 200, 20);
         
         // 게이지 바
         ctx.fillStyle = 'rgba(0, 255, 255, 0.8)';
-        ctx.fillRect(10, 220, (specialWeaponCharge / SPECIAL_WEAPON_MAX_CHARGE) * 200, 20);
+        ctx.fillRect(10, 190, (specialWeaponCharge / SPECIAL_WEAPON_MAX_CHARGE) * 200, 20);
         
         // 게이지 바 위에 텍스트 표시
         ctx.fillStyle = 'white';
         ctx.font = 'bold 16px Arial';
         ctx.textAlign = 'center';
         const percentText = `특수무기: ${Math.floor((specialWeaponCharge / SPECIAL_WEAPON_MAX_CHARGE) * 100)}%(보유:${specialWeaponCount}/5개)`;
-        ctx.fillText(percentText, 110, 235);
+        ctx.fillText(percentText, 110, 205);
     } else {
         // 사용 가능한 상태 - 깜빡이는 효과
         const blinkSpeed = 500; // 깜빡임 속도 (밀리초)
@@ -3539,30 +3539,30 @@ function drawUI() {
         
         // 배경색 설정 (게이지 바)
         ctx.fillStyle = isRed ? 'rgba(255, 0, 0, 0.3)' : 'rgba(0, 0, 255, 0.3)';
-        ctx.fillRect(10, 220, 200, 20);
+        ctx.fillRect(10, 190, 200, 20);
         
         // 테두리 효과
         ctx.strokeStyle = isRed ? 'red' : 'cyan';
         ctx.lineWidth = 2;
-        ctx.strokeRect(10, 220, 200, 20);
+        ctx.strokeRect(10, 190, 200, 20);
         
         // 게이지 바 위에 텍스트 표시 (충전율과 보유 개수)
         ctx.fillStyle = isRed ? 'red' : 'cyan';
         ctx.font = 'bold 16px Arial';
         ctx.textAlign = 'center';
         const percentText = `특수무기: ${Math.floor((specialWeaponCharge / SPECIAL_WEAPON_MAX_CHARGE) * 100)}%(보유:${specialWeaponCount}/5개)`;
-        ctx.fillText(percentText, 110, 235);
+        ctx.fillText(percentText, 110, 205);
         
         // 준비 완료 메시지 배경
         ctx.fillStyle = isRed ? 'rgba(255, 0, 0, 0.2)' : 'rgba(0, 0, 255, 0.2)';
-        ctx.fillRect(10, 240, 300, 30);
+        ctx.fillRect(10, 210, 300, 30);
         
         // 텍스트 색상 설정
         ctx.fillStyle = isRed ? 'red' : 'cyan';
         ctx.font = 'bold 15px Arial';
         ctx.textAlign = 'left';
         let statusText = '아래 [특수무기]버튼을 터치하세요.';
-        ctx.fillText(statusText, 15, 260);
+        ctx.fillText(statusText, 15, 230);
     }
     
     // 보스 체력 표시 개선
