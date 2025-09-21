@@ -1106,7 +1106,7 @@ const difficultySettings = {
         horizontalSpeedRange: 2 * mobileSpeedMultiplier,
         patternChance: 0.2,
         maxEnemies: 5,
-        bossHealth: 800,
+        bossHealth: 2000,
         bossSpawnInterval: 10000, // 10초
         powerUpChance: 0.1,
         bombDropChance: 0.1,
