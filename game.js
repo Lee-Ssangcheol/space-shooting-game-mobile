@@ -3968,33 +3968,84 @@ function handleBullets() {
             ctx.translate(bullet.x, bullet.y);
             ctx.rotate(bullet.rotation);
             
+            // 패턴별 색상 설정
+            let bulletColor, trailColor;
+            switch(bullet.pattern) {
+                case BOSS_PATTERNS.BASIC:
+                    bulletColor = '#FFFFFF'; // 흰색
+                    trailColor = '#FFFFFF';
+                    break;
+                case BOSS_PATTERNS.CIRCLE_SHOT:
+                    bulletColor = '#FF69B4'; // 핫핑크
+                    trailColor = '#FF69B4';
+                    break;
+                case BOSS_PATTERNS.CROSS_SHOT:
+                    bulletColor = '#00FFFF'; // 시안
+                    trailColor = '#00FFFF';
+                    break;
+                case BOSS_PATTERNS.SPIRAL_SHOT:
+                    bulletColor = '#FF8C00'; // 다크오렌지
+                    trailColor = '#FF8C00';
+                    break;
+                case BOSS_PATTERNS.WAVE_SHOT:
+                    bulletColor = '#90EE90'; // 라이트그린
+                    trailColor = '#90EE90';
+                    break;
+                case BOSS_PATTERNS.DIAMOND_SHOT:
+                    bulletColor = '#FF0000'; // 빨간색
+                    trailColor = '#FF0000';
+                    break;
+                case BOSS_PATTERNS.RANDOM_SPREAD:
+                    bulletColor = '#FFFF00'; // 노란색
+                    trailColor = '#FFFF00';
+                    break;
+                case BOSS_PATTERNS.DOUBLE_SPIRAL:
+                    bulletColor = '#00FF7F'; // 청녹색 (스프링그린)
+                    trailColor = '#00FF7F';
+                    break;
+                case BOSS_PATTERNS.TRIPLE_WAVE:
+                    bulletColor = '#32CD32'; // 라임그린
+                    trailColor = '#32CD32';
+                    break;
+                case BOSS_PATTERNS.TARGETED_SHOT:
+                    bulletColor = '#FF4500'; // 오렌지레드
+                    trailColor = '#FF4500';
+                    break;
+                case BOSS_PATTERNS.BURST_SHOT:
+                    bulletColor = '#FFD700'; // 골드
+                    trailColor = '#FFD700';
+                    break;
+                default:
+                    bulletColor = '#FF0000'; // 기본 빨간색
+                    trailColor = '#FF0000';
+            }
+            
             // 총알 본체
-            const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, bullet.width/2);
-            gradient.addColorStop(0, 'rgba(255, 0, 0, 0.8)');
-            gradient.addColorStop(1, 'rgba(255, 0, 0, 0)');
-            ctx.fillStyle = gradient;
+            ctx.fillStyle = bulletColor;
             ctx.beginPath();
             ctx.arc(0, 0, bullet.width/2, 0, Math.PI * 2);
             ctx.fill();
             
+            // 총알 테두리 (더 선명하게)
+            ctx.strokeStyle = '#000000'; // 검정 테두리로 대비 강화
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            
             // 총알 꼬리
             bullet.trail.forEach((pos, index) => {
                 const alpha = 1 - (index / bullet.trail.length);
-                ctx.fillStyle = `rgba(255, 0, 0, ${alpha * 0.5})`;
+                ctx.fillStyle = trailColor;
+                ctx.globalAlpha = alpha * 0.7; // 꼬리 투명도
                 ctx.beginPath();
                 ctx.arc(pos.x - bullet.x, pos.y - bullet.y, 
                         bullet.width/2 * (1 - index/bullet.trail.length), 0, Math.PI * 2);
                 ctx.fill();
             });
             
-            // 총알 주변에 빛나는 효과
-            const glowGradient = ctx.createRadialGradient(0, 0, 0, 0, 0, bullet.width);
-            glowGradient.addColorStop(0, 'rgba(255, 0, 0, 0.3)');
-            glowGradient.addColorStop(1, 'rgba(255, 0, 0, 0)');
-            ctx.fillStyle = glowGradient;
-            ctx.beginPath();
-            ctx.arc(0, 0, bullet.width, 0, Math.PI * 2);
-            ctx.fill();
+            // globalAlpha 리셋
+            ctx.globalAlpha = 1.0;
+            
+            // 빛나는 효과 제거 - 그라데이션 완전 제거
             
             ctx.restore();
             
@@ -4175,7 +4226,7 @@ function createBoss() {
         width: 60,
         height: 60,
         speed: BOSS_SETTINGS.SPEED,
-        pattern: (gameLevel < 5) ? BOSS_PATTERNS.WAVE_SHOT : BOSS_PATTERNS.CIRCLE_SHOT,
+        pattern: getRandomBossPattern(), // 랜덤 패턴 선택
         angle: 0,
         movePhase: 0,
         targetX: canvas.width / 2 - 30,
@@ -4552,7 +4603,8 @@ function createBossBullet(boss, angle) {
         trail: [], // 총알 꼬리 효과를 위한 배열
         glow: 1, // 빛나는 효과를 위한 값
         rotation: 0, // 회전 효과를 위한 값
-        rotationSpeed: 0.1 // 회전 속도
+        rotationSpeed: 0.1, // 회전 속도
+        pattern: boss.pattern // 보스 패턴 정보 추가
     };
     bullets.push(bullet);
 }
