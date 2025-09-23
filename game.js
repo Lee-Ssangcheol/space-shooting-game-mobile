@@ -1083,7 +1083,15 @@ const BOSS_PATTERNS = {
     DOUBLE_SPIRAL: 'double_spiral',
     TRIPLE_WAVE: 'triple_wave',
     TARGETED_SHOT: 'targeted_shot',
-    BURST_SHOT: 'burst_shot'
+    BURST_SHOT: 'burst_shot',
+    HEART_SHOT: 'heart_shot',
+    STAR_SHOT: 'star_shot',
+    FLOWER_SHOT: 'flower_shot',
+    BUTTERFLY_SHOT: 'butterfly_shot',
+    SPIRAL_WAVE: 'spiral_wave',
+    CONCENTRIC_CIRCLES: 'concentric_circles',
+    FIREWORKS_SHOT: 'fireworks_shot',
+    CHAOS_SHOT: 'chaos_shot'
 };
 
 // 키보드 입력 상태
@@ -3968,70 +3976,144 @@ function handleBullets() {
             ctx.translate(bullet.x, bullet.y);
             ctx.rotate(bullet.rotation);
             
-            // 패턴별 색상 설정
-            let bulletColor, trailColor;
+            // 패턴별 모양 그리기
             switch(bullet.pattern) {
                 case BOSS_PATTERNS.BASIC:
-                    bulletColor = '#FFFFFF'; // 흰색
-                    trailColor = '#FFFFFF';
+                    // 기본 패턴: 빨간색 원
+                    ctx.fillStyle = '#FF0000';
+                    ctx.beginPath();
+                    ctx.arc(0, 0, bullet.width/2, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = '#000000';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
                     break;
                 case BOSS_PATTERNS.CIRCLE_SHOT:
-                    bulletColor = '#FF69B4'; // 핫핑크
-                    trailColor = '#FF69B4';
+                    drawCircleBullet(ctx, bullet);
                     break;
                 case BOSS_PATTERNS.CROSS_SHOT:
-                    bulletColor = '#00FFFF'; // 시안
-                    trailColor = '#00FFFF';
+                    drawCrossBullet(ctx, bullet);
                     break;
                 case BOSS_PATTERNS.SPIRAL_SHOT:
-                    bulletColor = '#FF8C00'; // 다크오렌지
-                    trailColor = '#FF8C00';
+                    drawSpiralBullet(ctx, bullet);
                     break;
                 case BOSS_PATTERNS.WAVE_SHOT:
-                    bulletColor = '#90EE90'; // 라이트그린
-                    trailColor = '#90EE90';
+                    drawWaveBullet(ctx, bullet);
                     break;
                 case BOSS_PATTERNS.DIAMOND_SHOT:
-                    bulletColor = '#FF0000'; // 빨간색
-                    trailColor = '#FF0000';
+                    drawDiamondBullet(ctx, bullet);
                     break;
                 case BOSS_PATTERNS.RANDOM_SPREAD:
-                    bulletColor = '#FFFF00'; // 노란색
-                    trailColor = '#FFFF00';
+                    drawRandomSpreadBullet(ctx, bullet);
                     break;
                 case BOSS_PATTERNS.DOUBLE_SPIRAL:
-                    bulletColor = '#00FF7F'; // 청녹색 (스프링그린)
-                    trailColor = '#00FF7F';
+                    drawDoubleSpiralBullet(ctx, bullet);
                     break;
                 case BOSS_PATTERNS.TRIPLE_WAVE:
-                    bulletColor = '#32CD32'; // 라임그린
-                    trailColor = '#32CD32';
+                    drawTripleWaveBullet(ctx, bullet);
                     break;
                 case BOSS_PATTERNS.TARGETED_SHOT:
-                    bulletColor = '#FF4500'; // 오렌지레드
-                    trailColor = '#FF4500';
+                    drawTargetedBullet(ctx, bullet);
                     break;
                 case BOSS_PATTERNS.BURST_SHOT:
-                    bulletColor = '#FFD700'; // 골드
-                    trailColor = '#FFD700';
+                    drawBurstBullet(ctx, bullet);
+                    break;
+                case BOSS_PATTERNS.HEART_SHOT:
+                    drawHeartBullet(ctx, bullet);
+                    break;
+                case BOSS_PATTERNS.STAR_SHOT:
+                    drawStarBullet(ctx, bullet);
+                    break;
+                case BOSS_PATTERNS.FLOWER_SHOT:
+                    drawFlowerBullet(ctx, bullet);
+                    break;
+                case BOSS_PATTERNS.BUTTERFLY_SHOT:
+                    drawButterflyBullet(ctx, bullet);
+                    break;
+                case BOSS_PATTERNS.SPIRAL_WAVE:
+                    drawSpiralWaveBullet(ctx, bullet);
+                    break;
+                case BOSS_PATTERNS.CONCENTRIC_CIRCLES:
+                    drawConcentricBullet(ctx, bullet);
+                    break;
+                case BOSS_PATTERNS.FIREWORKS_SHOT:
+                    drawFireworksBullet(ctx, bullet);
+                    break;
+                case BOSS_PATTERNS.CHAOS_SHOT:
+                    drawChaosBullet(ctx, bullet);
                     break;
                 default:
-                    bulletColor = '#FF0000'; // 기본 빨간색
+                    // 기본 빨간색 원
+                    ctx.fillStyle = '#FF0000';
+                    ctx.beginPath();
+                    ctx.arc(0, 0, bullet.width/2, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = '#000000';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+            }
+            
+            // 총알 꼬리 효과 (패턴별 색상)
+            let trailColor;
+            switch(bullet.pattern) {
+                case BOSS_PATTERNS.CIRCLE_SHOT:
+                    trailColor = '#00FF00';
+                    break;
+                case BOSS_PATTERNS.CROSS_SHOT:
+                    trailColor = '#00FF80';
+                    break;
+                case BOSS_PATTERNS.SPIRAL_SHOT:
+                    trailColor = '#FFFF00';
+                    break;
+                case BOSS_PATTERNS.WAVE_SHOT:
+                    trailColor = '#FF00FF';
+                    break;
+                case BOSS_PATTERNS.DIAMOND_SHOT:
+                    trailColor = '#00FFFF';
+                    break;
+                case BOSS_PATTERNS.RANDOM_SPREAD:
+                    trailColor = '#FF8000';
+                    break;
+                case BOSS_PATTERNS.DOUBLE_SPIRAL:
+                    trailColor = '#FF00FF';
+                    break;
+                case BOSS_PATTERNS.TRIPLE_WAVE:
+                    trailColor = '#FF69B4';
+                    break;
+                case BOSS_PATTERNS.TARGETED_SHOT:
+                    trailColor = '#FFD700';
+                    break;
+                case BOSS_PATTERNS.BURST_SHOT:
+                    trailColor = '#FF6347';
+                    break;
+                case BOSS_PATTERNS.HEART_SHOT:
+                    trailColor = '#FF1493';
+                    break;
+                case BOSS_PATTERNS.STAR_SHOT:
+                    trailColor = '#FFD700';
+                    break;
+                case BOSS_PATTERNS.FLOWER_SHOT:
+                    trailColor = '#FF1493';
+                    break;
+                case BOSS_PATTERNS.BUTTERFLY_SHOT:
+                    trailColor = '#DA70D6';
+                    break;
+                case BOSS_PATTERNS.SPIRAL_WAVE:
+                    trailColor = '#40E0D0';
+                    break;
+                case BOSS_PATTERNS.CONCENTRIC_CIRCLES:
+                    trailColor = '#FF6347';
+                    break;
+                case BOSS_PATTERNS.FIREWORKS_SHOT:
+                    trailColor = '#FF4500';
+                    break;
+                case BOSS_PATTERNS.CHAOS_SHOT:
+                    trailColor = '#FF0000';
+                    break;
+                default:
                     trailColor = '#FF0000';
             }
             
-            // 총알 본체
-            ctx.fillStyle = bulletColor;
-            ctx.beginPath();
-            ctx.arc(0, 0, bullet.width/2, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // 총알 테두리 (더 선명하게)
-            ctx.strokeStyle = '#000000'; // 검정 테두리로 대비 강화
-            ctx.lineWidth = 1;
-            ctx.stroke();
-            
-            // 총알 꼬리
             bullet.trail.forEach((pos, index) => {
                 const alpha = 1 - (index / bullet.trail.length);
                 ctx.fillStyle = trailColor;
@@ -4382,7 +4464,15 @@ function handleBossPattern(boss) {
         BOSS_PATTERNS.DOUBLE_SPIRAL,
         BOSS_PATTERNS.TRIPLE_WAVE,
         BOSS_PATTERNS.TARGETED_SHOT,
-        BOSS_PATTERNS.BURST_SHOT
+        BOSS_PATTERNS.BURST_SHOT,
+        BOSS_PATTERNS.HEART_SHOT,
+        BOSS_PATTERNS.STAR_SHOT,
+        BOSS_PATTERNS.FLOWER_SHOT,
+        BOSS_PATTERNS.BUTTERFLY_SHOT,
+        BOSS_PATTERNS.SPIRAL_WAVE,
+        BOSS_PATTERNS.CONCENTRIC_CIRCLES,
+        BOSS_PATTERNS.FIREWORKS_SHOT,
+        BOSS_PATTERNS.CHAOS_SHOT
     ];
     
     // 레벨별 패턴 시스템
@@ -4586,11 +4676,92 @@ function executeBossPattern(boss, pattern, currentTime) {
                 boss.lastShot = currentTime;
             }
             break;
+            
+        case BOSS_PATTERNS.HEART_SHOT:
+            if (currentTime - boss.lastShot >= 1200) {  // 1.2초마다 발사
+                for (let i = 0; i < 5; i++) {
+                    const angle = (Math.PI * 2 / 5) * i;
+                    createBossBullet(boss, angle);
+                }
+                boss.lastShot = currentTime;
+            }
+            break;
+            
+        case BOSS_PATTERNS.STAR_SHOT:
+            if (currentTime - boss.lastShot >= 800) {  // 0.8초마다 발사
+                for (let i = 0; i < 5; i++) {
+                    const angle = (Math.PI * 2 / 5) * i;
+                    createBossBullet(boss, angle);
+                }
+                boss.lastShot = currentTime;
+            }
+            break;
+            
+        case BOSS_PATTERNS.FLOWER_SHOT:
+            if (currentTime - boss.lastShot >= 1000) {  // 1초마다 발사
+                for (let i = 0; i < 6; i++) {
+                    const angle = (Math.PI * 2 / 6) * i;
+                    createBossBullet(boss, angle);
+                }
+                boss.lastShot = currentTime;
+            }
+            break;
+            
+        case BOSS_PATTERNS.BUTTERFLY_SHOT:
+            if (currentTime - boss.lastShot >= 600) {  // 0.6초마다 발사
+                for (let i = 0; i < 4; i++) {
+                    const angle = (Math.PI / 2) * i;
+                    createBossBullet(boss, angle);
+                }
+                boss.lastShot = currentTime;
+            }
+            break;
+            
+        case BOSS_PATTERNS.SPIRAL_WAVE:
+            if (currentTime - boss.lastShot >= 300) {  // 0.3초마다 발사
+                createBossBullet(boss, boss.patternAngle);
+                boss.patternAngle += Math.PI / 6;  // 30도씩 회전
+                boss.lastShot = currentTime;
+                
+                // 나선 패턴이 한 바퀴 완료되면 초기화
+                if (boss.patternAngle >= Math.PI * 2) {
+                    boss.patternAngle = 0;
+                }
+            }
+            break;
+            
+        case BOSS_PATTERNS.CONCENTRIC_CIRCLES:
+            if (currentTime - boss.lastShot >= 1000) {  // 1초마다 발사
+                for (let i = 0; i < 8; i++) {
+                    const angle = (Math.PI * 2 / 8) * i;
+                    createBossBullet(boss, angle);
+                }
+                boss.lastShot = currentTime;
+            }
+            break;
+            
+        case BOSS_PATTERNS.FIREWORKS_SHOT:
+            if (currentTime - boss.lastShot >= 1500) {  // 1.5초마다 발사
+                for (let i = 0; i < 8; i++) {
+                    const angle = (Math.PI * 2 / 8) * i;
+                    createBossBullet(boss, angle);
+                }
+                boss.lastShot = currentTime;
+            }
+            break;
+            
+        case BOSS_PATTERNS.CHAOS_SHOT:
+            if (currentTime - boss.lastShot >= 200) {  // 0.2초마다 발사
+                const randomAngle = Math.random() * Math.PI * 2;
+                createBossBullet(boss, randomAngle);
+                boss.lastShot = currentTime;
+            }
+            break;
     }
 }
 
 // 보스 총알 생성 함수 수정
-function createBossBullet(boss, angle) {
+function createBossBullet(boss, angle, pattern = null) {
     const bullet = {
         x: boss.x + boss.width/2,
         y: boss.y + boss.height/2,
@@ -4604,9 +4775,263 @@ function createBossBullet(boss, angle) {
         glow: 1, // 빛나는 효과를 위한 값
         rotation: 0, // 회전 효과를 위한 값
         rotationSpeed: 0.1, // 회전 속도
-        pattern: boss.pattern // 보스 패턴 정보 추가
+        pattern: pattern || boss.pattern, // 보스 패턴 정보 추가
+        animationTime: 0 // 애니메이션 시간
     };
     bullets.push(bullet);
+}
+
+// 각 패턴별 총알 모양 그리기 함수들
+function drawCircleBullet(ctx, bullet) {
+    // 원형 샷: 초록색 원 모양
+    ctx.fillStyle = '#00FF00';
+    ctx.beginPath();
+    ctx.arc(0, 0, bullet.width/2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+}
+
+function drawCrossBullet(ctx, bullet) {
+    // 십자 샷: 청녹색 사각형 모양
+    ctx.fillStyle = '#00FF80';
+    ctx.fillRect(-bullet.width/2, -bullet.height/2, bullet.width, bullet.height);
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(-bullet.width/2, -bullet.height/2, bullet.width, bullet.height);
+}
+
+function drawSpiralBullet(ctx, bullet) {
+    // 나선 샷: 노란색 나선 모양
+    ctx.fillStyle = '#FFFF00';
+    ctx.beginPath();
+    const radius = bullet.width/2;
+    for (let i = 0; i < 3; i++) {
+        const angle = bullet.rotation + (i * Math.PI * 2 / 3);
+        const x = Math.cos(angle) * radius;
+        const y = Math.sin(angle) * radius;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+}
+
+function drawWaveBullet(ctx, bullet) {
+    // 파도 샷: 마젠타색 사각형 모양
+    ctx.fillStyle = '#FF00FF';
+    ctx.fillRect(-bullet.width/2, -bullet.height/2, bullet.width, bullet.height);
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(-bullet.width/2, -bullet.height/2, bullet.width, bullet.height);
+}
+
+function drawDiamondBullet(ctx, bullet) {
+    // 다이아몬드 샷: 시안색 사각형 모양
+    ctx.fillStyle = '#00FFFF';
+    ctx.beginPath();
+    ctx.moveTo(0, -bullet.height/2);
+    ctx.lineTo(bullet.width/2, 0);
+    ctx.lineTo(0, bullet.height/2);
+    ctx.lineTo(-bullet.width/2, 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+}
+
+function drawRandomSpreadBullet(ctx, bullet) {
+    // 랜덤 확산: 오렌지색 사각형 모양
+    ctx.fillStyle = '#FF8000';
+    ctx.fillRect(-bullet.width/2, -bullet.height/2, bullet.width, bullet.height);
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(-bullet.width/2, -bullet.height/2, bullet.width, bullet.height);
+}
+
+function drawDoubleSpiralBullet(ctx, bullet) {
+    // 이중 나선: 밝은 퍼플색 나선 모양
+    ctx.fillStyle = '#FF00FF';
+    ctx.beginPath();
+    const radius = bullet.width/2;
+    for (let i = 0; i < 4; i++) {
+        const angle = bullet.rotation + (i * Math.PI / 2);
+        const x = Math.cos(angle) * radius;
+        const y = Math.sin(angle) * radius;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+}
+
+function drawTripleWaveBullet(ctx, bullet) {
+    // 삼중 파도: 핑크색 사각형 모양
+    ctx.fillStyle = '#FF69B4';
+    ctx.fillRect(-bullet.width/2, -bullet.height/2, bullet.width, bullet.height);
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(-bullet.width/2, -bullet.height/2, bullet.width, bullet.height);
+}
+
+function drawTargetedBullet(ctx, bullet) {
+    // 조준 샷: 골드색 사각형 모양
+    ctx.fillStyle = '#FFD700';
+    ctx.fillRect(-bullet.width/2, -bullet.height/2, bullet.width, bullet.height);
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(-bullet.width/2, -bullet.height/2, bullet.width, bullet.height);
+}
+
+function drawBurstBullet(ctx, bullet) {
+    // 폭발 샷: 토마토색 사각형 모양
+    ctx.fillStyle = '#FF6347';
+    ctx.fillRect(-bullet.width/2, -bullet.height/2, bullet.width, bullet.height);
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(-bullet.width/2, -bullet.height/2, bullet.width, bullet.height);
+}
+
+function drawHeartBullet(ctx, bullet) {
+    // 하트 샷: 핫핑크색 하트 모양
+    ctx.fillStyle = '#FF1493';
+    ctx.beginPath();
+    const size = bullet.width/2;
+    ctx.moveTo(0, size/3);
+    ctx.bezierCurveTo(-size/2, -size/3, -size, size/6, 0, size);
+    ctx.bezierCurveTo(size, size/6, size/2, -size/3, 0, size/3);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+}
+
+function drawStarBullet(ctx, bullet) {
+    // 별 샷: 골드색 별 모양
+    ctx.fillStyle = '#FFD700';
+    ctx.beginPath();
+    const size = bullet.width/2;
+    for (let i = 0; i < 5; i++) {
+        const angle = (i * Math.PI * 2 / 5) - Math.PI / 2;
+        const x = Math.cos(angle) * size;
+        const y = Math.sin(angle) * size;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+}
+
+function drawFlowerBullet(ctx, bullet) {
+    // 꽃 샷: 딥핑크색 꽃 모양
+    ctx.fillStyle = '#FF1493';
+    ctx.beginPath();
+    const size = bullet.width/2;
+    for (let i = 0; i < 6; i++) {
+        const angle = (i * Math.PI * 2 / 6);
+        const x = Math.cos(angle) * size;
+        const y = Math.sin(angle) * size;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+}
+
+function drawButterflyBullet(ctx, bullet) {
+    // 나비 샷: 밝은 퍼플색 나비 모양
+    ctx.fillStyle = '#DA70D6';
+    ctx.beginPath();
+    const size = bullet.width/2;
+    ctx.ellipse(-size/2, 0, size/2, size/3, 0, 0, Math.PI * 2);
+    ctx.ellipse(size/2, 0, size/2, size/3, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+}
+
+function drawSpiralWaveBullet(ctx, bullet) {
+    // 나선 파동: 밝은 터콰이즈색 나선 모양
+    ctx.fillStyle = '#40E0D0';
+    ctx.beginPath();
+    const radius = bullet.width/2;
+    for (let i = 0; i < 3; i++) {
+        const angle = bullet.rotation + (i * Math.PI * 2 / 3);
+        const x = Math.cos(angle) * radius;
+        const y = Math.sin(angle) * radius;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+}
+
+function drawConcentricBullet(ctx, bullet) {
+    // 동심원: 토마토색 원 모양
+    ctx.fillStyle = '#FF6347';
+    ctx.beginPath();
+    ctx.arc(0, 0, bullet.width/2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+}
+
+function drawFireworksBullet(ctx, bullet) {
+    // 불꽃놀이 샷: 오렌지레드색 불꽃놀이 모양
+    ctx.fillStyle = '#FF4500';
+    ctx.beginPath();
+    const size = bullet.width/2;
+    for (let i = 0; i < 8; i++) {
+        const angle = (i * Math.PI * 2 / 8);
+        const x = Math.cos(angle) * size;
+        const y = Math.sin(angle) * size;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+}
+
+function drawChaosBullet(ctx, bullet) {
+    // 혼돈 샷: 밝은 레드색 혼돈 모양
+    ctx.fillStyle = '#FF0000';
+    ctx.beginPath();
+    const size = bullet.width/2;
+    for (let i = 0; i < 7; i++) {
+        const angle = (i * Math.PI * 2 / 7) + bullet.rotation;
+        const x = Math.cos(angle) * size;
+        const y = Math.sin(angle) * size;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1;
+    ctx.stroke();
 }
 
 // 레벨업 체크 함수 수정
@@ -5600,7 +6025,15 @@ let levelBossPatterns = {
         BOSS_PATTERNS.DOUBLE_SPIRAL,
         BOSS_PATTERNS.TRIPLE_WAVE,
         BOSS_PATTERNS.TARGETED_SHOT,
-        BOSS_PATTERNS.BURST_SHOT
+        BOSS_PATTERNS.BURST_SHOT,
+        BOSS_PATTERNS.HEART_SHOT,
+        BOSS_PATTERNS.STAR_SHOT,
+        BOSS_PATTERNS.FLOWER_SHOT,
+        BOSS_PATTERNS.BUTTERFLY_SHOT,
+        BOSS_PATTERNS.SPIRAL_WAVE,
+        BOSS_PATTERNS.CONCENTRIC_CIRCLES,
+        BOSS_PATTERNS.FIREWORKS_SHOT,
+        BOSS_PATTERNS.CHAOS_SHOT
     ]
 };
 
