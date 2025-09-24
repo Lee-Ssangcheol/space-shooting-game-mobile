@@ -2,7 +2,7 @@
 console.log('게임 파일 수정됨:', new Date().toLocaleString());
 
 // 게임 상수 정의
-const SPECIAL_WEAPON_MAX_CHARGE = 3000;  // 특수무기 최대 충전량
+const SPECIAL_WEAPON_MAX_CHARGE = 5000;  // 특수무기 최대 충전량
 const SPECIAL_WEAPON_CHARGE_RATE = 10;   // 특수무기 충전 속도
 const TOP_EFFECT_ZONE = 20;  // 상단 효과 무시 영역 (픽셀)
 
@@ -4652,7 +4652,7 @@ function handleBullets() {
 
 // 보스 관련 상수 추가
 const BOSS_SETTINGS = {
-    HEALTH: 1000,        // 기본 체력
+    HEALTH: 2000,        // 기본 체력 (일반 20발, 파워업 10발)
     DAMAGE: 50,          // 보스 총알 데미지
     SPEED: 2 * mobileSpeedMultiplier,           // 보스 이동 속도
     BULLET_SPEED: 5 * mobileSpeedMultiplier,    // 보스 총알 속도
