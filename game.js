@@ -5277,8 +5277,8 @@ function createBossBullet(boss, angle, pattern = null) {
     const bullet = {
         x: boss.x + boss.width/2,
         y: boss.y + boss.height/2,
-        width: 20,  // 크기 증가 (12 -> 20)
-        height: 20, // 크기 증가 (12 -> 20)
+        width: 24,  // 크기 증가 (20 -> 24, 20% 증가)
+        height: 24, // 크기 증가 (20 -> 24, 20% 증가)
         speed: boss.bulletSpeed,
         angle: angle,
         isBossBullet: true,
