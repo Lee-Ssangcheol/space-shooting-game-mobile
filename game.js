@@ -1657,13 +1657,13 @@ const BOSS_PATTERN_COLORS = {
     'crown_shot': '#FFDD44',      // 밝은 금색
     'moon_shot': '#CCCCFF',       // 밝은 연보라색
     // 새로운 어려운 패턴 색상
-    'machine_gun': '#FF0000',      // 진한 빨간색
-    'laser_beam': '#00FFFF',       // 청록색
-    'missile_barrage': '#FF8000',  // 주황색
-    'vortex_shot': '#8000FF',     // 보라색
-    'chain_reaction': '#FFFF00',   // 노란색
-    'quantum_shot': '#FF00FF',    // 자홍색
-    'black_hole': '#000000',       // 검은색
+    'machine_gun': '#FF4444',      // 밝은 빨간색
+    'laser_beam': '#44FFFF',       // 밝은 청록색
+    'missile_barrage': '#FFAA44',  // 밝은 주황색
+    'vortex_shot': '#AA44FF',     // 밝은 보라색
+    'chain_reaction': '#FFFF44',   // 밝은 노란색
+    'quantum_shot': '#FF44FF',    // 밝은 자홍색
+    'black_hole': '#444444',       // 밝은 회색
     'time_dilation': '#FFFFFF'    // 흰색
 };
 
@@ -2908,11 +2908,14 @@ function handleCollision() {
     }
     
     const currentTime = Date.now();
-    collisionCount += 2;  // 충돌 횟수를 두배로 증가 (피격 총알 개수 두배)
+    // 파워업 상태에 따른 피격 총알 개수 조정
+    const bulletsPerHit = (damageMultiplier > 1 || fireRateMultiplier > 1) ? 1 : 1;  // 파워업 상태와 일반 상태 모두 동일하게 1개씩 증가
+    collisionCount += bulletsPerHit;
     flashTimer = flashDuration;
     
     // 목숨 감소 시 경고음 재생 및 경고 깜박임 타이머 시작
-    if (collisionCount < maxLives * 2) {  // 충돌 횟수가 두배로 증가했으므로 조건도 조정
+    const maxCollisions = (damageMultiplier > 1 || fireRateMultiplier > 1) ? 30 : 50;  // 파워업 상태: 30개, 일반 상태: 50개
+    if (collisionCount < maxCollisions) {
         // 경고음 재생
         warningSound.currentTime = 0;
         warningSound.play().catch(error => {
@@ -2932,7 +2935,7 @@ function handleCollision() {
         lastCollisionTime = currentTime;
     }
     
-    if (collisionCount >= maxLives * 2) {  // 충돌 횟수가 두배로 증가했으므로 게임 오버 조건도 조정
+    if (collisionCount >= maxCollisions) {  // 파워업 상태에 따른 게임 오버 조건
         handleGameOver();
         
         // 폭발 효과
@@ -3769,6 +3772,44 @@ function checkEnemyCollisions(enemy) {
                 // 체력 감소 (각 총알당 100의 데미지)
                 enemy.health -= 100;
                 bossHealth = enemy.health;
+                
+                // 파워업 상태에 따른 보스 처치 조건 체크
+                const requiredHits = (damageMultiplier > 1 || fireRateMultiplier > 1) ? 30 : 50;
+                if (enemy.hitCount >= requiredHits) {
+                    console.log('보스 파괴됨 - 총알 개수 달성:', {
+                        hitCount: enemy.hitCount,
+                        requiredHits: requiredHits,
+                        isPowerUp: (damageMultiplier > 1 || fireRateMultiplier > 1)
+                    });
+                    enemy.health = 0;
+                    bossHealth = 0;
+                    bossDestroyed = true;
+                    updateScore(BOSS_SETTINGS.BONUS_SCORE);
+                    
+                    // 보스 파괴 시 목숨 1개 추가
+                    maxLives++;
+                    
+                    // 큰 폭발 효과
+                    explosions.push(new Explosion(
+                        enemy.x + enemy.width/2,
+                        enemy.y + enemy.height/2,
+                        true
+                    ));
+                    
+                    // 추가 폭발 효과
+                    for (let i = 0; i < 8; i++) {
+                        const angle = (Math.PI * 2 / 8) * i;
+                        const distance = 50;
+                        explosions.push(new Explosion(
+                            enemy.x + enemy.width/2 + Math.cos(angle) * distance,
+                            enemy.y + enemy.height/2 + Math.sin(angle) * distance,
+                            false
+                        ));
+                    }
+                    
+                    bossActive = false;
+                    return false;
+                }
                 
                 // 보스 피격음 재생
                 if (collisionSound && audioInitialized) {
