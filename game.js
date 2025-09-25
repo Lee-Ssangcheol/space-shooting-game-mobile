@@ -1669,7 +1669,7 @@ const difficultySettings = {
         horizontalSpeedRange: 2 * mobileSpeedMultiplier,
         patternChance: 0.2,
         maxEnemies: 5,
-        bossHealth: 2000,
+        bossHealth: 4000,
         bossSpawnInterval: 10000, // 10초
         powerUpChance: 0.1,
         bombDropChance: 0.1,
@@ -1717,7 +1717,7 @@ const difficultySettings = {
         horizontalSpeedRange: 6 * mobileSpeedMultiplier,
         patternChance: 1.0,
         maxEnemies: 20,
-        bossHealth: 2000,
+        bossHealth: 4000,
         bossSpawnInterval: 10000, // 10초
         powerUpChance: 0.3,
         bombDropChance: 0.3,
@@ -2485,7 +2485,7 @@ function createEnemy() {
             horizontalSpeedRange: (6 + levelDiff * 0.5) * mobileSpeedMultiplier,
             patternChance: 1.0,
             maxEnemies: Math.min(20 + levelDiff * 2, 50),
-            bossHealth: 2000 + levelDiff * 300,
+            bossHealth: 4000 + levelDiff * 600,  // 기본 체력 4000, 레벨당 600씩 증가
             bossSpawnInterval: Math.max(10000 - levelDiff * 200, 5000),
             powerUpChance: Math.min(0.3 + levelDiff * 0.01, 0.5),
             bombDropChance: Math.min(0.3 + levelDiff * 0.01, 0.5),
@@ -3406,7 +3406,7 @@ function handleEnemies() {
             horizontalSpeedRange: (6 + levelDiff * 0.5) * mobileSpeedMultiplier,
             patternChance: 1.0,
             maxEnemies: Math.min(20 + levelDiff * 2, 50),
-            bossHealth: 2000 + levelDiff * 300,
+            bossHealth: 4000 + levelDiff * 600,  // 기본 체력 4000, 레벨당 600씩 증가
             bossSpawnInterval: Math.max(10000 - levelDiff * 200, 5000),
             powerUpChance: Math.min(0.3 + levelDiff * 0.01, 0.5),
             bombDropChance: Math.min(0.3 + levelDiff * 0.01, 0.5),
@@ -4652,7 +4652,7 @@ function handleBullets() {
 
 // 보스 관련 상수 추가
 const BOSS_SETTINGS = {
-    HEALTH: 2000,        // 기본 체력 (일반 20발, 파워업 10발)
+    HEALTH: 4000,        // 기본 체력 (일반 40발, 파워업 20발)
     DAMAGE: 50,          // 보스 총알 데미지
     SPEED: 2 * mobileSpeedMultiplier,           // 보스 이동 속도
     BULLET_SPEED: 5 * mobileSpeedMultiplier,    // 보스 총알 속도
@@ -5282,7 +5282,7 @@ function checkLevelUp() {
                 horizontalSpeedRange: (6 + levelDiff * 0.5) * mobileSpeedMultiplier,
                 patternChance: 1.0,
                 maxEnemies: Math.min(20 + levelDiff * 2, 50), // 최대 50마리로 제한
-                bossHealth: 2000 + levelDiff * 300,
+                bossHealth: 4000 + levelDiff * 600,  // 기본 체력 4000, 레벨당 600씩 증가
                 bossSpawnInterval: Math.max(10000 - levelDiff * 200, 5000), // 최소 5초로 제한
                 powerUpChance: Math.min(0.3 + levelDiff * 0.01, 0.5), // 최대 50%로 제한
                 bombDropChance: Math.min(0.3 + levelDiff * 0.01, 0.5),
@@ -5317,7 +5317,7 @@ function checkLevelUp() {
                 if (reward.type === 'all') {
                     // 모든 파워업 적용
                     hasShield = true;
-                    damageMultiplier = 2;
+                    damageMultiplier = 1.33;  // 4000 ÷ 30 = 133.33, 133.33 ÷ 100 = 1.33
                     fireRateMultiplier = 2;
                     
                     // 파워업 지속 시간 설정
@@ -5467,7 +5467,7 @@ function applyPowerUp(type) {
             setTimeout(() => hasShield = false, 10000);
             break;
         case POWERUP_TYPES.DOUBLE_DAMAGE:
-            damageMultiplier = 2;
+            damageMultiplier = 1.33;  // 4000 ÷ 30 = 133.33, 133.33 ÷ 100 = 1.33
             setTimeout(() => damageMultiplier = 1, 10000);
             break;
         case POWERUP_TYPES.RAPID_FIRE:
