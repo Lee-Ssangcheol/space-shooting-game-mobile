@@ -2890,11 +2890,11 @@ function handleCollision() {
     }
     
     const currentTime = Date.now();
-    collisionCount++;
+    collisionCount += 2;  // 충돌 횟수를 두배로 증가 (피격 총알 개수 두배)
     flashTimer = flashDuration;
     
     // 목숨 감소 시 경고음 재생 및 경고 깜박임 타이머 시작
-    if (collisionCount < maxLives) {
+    if (collisionCount < maxLives * 2) {  // 충돌 횟수가 두배로 증가했으므로 조건도 조정
         // 경고음 재생
         warningSound.currentTime = 0;
         warningSound.play().catch(error => {
@@ -2914,7 +2914,7 @@ function handleCollision() {
         lastCollisionTime = currentTime;
     }
     
-    if (collisionCount >= maxLives) {  // maxLives 사용
+    if (collisionCount >= maxLives * 2) {  // 충돌 횟수가 두배로 증가했으므로 게임 오버 조건도 조정
         handleGameOver();
         
         // 폭발 효과
@@ -4060,7 +4060,7 @@ function drawUI() {
     }
     
     ctx.font = 'bold 20px Arial';  // 폰트를 진하게 변경
-    ctx.fillText(`남은 목숨: ${maxLives - collisionCount}`, 10, 170);
+    ctx.fillText(`남은 목숨: ${maxLives - Math.floor(collisionCount / 2)}`, 10, 170);  // 충돌 횟수가 두배로 증가했으므로 표시도 조정
 
     // 제작자 정보 표시
     ctx.fillStyle = 'white';
@@ -4816,11 +4816,11 @@ function handleBossPattern(boss) {
     }
 
     // 보스 이동 패턴
-    const movePattern = Math.floor(currentTime / 5000) % 4;  // 5초마다 이동 패턴 변경
+    const movePattern = Math.floor(currentTime / 10000) % 4;  // 10초마다 이동 패턴 변경 (체공 시간 증가)
     
     switch (movePattern) {
         case 0:  // 좌우 이동
-            boss.x += Math.sin(currentTime / 500) * 3;  // 부드러운 좌우 이동
+            boss.x += Math.sin(currentTime / 800) * 2;  // 더 부드럽고 느린 좌우 이동 (체공 시간 증가)
             break;
         case 1:  // 원형 이동
             const radius = 100;
