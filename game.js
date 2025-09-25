@@ -1628,7 +1628,7 @@ const BOSS_PATTERNS = {
 
 // 보스 패턴별 색상 설정 - 더 밝고 대비가 강한 색상
 const BOSS_PATTERN_COLORS = {
-    'basic': '#FF4444',           // 밝은 빨간색
+    'basic': '#FF8888',           // 더 밝은 빨간색
     'circle_shot': '#44FF44',    // 밝은 녹색
     'cross_shot': '#44FFFF',      // 청록색으로 변경
     'spiral_shot': '#FFFF44',     // 밝은 노란색
@@ -1644,26 +1644,26 @@ const BOSS_PATTERN_COLORS = {
     'flower_shot': '#FF44AA',     // 밝은 딥핑크
     'butterfly_shot': '#88FF88',  // 연녹색으로 변경
     'firework_shot': '#FF6644',   // 밝은 토마토색
-    'chaos_shot': '#FF4444',      // 밝은 다크레드
+    'chaos_shot': '#FF8888',      // 더 밝은 빨간색
     'ice_shot': '#44AAFF',        // 밝은 하늘색
     'dragon_shot': '#FF8844',     // 밝은 주황색
     'lightning_shot': '#FFFF44',   // 밝은 노란색
     'crystal_shot': '#44FFFF',     // 밝은 청록색
     'cloud_shot': '#CCCCFF',      // 밝은 연보라색
     'leaf_shot': '#44FF44',       // 밝은 녹색
-    'gear_shot': '#AAAAAA',       // 밝은 회색
-    'arrow_shot': '#FF4444',      // 밝은 빨간색
+    'gear_shot': '#FFFFFF',       // 하얀색
+    'arrow_shot': '#FF8888',      // 더 밝은 빨간색
     'shield_shot': '#44AAFF',     // 밝은 파란색
     'crown_shot': '#FFDD44',      // 밝은 금색
     'moon_shot': '#CCCCFF',       // 밝은 연보라색
     // 새로운 어려운 패턴 색상
-    'machine_gun': '#FF4444',      // 밝은 빨간색
+    'machine_gun': '#FF8888',      // 더 밝은 빨간색
     'laser_beam': '#44FFFF',       // 밝은 청록색
     'missile_barrage': '#FFAA44',  // 밝은 주황색
     'vortex_shot': '#AA44FF',     // 밝은 보라색
     'chain_reaction': '#FFFF44',   // 밝은 노란색
     'quantum_shot': '#FF44FF',    // 밝은 자홍색
-    'black_hole': '#444444',       // 밝은 회색
+    'black_hole': '#FFFFFF',       // 하얀색
     'time_dilation': '#FFFFFF'    // 흰색
 };
 
