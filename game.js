@@ -975,11 +975,11 @@ function initAudio() {
             collisionSound = new Audio('sounds/collision.mp3');
             warningSound = new Audio('sounds/warning.mp3');
 
-            // 사운드 설정
-            shootSound.volume = 0.4;
-            explosionSound.volume = 0.6;
-            collisionSound.volume = 0.5;
-            warningSound.volume = 0.7;
+            // 사운드 설정 (볼륨을 반으로 줄임)
+            shootSound.volume = 0.2;        // 0.4 → 0.2 (50% 감소)
+            explosionSound.volume = 0.3;     // 0.6 → 0.3 (50% 감소)
+            collisionSound.volume = 0.25;    // 0.5 → 0.25 (50% 감소)
+            warningSound.volume = 0.35;      // 0.7 → 0.35 (50% 감소)
 
             // 충돌 사운드 길이 제어
             collisionSound.addEventListener('loadedmetadata', () => {
@@ -3767,14 +3767,13 @@ function checkEnemyCollisions(enemy) {
                     console.log('보스가 특수 무기에 맞음');
                     enemy.health = 0;
                     bossHealth = 0;
-                    bossDestroyed = true;
                     updateScore(BOSS_SETTINGS.BONUS_SCORE);
                     
                     // 보스 파괴 시 목숨 1개 추가 (중복 방지)
                     if (!bossDestroyed) {
                         maxLives++; // 최대 목숨 증가
+                        bossDestroyed = true; // 중복 방지 플래그 설정
                     }
-                    bossDestroyed = true;
                     
                     // 큰 폭발 효과
                     explosions.push(new Explosion(
@@ -3829,14 +3828,13 @@ function checkEnemyCollisions(enemy) {
                     });
                     enemy.health = 0;
                     bossHealth = 0;
-                    bossDestroyed = true;
                     updateScore(BOSS_SETTINGS.BONUS_SCORE);
                     
                     // 보스 파괴 시 목숨 1개 추가 (중복 방지)
                     if (!bossDestroyed) {
                         maxLives++;
+                        bossDestroyed = true; // 중복 방지 플래그 설정
                     }
-                    bossDestroyed = true;
                     
                     // 큰 폭발 효과
                     explosions.push(new Explosion(
@@ -3883,14 +3881,13 @@ function checkEnemyCollisions(enemy) {
                     });
                     enemy.health = 0;
                     bossHealth = 0;
-                    bossDestroyed = true;
                     updateScore(BOSS_SETTINGS.BONUS_SCORE);
                     
                     // 보스 파괴 시 목숨 1개 추가 (이미 특수 무기로 파괴된 경우는 제외, 중복 방지)
                     if (!bullet.isSpecial && !bossDestroyed) {
                         maxLives++; // 최대 목숨 증가
+                        bossDestroyed = true; // 중복 방지 플래그 설정
                     }
-                    bossDestroyed = true;
                     
                     // 큰 폭발 효과
                     explosions.push(new Explosion(
@@ -4890,7 +4887,6 @@ function handleBossPattern(boss) {
     
     // 보스 체력이 0 이하이면 파괴 처리
     if (boss.health <= 0 && !bossDestroyed) {
-        bossDestroyed = true;
         bossActive = false;
         bossHealth = 0;
         updateScore(BOSS_SETTINGS.BONUS_SCORE);
@@ -5141,9 +5137,9 @@ function executeBossPattern(boss, pattern, currentTime) {
             
         case BOSS_PATTERNS.WINDMILL_SHOT:
             if (currentTime - boss.lastShot >= 400) {  // 0.4초마다 발사
-                // 바람개비 모양으로 4방향 발사
-                for (let i = 0; i < 4; i++) {
-                    const angle = (i * Math.PI * 2 / 4) + boss.patternAngle;
+                // 바람개비 모양으로 2방향 발사 (4발에서 2발로 감소)
+                for (let i = 0; i < 2; i++) {
+                    const angle = (i * Math.PI * 2 / 2) + boss.patternAngle;
                     createBossBullet(boss, angle, BOSS_PATTERNS.WINDMILL_SHOT);
                 }
                 boss.patternAngle += Math.PI / 8;  // 22.5도씩 회전
@@ -5158,9 +5154,9 @@ function executeBossPattern(boss, pattern, currentTime) {
             
         case BOSS_PATTERNS.GEAR_SHOT:
             if (currentTime - boss.lastShot >= 500) {  // 0.5초마다 발사
-                // 톱니바퀴 모양으로 6방향 발사
-                for (let i = 0; i < 6; i++) {  // 12발에서 6발로 감소
-                    const angle = (i * Math.PI * 2 / 6) + boss.patternAngle;
+                // 톱니바퀴 모양으로 3방향 발사 (6발에서 3발로 감소)
+                for (let i = 0; i < 3; i++) {
+                    const angle = (i * Math.PI * 2 / 3) + boss.patternAngle;
                     createBossBullet(boss, angle, BOSS_PATTERNS.GEAR_SHOT);
                 }
                 boss.patternAngle += Math.PI / 12;  // 15도씩 회전 (더 빠른 회전)
@@ -5177,8 +5173,8 @@ function executeBossPattern(boss, pattern, currentTime) {
         // 새로운 모양 패턴들
         case BOSS_PATTERNS.HEART_SHOT:
             if (currentTime - boss.lastShot >= 600) {  // 0.6초마다 발사
-                for (let i = 0; i < 6; i++) {
-                    const angle = (Math.PI * 2 / 6) * i;
+                for (let i = 0; i < 3; i++) {  // 6발에서 3발로 감소
+                    const angle = (Math.PI * 2 / 3) * i;
                     createBossBullet(boss, angle, BOSS_PATTERNS.HEART_SHOT);
                 }
                 boss.lastShot = currentTime;
@@ -5187,8 +5183,8 @@ function executeBossPattern(boss, pattern, currentTime) {
             
         case BOSS_PATTERNS.STAR_SHOT:
             if (currentTime - boss.lastShot >= 500) {  // 0.5초마다 발사
-                for (let i = 0; i < 5; i++) {
-                    const angle = (Math.PI * 2 / 5) * i;
+                for (let i = 0; i < 2; i++) {  // 5발에서 2발로 감소
+                    const angle = (Math.PI * 2 / 2) * i;
                     createBossBullet(boss, angle, BOSS_PATTERNS.STAR_SHOT);
                 }
                 boss.lastShot = currentTime;
@@ -5197,8 +5193,8 @@ function executeBossPattern(boss, pattern, currentTime) {
             
         case BOSS_PATTERNS.FLOWER_SHOT:
             if (currentTime - boss.lastShot >= 700) {  // 0.7초마다 발사
-                for (let i = 0; i < 4; i++) {  // 8발에서 4발로 감소
-                    const angle = (Math.PI * 2 / 4) * i;
+                for (let i = 0; i < 2; i++) {  // 4발에서 2발로 감소
+                    const angle = (Math.PI * 2 / 2) * i;
                     createBossBullet(boss, angle, BOSS_PATTERNS.FLOWER_SHOT);
                 }
                 boss.lastShot = currentTime;
@@ -5210,8 +5206,8 @@ function executeBossPattern(boss, pattern, currentTime) {
             
         case BOSS_PATTERNS.ICE_SHOT:
             if (currentTime - boss.lastShot >= 600) {  // 0.6초마다 발사
-                for (let i = 0; i < 6; i++) {
-                    const angle = (Math.PI * 2 / 6) * i;
+                for (let i = 0; i < 3; i++) {  // 6발에서 3발로 감소
+                    const angle = (Math.PI * 2 / 3) * i;
                     createBossBullet(boss, angle, BOSS_PATTERNS.ICE_SHOT);
                 }
                 boss.lastShot = currentTime;
@@ -5220,9 +5216,9 @@ function executeBossPattern(boss, pattern, currentTime) {
             
         case BOSS_PATTERNS.SNOWFLAKE_SHOT:
             if (currentTime - boss.lastShot >= 400) {  // 0.4초마다 발사
-                // 눈 결정체 패턴 - 8방향으로 발사
-                for (let i = 0; i < 8; i++) {
-                    const angle = (Math.PI * 2 / 8) * i;
+                // 눈 결정체 패턴 - 4방향으로 발사 (8발에서 4발로 감소)
+                for (let i = 0; i < 4; i++) {
+                    const angle = (Math.PI * 2 / 4) * i;
                     createBossBullet(boss, angle, BOSS_PATTERNS.SNOWFLAKE_SHOT);
                 }
                 boss.lastShot = currentTime;
