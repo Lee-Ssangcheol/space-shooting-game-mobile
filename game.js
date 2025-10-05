@@ -1046,7 +1046,7 @@ function renderBossBulletShape(bullet, color) {
             // 기본 원형 총알 - 그라데이션 제거, 크기 축소
             ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1.0)`;
             ctx.beginPath();
-            ctx.arc(0, 0, size * 0.6, 0, Math.PI * 2); // 크기를 60%로 축소
+            ctx.arc(0, 0, size * 0.5, 0, Math.PI * 2); // 크기를 50%로 축소 (1~2픽셀 감소)
             ctx.fill();
             break;
             
@@ -1111,14 +1111,14 @@ function renderBossBulletShape(bullet, color) {
             
         // 새로운 모양 패턴들
         case 'heart_shot':
-            // 하트 모양 총알 (크기 1.5배 확대)
+            // 하트 모양 총알 (크기 축소)
             ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1.0)`;
             ctx.strokeStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1.0)`;
             ctx.lineWidth = 2;
             ctx.beginPath();
-            ctx.moveTo(0, size * 0.45); // 0.3 * 1.5 = 0.45
-            ctx.bezierCurveTo(-size * 0.75, -size * 0.3, -size * 1.5, size * 0.15, 0, size * 1.5); // 모든 좌표에 1.5배 적용
-            ctx.bezierCurveTo(size * 1.5, size * 0.15, size * 0.75, -size * 0.3, 0, size * 0.45);
+            ctx.moveTo(0, size * 0.4); // 하트 크기 축소
+            ctx.bezierCurveTo(-size * 0.65, -size * 0.25, -size * 1.3, size * 0.12, 0, size * 1.3); // 하트 크기 축소
+            ctx.bezierCurveTo(size * 1.3, size * 0.12, size * 0.65, -size * 0.25, 0, size * 0.4);
             ctx.fill();
             ctx.stroke();
             break;
@@ -1156,7 +1156,7 @@ function renderBossBulletShape(bullet, color) {
             ctx.lineWidth = 2;
             // 중심 원 - 크기 축소
             ctx.beginPath();
-            ctx.arc(0, 0, size * 0.18, 0, Math.PI * 2); // 60% 축소
+            ctx.arc(0, 0, size * 0.15, 0, Math.PI * 2); // 크기 축소 (1~2픽셀 감소)
             ctx.fill();
             ctx.stroke();
             // 꽃잎들
@@ -1164,10 +1164,10 @@ function renderBossBulletShape(bullet, color) {
                 const angle = (i * Math.PI * 2) / 6;
                 ctx.beginPath();
                 ctx.ellipse(
-                    Math.cos(angle) * size * 0.6, 
-                    Math.sin(angle) * size * 0.6, 
-                    size * 0.4, 
-                    size * 0.2, 
+                    Math.cos(angle) * size * 0.5, 
+                    Math.sin(angle) * size * 0.5, 
+                    size * 0.35, 
+                    size * 0.18, 
                     angle, 
                     0, 
                     Math.PI * 2
@@ -1198,7 +1198,7 @@ function renderBossBulletShape(bullet, color) {
             // 중심에 작은 원 - 크기 축소
             ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1)`;
             ctx.beginPath();
-            ctx.arc(0, 0, size * 0.3, 0, Math.PI * 2); // 크기를 30%로 축소
+            ctx.arc(0, 0, size * 0.25, 0, Math.PI * 2); // 크기 축소 (1~2픽셀 감소)
             ctx.fill();
             break;
             
@@ -1210,7 +1210,7 @@ function renderBossBulletShape(bullet, color) {
             ctx.beginPath();
             for (let i = 0; i < 7; i++) {
                 const angle = (i * Math.PI * 2) / 7 + Math.random() * 0.5;
-                const radius = size * 1.5 * (0.5 + Math.random() * 0.5);
+                const radius = size * 1.3 * (0.5 + Math.random() * 0.5); // 크기 축소
                 const x = Math.cos(angle) * radius;
                 const y = Math.sin(angle) * radius;
                 if (i === 0) {
@@ -1232,8 +1232,8 @@ function renderBossBulletShape(bullet, color) {
             // 육각형 모양 (크기 축소)
             for (let i = 0; i < 6; i++) {
                 const angle = (i * Math.PI * 2) / 6;
-                const x = Math.cos(angle) * size * 0.8; // 1.5에서 0.8로 축소
-                const y = Math.sin(angle) * size * 0.8; // 1.5에서 0.8로 축소
+                const x = Math.cos(angle) * size * 0.7; // 크기 축소 (1~2픽셀 감소)
+                const y = Math.sin(angle) * size * 0.7; // 크기 축소 (1~2픽셀 감소)
                 if (i === 0) {
                     ctx.moveTo(x, y);
                 } else {
@@ -1248,8 +1248,8 @@ function renderBossBulletShape(bullet, color) {
             ctx.beginPath();
             for (let i = 0; i < 6; i++) {
                 const angle = (i * Math.PI * 2) / 6;
-                const x = Math.cos(angle) * size * 0.2; // 0.3에서 0.2로 더 축소
-                const y = Math.sin(angle) * size * 0.2; // 0.3에서 0.2로 더 축소
+                const x = Math.cos(angle) * size * 0.18; // 크기 축소 (1~2픽셀 감소)
+                const y = Math.sin(angle) * size * 0.18; // 크기 축소 (1~2픽셀 감소)
                 if (i === 0) {
                     ctx.moveTo(x, y);
                 } else {
@@ -1279,8 +1279,8 @@ function renderBossBulletShape(bullet, color) {
             ctx.beginPath();
             for (let i = 0; i < 8; i++) {
                 const angle = (i * Math.PI * 2) / 8;
-                const x = Math.cos(angle) * size * 0.7; // 크기를 70%로 축소
-                const y = Math.sin(angle) * size * 0.7; // 크기를 70%로 축소
+                const x = Math.cos(angle) * size * 0.6; // 크기 축소 (1~2픽셀 감소)
+                const y = Math.sin(angle) * size * 0.6; // 크기 축소 (1~2픽셀 감소)
                 if (i === 0) {
                     ctx.moveTo(x, y);
                 } else {
@@ -1299,7 +1299,7 @@ function renderBossBulletShape(bullet, color) {
             ctx.lineWidth = 3;
             // 중심 원
             ctx.beginPath();
-            ctx.arc(0, 0, size * 0.2, 0, Math.PI * 2);
+            ctx.arc(0, 0, size * 0.18, 0, Math.PI * 2); // 크기 축소 (1~2픽셀 감소)
             ctx.fill();
             ctx.stroke();
             // 바람개비 날개들
@@ -1308,7 +1308,7 @@ function renderBossBulletShape(bullet, color) {
                 ctx.beginPath();
                 ctx.moveTo(0, 0);
                 ctx.lineTo(Math.cos(angle) * size, Math.sin(angle) * size);
-                ctx.lineTo(Math.cos(angle + Math.PI/4) * size * 0.7, Math.sin(angle + Math.PI/4) * size * 0.7);
+                ctx.lineTo(Math.cos(angle + Math.PI/4) * size * 0.6, Math.sin(angle + Math.PI/4) * size * 0.6); // 크기 축소
                 ctx.closePath();
                 ctx.fill();
                 ctx.stroke();
@@ -1323,17 +1323,17 @@ function renderBossBulletShape(bullet, color) {
             ctx.lineWidth = 3;
             // 용의 몸통
             ctx.beginPath();
-            ctx.ellipse(0, 0, size * 1.2, size * 0.6, 0, 0, Math.PI * 2);
+            ctx.ellipse(0, 0, size * 1.1, size * 0.55, 0, 0, Math.PI * 2); // 크기 축소
             ctx.fill();
             ctx.stroke();
             // 용의 머리
             ctx.beginPath();
-            ctx.ellipse(0, -size * 0.8, size * 0.8, size * 0.4, 0, 0, Math.PI * 2);
+            ctx.ellipse(0, -size * 0.7, size * 0.7, size * 0.35, 0, 0, Math.PI * 2); // 크기 축소
             ctx.fill();
             ctx.stroke();
             // 용의 꼬리
             ctx.beginPath();
-            ctx.ellipse(0, size * 0.8, size * 0.6, size * 0.3, 0, 0, Math.PI * 2);
+            ctx.ellipse(0, size * 0.7, size * 0.55, size * 0.28, 0, 0, Math.PI * 2); // 크기 축소
             ctx.fill();
             ctx.stroke();
             break;
@@ -1344,12 +1344,12 @@ function renderBossBulletShape(bullet, color) {
             ctx.strokeStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1.0)`;
             ctx.lineWidth = 4;
             ctx.beginPath();
-            ctx.moveTo(-size * 0.5, -size * 1.2);
-            ctx.lineTo(size * 0.3, -size * 0.4);
-            ctx.lineTo(-size * 0.2, -size * 0.4);
-            ctx.lineTo(size * 0.5, size * 1.2);
-            ctx.lineTo(-size * 0.3, size * 0.4);
-            ctx.lineTo(size * 0.2, size * 0.4);
+            ctx.moveTo(-size * 0.45, -size * 1.1); // 크기 축소
+            ctx.lineTo(size * 0.28, -size * 0.35);
+            ctx.lineTo(-size * 0.18, -size * 0.35);
+            ctx.lineTo(size * 0.45, size * 1.1);
+            ctx.lineTo(-size * 0.28, size * 0.35);
+            ctx.lineTo(size * 0.18, size * 0.35);
             ctx.closePath();
             ctx.fill();
             ctx.stroke();
@@ -1362,12 +1362,12 @@ function renderBossBulletShape(bullet, color) {
             ctx.lineWidth = 3;
             ctx.beginPath();
             // 수정의 윗부분
-            ctx.moveTo(0, -size * 1.2);
-            ctx.lineTo(size * 0.6, -size * 0.4);
-            ctx.lineTo(size * 0.3, size * 0.2);
-            ctx.lineTo(0, size * 1.2);
-            ctx.lineTo(-size * 0.3, size * 0.2);
-            ctx.lineTo(-size * 0.6, -size * 0.4);
+            ctx.moveTo(0, -size * 1.1); // 크기 축소
+            ctx.lineTo(size * 0.55, -size * 0.35);
+            ctx.lineTo(size * 0.28, size * 0.18);
+            ctx.lineTo(0, size * 1.1);
+            ctx.lineTo(-size * 0.28, size * 0.18);
+            ctx.lineTo(-size * 0.55, -size * 0.35);
             ctx.closePath();
             ctx.fill();
             ctx.stroke();
@@ -1380,15 +1380,15 @@ function renderBossBulletShape(bullet, color) {
             ctx.lineWidth = 3;
             // 구름의 여러 부분 - 크기 축소
             ctx.beginPath();
-            ctx.arc(-size * 0.3, 0, size * 0.36, 0, Math.PI * 2); // 60% 축소
+            ctx.arc(-size * 0.28, 0, size * 0.32, 0, Math.PI * 2); // 크기 축소
             ctx.fill();
             ctx.stroke();
             ctx.beginPath();
-            ctx.arc(0, 0, size * 0.48, 0, Math.PI * 2); // 60% 축소
+            ctx.arc(0, 0, size * 0.42, 0, Math.PI * 2); // 크기 축소
             ctx.fill();
             ctx.stroke();
             ctx.beginPath();
-            ctx.arc(size * 0.3, 0, size * 0.36, 0, Math.PI * 2); // 60% 축소
+            ctx.arc(size * 0.28, 0, size * 0.32, 0, Math.PI * 2); // 크기 축소
             ctx.fill();
             ctx.stroke();
             break;
@@ -1401,8 +1401,8 @@ function renderBossBulletShape(bullet, color) {
             ctx.beginPath();
             for (let i = 0; i < 12; i++) {
                 const angle = (i * Math.PI * 2) / 12;
-                const outerRadius = size * 0.8; // 1.2에서 0.8로 축소
-                const innerRadius = size * 0.5; // 0.8에서 0.5로 축소
+                const outerRadius = size * 0.7; // 크기 축소 (1~2픽셀 감소)
+                const innerRadius = size * 0.45; // 크기 축소 (1~2픽셀 감소)
                 const x1 = Math.cos(angle) * outerRadius;
                 const y1 = Math.sin(angle) * outerRadius;
                 const x2 = Math.cos(angle + Math.PI/12) * innerRadius;
@@ -1425,13 +1425,13 @@ function renderBossBulletShape(bullet, color) {
             ctx.strokeStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1.0)`;
             ctx.lineWidth = 3;
             ctx.beginPath();
-            ctx.moveTo(0, -size * 1.2);
-            ctx.lineTo(size * 0.4, size * 0.2);
-            ctx.lineTo(size * 0.2, size * 0.2);
-            ctx.lineTo(size * 0.2, size * 1.2);
-            ctx.lineTo(-size * 0.2, size * 1.2);
-            ctx.lineTo(-size * 0.2, size * 0.2);
-            ctx.lineTo(-size * 0.4, size * 0.2);
+            ctx.moveTo(0, -size * 1.1); // 크기 축소
+            ctx.lineTo(size * 0.35, size * 0.18);
+            ctx.lineTo(size * 0.18, size * 0.18);
+            ctx.lineTo(size * 0.18, size * 1.1);
+            ctx.lineTo(-size * 0.18, size * 1.1);
+            ctx.lineTo(-size * 0.18, size * 0.18);
+            ctx.lineTo(-size * 0.35, size * 0.18);
             ctx.closePath();
             ctx.fill();
             ctx.stroke();
@@ -1478,8 +1478,8 @@ function renderBossBulletShape(bullet, color) {
             ctx.strokeStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1.0)`;
             ctx.lineWidth = 3;
             ctx.beginPath();
-            ctx.arc(0, 0, size * 0.72, Math.PI * 0.3, Math.PI * 1.7); // 60% 축소
-            ctx.arc(size * 0.18, 0, size * 0.54, Math.PI * 1.7, Math.PI * 0.3, true); // 60% 축소
+            ctx.arc(0, 0, size * 0.65, Math.PI * 0.3, Math.PI * 1.7); // 크기 축소
+            ctx.arc(size * 0.16, 0, size * 0.48, Math.PI * 1.7, Math.PI * 0.3, true); // 크기 축소
             ctx.stroke();
             break;
             
@@ -1573,7 +1573,7 @@ function renderBossBulletShape(bullet, color) {
             
             // 중심에 작은 원형 장식 - 크기 축소
             ctx.beginPath();
-            ctx.arc(0, 0, size * 0.08, 0, Math.PI * 2); // 0.1 * 0.8 = 0.08
+            ctx.arc(0, 0, size * 0.07, 0, Math.PI * 2); // 크기 축소 (1~2픽셀 감소)
             ctx.fill();
             break;
             
@@ -1581,7 +1581,7 @@ function renderBossBulletShape(bullet, color) {
             // 기본 원형 총알 - 크기 축소
             ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1.0)`;
             ctx.beginPath();
-            ctx.arc(0, 0, size * 0.6, 0, Math.PI * 2); // 크기를 60%로 축소
+            ctx.arc(0, 0, size * 0.5, 0, Math.PI * 2); // 크기 축소 (1~2픽셀 감소)
             ctx.fill();
             break;
     }
