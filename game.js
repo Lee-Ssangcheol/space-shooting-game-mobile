@@ -5070,9 +5070,9 @@ function executeBossPattern(boss, pattern, currentTime) {
             break;
             
         case BOSS_PATTERNS.CROSS_SHOT:
-            if (currentTime - boss.lastShot >= 600) {  // 발사 간격 증가 (500ms -> 600ms)
-                for (let i = 0; i < 3; i++) {  // 4발에서 3발로 감소
-                    const angle = (Math.PI / 3) * i;
+            if (currentTime - boss.lastShot >= 500) {  // 0.5초마다 발사 (더 빠름)
+                for (let i = 0; i < 4; i++) {  // 8발에서 4발로 감소
+                    const angle = (Math.PI / 4) * i;
                     createBossBullet(boss, angle, BOSS_PATTERNS.CROSS_SHOT);
                 }
                 boss.lastShot = currentTime;
@@ -5080,10 +5080,11 @@ function executeBossPattern(boss, pattern, currentTime) {
             break;
             
         case BOSS_PATTERNS.SPIRAL_SHOT:
-            if (currentTime - boss.lastShot >= 150) {  // 발사 간격 증가 (100ms -> 150ms)
-                // 단일 나선 패턴 (이중에서 단일로 변경)
+            if (currentTime - boss.lastShot >= 100) {  // 0.1초마다 발사 (더 빠름)
+                // 이중 나선 패턴
                 createBossBullet(boss, boss.patternAngle, BOSS_PATTERNS.SPIRAL_SHOT);
-                boss.patternAngle += Math.PI / 8;  // 22.5도씩 회전 (더 느린 회전)
+                createBossBullet(boss, boss.patternAngle + Math.PI, BOSS_PATTERNS.SPIRAL_SHOT);
+                boss.patternAngle += Math.PI / 12;  // 15도씩 회전 (더 빠른 회전)
                 boss.lastShot = currentTime;
                 
                 // 나선 패턴이 한 바퀴 완료되면 초기화
@@ -5094,13 +5095,13 @@ function executeBossPattern(boss, pattern, currentTime) {
             break;
             
         case BOSS_PATTERNS.WAVE_SHOT:
-            if (currentTime - boss.lastShot >= 300) {  // 발사 간격 증가 (200ms -> 300ms)
-                // 이중 파도 패턴 (삼중에서 이중으로 변경)
-                for (let i = 0; i < 2; i++) {
-                    const waveAngle = Math.sin(boss.patternAngle + (i * Math.PI * 2 / 2)) * (Math.PI / 4);
+            if (currentTime - boss.lastShot >= 200) {  // 0.2초마다 발사 (더 빠름)
+                // 삼중 파도 패턴
+                for (let i = 0; i < 3; i++) {
+                    const waveAngle = Math.sin(boss.patternAngle + (i * Math.PI * 2 / 3)) * (Math.PI / 3);
                     createBossBullet(boss, Math.PI / 2 + waveAngle, BOSS_PATTERNS.WAVE_SHOT);
                 }
-                boss.patternAngle += 0.2;  // 더 느린 파도 변화
+                boss.patternAngle += 0.3;
                 boss.lastShot = currentTime;
                 
                 // 파도 패턴이 일정 시간 지나면 초기화
@@ -5111,10 +5112,10 @@ function executeBossPattern(boss, pattern, currentTime) {
             break;
             
         case BOSS_PATTERNS.DIAMOND_SHOT:
-            if (currentTime - boss.lastShot >= 500) {  // 발사 간격 증가 (400ms -> 500ms)
-                // 3방향 다이아몬드 패턴 (4발에서 3발로 감소)
-                for (let i = 0; i < 3; i++) {
-                    const angle = (Math.PI * 2 / 3) * i;
+            if (currentTime - boss.lastShot >= 400) {  // 0.4초마다 발사 (더 빠름)
+                // 4방향 다이아몬드 패턴
+                for (let i = 0; i < 4; i++) {  // 8발에서 4발로 감소
+                    const angle = (Math.PI / 4) * i;
                     createBossBullet(boss, angle, BOSS_PATTERNS.DIAMOND_SHOT);
                 }
                 boss.lastShot = currentTime;
@@ -5122,8 +5123,8 @@ function executeBossPattern(boss, pattern, currentTime) {
             break;
             
         case BOSS_PATTERNS.RANDOM_SPREAD:
-            if (currentTime - boss.lastShot >= 400) {  // 발사 간격 증가 (250ms -> 400ms)
-                for (let i = 0; i < 3; i++) {  // 4발에서 3발로 감소
+            if (currentTime - boss.lastShot >= 250) {  // 0.25초마다 발사 (더 빠름)
+                for (let i = 0; i < 4; i++) {  // 8발에서 4발로 감소
                     const randomAngle = Math.random() * Math.PI * 2;  // 0~360도 랜덤
                     createBossBullet(boss, randomAngle, BOSS_PATTERNS.RANDOM_SPREAD);
                 }
@@ -5135,10 +5136,13 @@ function executeBossPattern(boss, pattern, currentTime) {
             
             
         case BOSS_PATTERNS.WINDMILL_SHOT:
-            if (currentTime - boss.lastShot >= 500) {  // 발사 간격 증가 (400ms -> 500ms)
-                // 바람개비 모양으로 단일 방향 발사 (2발에서 1발로 감소)
-                createBossBullet(boss, boss.patternAngle, BOSS_PATTERNS.WINDMILL_SHOT);
-                boss.patternAngle += Math.PI / 6;  // 30도씩 회전 (더 느린 회전)
+            if (currentTime - boss.lastShot >= 400) {  // 0.4초마다 발사
+                // 바람개비 모양으로 2방향 발사 (4발에서 2발로 감소)
+                for (let i = 0; i < 2; i++) {
+                    const angle = (i * Math.PI * 2 / 2) + boss.patternAngle;
+                    createBossBullet(boss, angle, BOSS_PATTERNS.WINDMILL_SHOT);
+                }
+                boss.patternAngle += Math.PI / 8;  // 22.5도씩 회전
                 boss.lastShot = currentTime;
                 
                 // 바람개비 패턴이 한 바퀴 완료되면 초기화
@@ -5149,13 +5153,13 @@ function executeBossPattern(boss, pattern, currentTime) {
             break;
             
         case BOSS_PATTERNS.GEAR_SHOT:
-            if (currentTime - boss.lastShot >= 600) {  // 발사 간격 증가 (500ms -> 600ms)
-                // 톱니바퀴 모양으로 2방향 발사 (3발에서 2발로 감소)
-                for (let i = 0; i < 2; i++) {
-                    const angle = (i * Math.PI * 2 / 2) + boss.patternAngle;
+            if (currentTime - boss.lastShot >= 500) {  // 0.5초마다 발사
+                // 톱니바퀴 모양으로 3방향 발사 (6발에서 3발로 감소)
+                for (let i = 0; i < 3; i++) {
+                    const angle = (i * Math.PI * 2 / 3) + boss.patternAngle;
                     createBossBullet(boss, angle, BOSS_PATTERNS.GEAR_SHOT);
                 }
-                boss.patternAngle += Math.PI / 8;  // 22.5도씩 회전 (더 느린 회전)
+                boss.patternAngle += Math.PI / 12;  // 15도씩 회전 (더 빠른 회전)
                 boss.lastShot = currentTime;
                 
                 // 톱니바퀴 패턴이 한 바퀴 완료되면 초기화
@@ -5211,10 +5215,10 @@ function executeBossPattern(boss, pattern, currentTime) {
             break;
             
         case BOSS_PATTERNS.SNOWFLAKE_SHOT:
-            if (currentTime - boss.lastShot >= 500) {  // 발사 간격 증가 (400ms -> 500ms)
-                // 눈 결정체 패턴 - 3방향으로 발사 (4발에서 3발로 감소)
-                for (let i = 0; i < 3; i++) {
-                    const angle = (Math.PI * 2 / 3) * i;
+            if (currentTime - boss.lastShot >= 400) {  // 0.4초마다 발사
+                // 눈 결정체 패턴 - 4방향으로 발사 (8발에서 4발로 감소)
+                for (let i = 0; i < 4; i++) {
+                    const angle = (Math.PI * 2 / 4) * i;
                     createBossBullet(boss, angle, BOSS_PATTERNS.SNOWFLAKE_SHOT);
                 }
                 boss.lastShot = currentTime;
