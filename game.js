@@ -1487,16 +1487,16 @@ const BOSS_PATTERN_COLORS = {
     'wave_shot': '#88FF88',
     'diamond_shot': '#44FFFF',
     'random_spread': '#44FF88',
-    'windmill_shot': '#FFFFFF',
-    'gear_shot': '#44FFAA',
-    'heart_shot': '#FF88CC',
-    'star_shot': '#FFAA44',
+    'windmill_shot': '#44FFAA',      // 청녹색으로 변경
+    'gear_shot': '#CCCCCC',          // 밝은 회색으로 변경
+    'heart_shot': '#FF88CC',         // 밝은 핑크색으로 변경
+    'star_shot': '#FFFF44',          // 밝은 노란색으로 변경
     'flower_shot': '#FF44AA',
-    'ice_shot': '#44AAFF',
-    'snowflake_shot': '#FFFFFF',
+    'ice_shot': '#44FFFF',           // 청록색으로 변경
+    'snowflake_shot': '#0066CC',     // 오션블루로 변경
     'lightning_shot': '#FFFF44',
-    'moon_shot': '#CCCCFF',
-    'triangle_shot': '#FF4444'
+    'moon_shot': '#FFFF44',          // 노란색 반달로 변경
+    'triangle_shot': '#88FF88'       // 연녹색으로 변경
 };
 
 // 키보드 입력 상태
