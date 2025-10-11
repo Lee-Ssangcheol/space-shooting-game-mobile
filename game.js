@@ -5069,7 +5069,7 @@ function executeBossPattern(boss, pattern, currentTime) {
             
         case BOSS_PATTERNS.CROSS_SHOT:
             if (currentTime - boss.lastShot >= 800) {  // 0.8초마다 발사
-                for (let i = 0; i < 4; i++) {
+                for (let i = 0; i < 5; i++) {  // 4발에서 5발로 증가 (25% 증가)
                     const angle = (Math.PI / 2) * i;
                     createBossBullet(boss, angle, BOSS_PATTERNS.CROSS_SHOT);
                 }
@@ -5092,15 +5092,15 @@ function executeBossPattern(boss, pattern, currentTime) {
             
         case BOSS_PATTERNS.WAVE_SHOT:
             if (currentTime - boss.lastShot >= 500) {  // 0.5초마다 발사 (간격 증가)
-                // 세 개의 파도형 패턴을 동시에 발사
-                for (let i = 0; i < 3; i++) {
-                    const waveAngle = Math.sin(boss.patternAngle + (i * Math.PI * 2 / 3)) * (Math.PI / 3);
+                // 네 개의 파도형 패턴을 동시에 발사 (3개에서 4개로 증가)
+                for (let i = 0; i < 4; i++) {
+                    const waveAngle = Math.sin(boss.patternAngle + (i * Math.PI * 2 / 4)) * (Math.PI / 3);
                     createBossBullet(boss, Math.PI / 2 + waveAngle, BOSS_PATTERNS.WAVE_SHOT);
                 }
                 boss.patternAngle += 0.4;
                 boss.lastShot = currentTime;
                 
-                // 삼중 파도 패턴이 일정 시간 지나면 초기화
+                // 사중 파도 패턴이 일정 시간 지나면 초기화
                 if (boss.patternAngle >= Math.PI * 2) {
                     boss.patternAngle = 0;
                 }
@@ -5109,7 +5109,7 @@ function executeBossPattern(boss, pattern, currentTime) {
             
         case BOSS_PATTERNS.DIAMOND_SHOT:
             if (currentTime - boss.lastShot >= 600) {  // 0.6초마다 발사
-                const angles = [0, Math.PI/2, Math.PI, Math.PI*3/2];  // 상, 우, 하, 좌
+                const angles = [0, Math.PI/2, Math.PI, Math.PI*3/2, Math.PI/4];  // 상, 우, 하, 좌, 대각선 추가 (5방향)
                 angles.forEach(angle => {
                     createBossBullet(boss, angle, BOSS_PATTERNS.DIAMOND_SHOT);
                 });
@@ -5122,8 +5122,8 @@ function executeBossPattern(boss, pattern, currentTime) {
                 // 랜덤 확산 패턴 - 더 역동적으로 개선
                 const baseAngles = [0, Math.PI/2, Math.PI, Math.PI*3/2]; // 4방향 기본 각도
                 baseAngles.forEach(baseAngle => {
-                    // 각 방향마다 3-5개의 총알을 랜덤하게 발사
-                    const bulletCount = Math.floor(Math.random() * 3) + 3; // 3-5개
+                    // 각 방향마다 4-6개의 총알을 랜덤하게 발사 (3-5개에서 증가)
+                    const bulletCount = Math.floor(Math.random() * 3) + 4; // 4-6개
                     for (let i = 0; i < bulletCount; i++) {
                         const randomOffset = (Math.random() - 0.5) * Math.PI/3; // ±30도 랜덤
                         const angle = baseAngle + randomOffset;
@@ -5142,8 +5142,8 @@ function executeBossPattern(boss, pattern, currentTime) {
                 // 바람개비 확산 패턴 - 더 역동적으로 개선
                 const windmillAngles = [0, Math.PI/2, Math.PI, Math.PI*3/2];
                 windmillAngles.forEach(baseAngle => {
-                    // 각 방향마다 2-3개의 총알을 발사
-                    const bulletCount = Math.floor(Math.random() * 2) + 2; // 2-3개
+                    // 각 방향마다 3-4개의 총알을 발사 (2-3개에서 증가)
+                    const bulletCount = Math.floor(Math.random() * 2) + 3; // 3-4개
                     for (let i = 0; i < bulletCount; i++) {
                         const spreadOffset = (i - (bulletCount-1)/2) * 0.3; // 좌우로 퍼짐
                         const angle = baseAngle + spreadOffset;
@@ -5156,9 +5156,9 @@ function executeBossPattern(boss, pattern, currentTime) {
             
         case BOSS_PATTERNS.GEAR_SHOT:
             if (currentTime - boss.lastShot >= 600) {  // 0.6초마다 발사 (간격 증가)
-                // 나선 확산 패턴 - 5방향으로 발사
-                for (let i = 0; i < 5; i++) {
-                    const angle = boss.patternAngle + (i * Math.PI * 2 / 5);
+                // 나선 확산 패턴 - 6방향으로 발사 (5방향에서 증가)
+                for (let i = 0; i < 6; i++) {
+                    const angle = boss.patternAngle + (i * Math.PI * 2 / 6);
                     createBossBullet(boss, angle, BOSS_PATTERNS.GEAR_SHOT);
                 }
                 boss.patternAngle += Math.PI / 6;  // 30도씩 회전 (더 큰 각도)
@@ -5213,9 +5213,9 @@ function executeBossPattern(boss, pattern, currentTime) {
             
         case BOSS_PATTERNS.SNOWFLAKE_SHOT:
             if (currentTime - boss.lastShot >= 700) {  // 0.7초마다 발사
-                // 다이아몬드 확산 패턴 - 5방향으로 발사
-                for (let i = 0; i < 5; i++) {
-                    const angle = (Math.PI * 2 / 5) * i;
+                // 다이아몬드 확산 패턴 - 6방향으로 발사 (5방향에서 증가)
+                for (let i = 0; i < 6; i++) {
+                    const angle = (Math.PI * 2 / 6) * i;
                     createBossBullet(boss, angle, BOSS_PATTERNS.SNOWFLAKE_SHOT);
                 }
                 boss.lastShot = currentTime;
