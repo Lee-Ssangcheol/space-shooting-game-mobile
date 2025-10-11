@@ -1577,6 +1577,20 @@ function renderBossBulletShape(bullet, color) {
             ctx.fill();
             break;
             
+        case 'triangle_shot':
+            // 삼각형 모양 총알
+            ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1.0)`;
+            ctx.strokeStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1.0)`;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, -size * 0.8);  // 위쪽 꼭짓점
+            ctx.lineTo(size * 0.7, size * 0.4);  // 오른쪽 아래
+            ctx.lineTo(-size * 0.7, size * 0.4);  // 왼쪽 아래
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            break;
+            
         default:
             // 기본 원형 총알 - 크기 축소
             ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1.0)`;
@@ -1664,7 +1678,8 @@ const BOSS_PATTERNS = {
     SHIELD_SHOT: 'shield_shot',
     CROWN_SHOT: 'crown_shot',
     MOON_SHOT: 'moon_shot',
-    SNOWFLAKE_SHOT: 'snowflake_shot'  // 눈 결정체 패턴 추가
+    SNOWFLAKE_SHOT: 'snowflake_shot',  // 눈 결정체 패턴 추가
+    TRIANGLE_SHOT: 'triangle_shot'     // 삼각 패턴 추가
 };
 
 // 보스 패턴별 색상 설정 - 더 밝고 대비가 강한 색상
@@ -1694,7 +1709,8 @@ const BOSS_PATTERN_COLORS = {
     'shield_shot': '#44AAFF',     // 밝은 파란색
     'crown_shot': '#FFDD44',      // 밝은 금색
     'moon_shot': '#CCCCFF',       // 밝은 연보라색
-    'snowflake_shot': '#FFFFFF'   // 흰색 눈 결정체 (더 잘 보이도록)
+    'snowflake_shot': '#FFFFFF',  // 흰색 눈 결정체 (더 잘 보이도록)
+    'triangle_shot': '#FF4444'    // 밝은 빨간색 삼각형
 };
 
 // 키보드 입력 상태
@@ -4994,7 +5010,10 @@ function handleBossPattern(boss) {
         BOSS_PATTERNS.STAR_SHOT,
         BOSS_PATTERNS.FLOWER_SHOT,
         BOSS_PATTERNS.ICE_SHOT,
-        BOSS_PATTERNS.SNOWFLAKE_SHOT  // 눈 결정체 패턴 추가
+        BOSS_PATTERNS.SNOWFLAKE_SHOT,  // 눈 결정체 패턴 추가
+        BOSS_PATTERNS.LIGHTNING_SHOT,  // 번개 패턴 추가
+        BOSS_PATTERNS.MOON_SHOT,       // 달 패턴 추가
+        BOSS_PATTERNS.TRIANGLE_SHOT    // 삼각 패턴 추가
     ];
     
     // 모든 레벨에서 동일한 랜덤 패턴 시스템 사용 (중복 방지)
@@ -5217,6 +5236,50 @@ function executeBossPattern(boss, pattern, currentTime) {
                 for (let i = 0; i < 6; i++) {
                     const angle = (Math.PI * 2 / 6) * i;
                     createBossBullet(boss, angle, BOSS_PATTERNS.SNOWFLAKE_SHOT);
+                }
+                boss.lastShot = currentTime;
+            }
+            break;
+            
+        case BOSS_PATTERNS.FLOWER_SHOT:
+            if (currentTime - boss.lastShot >= 600) {  // 0.6초마다 발사
+                // 꽃 패턴 - 6방향으로 발사
+                for (let i = 0; i < 6; i++) {
+                    const angle = (Math.PI * 2 / 6) * i;
+                    createBossBullet(boss, angle, BOSS_PATTERNS.FLOWER_SHOT);
+                }
+                boss.lastShot = currentTime;
+            }
+            break;
+            
+        case BOSS_PATTERNS.LIGHTNING_SHOT:
+            if (currentTime - boss.lastShot >= 500) {  // 0.5초마다 발사
+                // 번개 패턴 - 4방향으로 발사
+                for (let i = 0; i < 4; i++) {
+                    const angle = (Math.PI * 2 / 4) * i;
+                    createBossBullet(boss, angle, BOSS_PATTERNS.LIGHTNING_SHOT);
+                }
+                boss.lastShot = currentTime;
+            }
+            break;
+            
+        case BOSS_PATTERNS.MOON_SHOT:
+            if (currentTime - boss.lastShot >= 800) {  // 0.8초마다 발사
+                // 달 패턴 - 3방향으로 발사
+                for (let i = 0; i < 3; i++) {
+                    const angle = (Math.PI * 2 / 3) * i;
+                    createBossBullet(boss, angle, BOSS_PATTERNS.MOON_SHOT);
+                }
+                boss.lastShot = currentTime;
+            }
+            break;
+            
+        case BOSS_PATTERNS.TRIANGLE_SHOT:
+            if (currentTime - boss.lastShot >= 600) {  // 0.6초마다 발사
+                // 삼각형 패턴 - 3방향으로 발사
+                for (let i = 0; i < 3; i++) {
+                    const angle = (Math.PI * 2 / 3) * i;
+                    createBossBullet(boss, angle, BOSS_PATTERNS.TRIANGLE_SHOT);
                 }
                 boss.lastShot = currentTime;
             }
