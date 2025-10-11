@@ -1177,52 +1177,6 @@ function renderBossBulletShape(bullet, color) {
             }
             break;
             
-        case 'firework_shot':
-            // 불꽃놀이 모양 총알
-            ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1.0)`;
-            ctx.strokeStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1.0)`;
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            for (let i = 0; i < 8; i++) {
-                const angle = (i * Math.PI * 2) / 8;
-                const x = Math.cos(angle) * size * 1.5;
-                const y = Math.sin(angle) * size * 1.5;
-                if (i === 0) {
-                    ctx.moveTo(0, 0);
-                }
-                ctx.lineTo(x, y);
-            }
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
-            // 중심에 작은 원 - 크기 축소
-            ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1)`;
-            ctx.beginPath();
-            ctx.arc(0, 0, size * 0.25, 0, Math.PI * 2); // 크기 축소 (1~2픽셀 감소)
-            ctx.fill();
-            break;
-            
-        case 'chaos_shot':
-            // 혼돈 모양 총알
-            ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1.0)`;
-            ctx.strokeStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1.0)`;
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            for (let i = 0; i < 7; i++) {
-                const angle = (i * Math.PI * 2) / 7 + Math.random() * 0.5;
-                const radius = size * 1.3 * (0.5 + Math.random() * 0.5); // 크기 축소
-                const x = Math.cos(angle) * radius;
-                const y = Math.sin(angle) * radius;
-                if (i === 0) {
-                    ctx.moveTo(0, 0);
-                }
-                ctx.lineTo(x, y);
-            }
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
-            break;
-            
         case 'ice_shot':
             // 빙설 모양 총알
             ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1.0)`;
@@ -1260,38 +1214,6 @@ function renderBossBulletShape(bullet, color) {
             ctx.fill();
             break;
             
-        case 'targeted_shot':
-            // 추적 패턴 - 화살 모양 총알
-            ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.9)`;
-            ctx.beginPath();
-            ctx.moveTo(0, -size);
-            ctx.lineTo(size/2, size/2);
-            ctx.lineTo(-size/2, size/2);
-            ctx.closePath();
-            ctx.fill();
-            break;
-            
-        case 'burst_shot':
-            // 버스트 패턴 - 팔각형 총알 (크기 축소)
-            ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1.0)`;
-            ctx.strokeStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1.0)`;
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            for (let i = 0; i < 8; i++) {
-                const angle = (i * Math.PI * 2) / 8;
-                const x = Math.cos(angle) * size * 0.6; // 크기 축소 (1~2픽셀 감소)
-                const y = Math.sin(angle) * size * 0.6; // 크기 축소 (1~2픽셀 감소)
-                if (i === 0) {
-                    ctx.moveTo(x, y);
-                } else {
-                    ctx.lineTo(x, y);
-                }
-            }
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
-            break;
-            
         case 'windmill_shot':
             // 바람개비 모양 총알
             ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1.0)`;
@@ -1313,84 +1235,6 @@ function renderBossBulletShape(bullet, color) {
                 ctx.fill();
                 ctx.stroke();
             }
-            break;
-            
-        // 새로운 개성있는 모양들
-        case 'dragon_shot':
-            // 용 모양 총알 - 더 크고 복잡한 모양
-            ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1.0)`;
-            ctx.strokeStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1.0)`;
-            ctx.lineWidth = 3;
-            // 용의 몸통
-            ctx.beginPath();
-            ctx.ellipse(0, 0, size * 1.1, size * 0.55, 0, 0, Math.PI * 2); // 크기 축소
-            ctx.fill();
-            ctx.stroke();
-            // 용의 머리
-            ctx.beginPath();
-            ctx.ellipse(0, -size * 0.7, size * 0.7, size * 0.35, 0, 0, Math.PI * 2); // 크기 축소
-            ctx.fill();
-            ctx.stroke();
-            // 용의 꼬리
-            ctx.beginPath();
-            ctx.ellipse(0, size * 0.7, size * 0.55, size * 0.28, 0, 0, Math.PI * 2); // 크기 축소
-            ctx.fill();
-            ctx.stroke();
-            break;
-            
-        case 'lightning_shot':
-            // 번개 모양 총알 - 더 크고 선명한 번개
-            ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1.0)`;
-            ctx.strokeStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1.0)`;
-            ctx.lineWidth = 4;
-            ctx.beginPath();
-            ctx.moveTo(-size * 0.45, -size * 1.1); // 크기 축소
-            ctx.lineTo(size * 0.28, -size * 0.35);
-            ctx.lineTo(-size * 0.18, -size * 0.35);
-            ctx.lineTo(size * 0.45, size * 1.1);
-            ctx.lineTo(-size * 0.28, size * 0.35);
-            ctx.lineTo(size * 0.18, size * 0.35);
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
-            break;
-            
-        case 'crystal_shot':
-            // 수정 모양 총알 - 더 크고 복잡한 수정
-            ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1.0)`;
-            ctx.strokeStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1.0)`;
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            // 수정의 윗부분
-            ctx.moveTo(0, -size * 1.1); // 크기 축소
-            ctx.lineTo(size * 0.55, -size * 0.35);
-            ctx.lineTo(size * 0.28, size * 0.18);
-            ctx.lineTo(0, size * 1.1);
-            ctx.lineTo(-size * 0.28, size * 0.18);
-            ctx.lineTo(-size * 0.55, -size * 0.35);
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
-            break;
-            
-        case 'cloud_shot':
-            // 구름 모양 총알 - 크기 축소
-            ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1.0)`;
-            ctx.strokeStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1.0)`;
-            ctx.lineWidth = 3;
-            // 구름의 여러 부분 - 크기 축소
-            ctx.beginPath();
-            ctx.arc(-size * 0.28, 0, size * 0.32, 0, Math.PI * 2); // 크기 축소
-            ctx.fill();
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.arc(0, 0, size * 0.42, 0, Math.PI * 2); // 크기 축소
-            ctx.fill();
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.arc(size * 0.28, 0, size * 0.32, 0, Math.PI * 2); // 크기 축소
-            ctx.fill();
-            ctx.stroke();
             break;
             
         case 'gear_shot':
@@ -1419,54 +1263,18 @@ function renderBossBulletShape(bullet, color) {
             ctx.stroke();
             break;
             
-        case 'arrow_shot':
-            // 화살 모양 총알 - 더 크고 선명한 화살
+        case 'lightning_shot':
+            // 번개 모양 총알 - 더 크고 선명한 번개
             ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1.0)`;
             ctx.strokeStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1.0)`;
-            ctx.lineWidth = 3;
+            ctx.lineWidth = 4;
             ctx.beginPath();
-            ctx.moveTo(0, -size * 1.1); // 크기 축소
-            ctx.lineTo(size * 0.35, size * 0.18);
-            ctx.lineTo(size * 0.18, size * 0.18);
-            ctx.lineTo(size * 0.18, size * 1.1);
-            ctx.lineTo(-size * 0.18, size * 1.1);
-            ctx.lineTo(-size * 0.18, size * 0.18);
-            ctx.lineTo(-size * 0.35, size * 0.18);
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
-            break;
-            
-        case 'shield_shot':
-            // 방패 모양 총알 - 더 크고 복잡한 방패
-            ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1.0)`;
-            ctx.strokeStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1.0)`;
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.moveTo(0, -size * 1.2);
-            ctx.lineTo(size * 0.6, -size * 0.4);
-            ctx.lineTo(size * 0.6, size * 0.8);
-            ctx.lineTo(0, size * 1.2);
-            ctx.lineTo(-size * 0.6, size * 0.8);
-            ctx.lineTo(-size * 0.6, -size * 0.4);
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
-            break;
-            
-        case 'crown_shot':
-            // 왕관 모양 총알 - 더 크고 복잡한 왕관
-            ctx.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1.0)`;
-            ctx.strokeStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1.0)`;
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.moveTo(-size * 0.8, size * 0.4);
-            ctx.lineTo(-size * 0.4, -size * 1.2);
-            ctx.lineTo(0, -size * 0.8);
-            ctx.lineTo(size * 0.4, -size * 1.2);
-            ctx.lineTo(size * 0.8, size * 0.4);
-            ctx.lineTo(size * 0.6, size * 1.2);
-            ctx.lineTo(-size * 0.6, size * 1.2);
+            ctx.moveTo(-size * 0.45, -size * 1.1); // 크기 축소
+            ctx.lineTo(size * 0.28, -size * 0.35);
+            ctx.lineTo(-size * 0.18, -size * 0.35);
+            ctx.lineTo(size * 0.45, size * 1.1);
+            ctx.lineTo(-size * 0.28, size * 0.35);
+            ctx.lineTo(size * 0.18, size * 0.35);
             ctx.closePath();
             ctx.fill();
             ctx.stroke();
@@ -1653,64 +1461,42 @@ let isGameActive = true;
 
 // 보스 패턴 상수 추가
 const BOSS_PATTERNS = {
-    BASIC: 'basic',           // 기본 패턴 추가
+    BASIC: 'basic',
     CROSS_SHOT: 'cross_shot',
     SPIRAL_SHOT: 'spiral_shot',
     WAVE_SHOT: 'wave_shot',
     DIAMOND_SHOT: 'diamond_shot',
     RANDOM_SPREAD: 'random_spread',
-    TARGETED_SHOT: 'targeted_shot',
-    BURST_SHOT: 'burst_shot',
     WINDMILL_SHOT: 'windmill_shot',
     GEAR_SHOT: 'gear_shot',
     HEART_SHOT: 'heart_shot',
     STAR_SHOT: 'star_shot',
     FLOWER_SHOT: 'flower_shot',
-    FIREWORK_SHOT: 'firework_shot',
-    CHAOS_SHOT: 'chaos_shot',
     ICE_SHOT: 'ice_shot',
-    DRAGON_SHOT: 'dragon_shot',
+    SNOWFLAKE_SHOT: 'snowflake_shot',
     LIGHTNING_SHOT: 'lightning_shot',
-    CRYSTAL_SHOT: 'crystal_shot',
-    CLOUD_SHOT: 'cloud_shot',
-    GEAR_SHOT: 'gear_shot',
-    ARROW_SHOT: 'arrow_shot',
-    SHIELD_SHOT: 'shield_shot',
-    CROWN_SHOT: 'crown_shot',
     MOON_SHOT: 'moon_shot',
-    SNOWFLAKE_SHOT: 'snowflake_shot',  // 눈 결정체 패턴 추가
-    TRIANGLE_SHOT: 'triangle_shot'     // 삼각 패턴 추가
+    TRIANGLE_SHOT: 'triangle_shot'
 };
 
 // 보스 패턴별 색상 설정 - 더 밝고 대비가 강한 색상
 const BOSS_PATTERN_COLORS = {
-    'basic': '#FF8888',           // 더 밝은 빨간색
-    'cross_shot': '#44FFFF',      // 청록색으로 변경
-    'spiral_shot': '#FFFF44',     // 밝은 노란색
-    'wave_shot': '#88FF88',       // 연녹색으로 변경
-    'diamond_shot': '#44FFFF',    // 밝은 청록색
-    'random_spread': '#44FF88',   // 밝은 연녹색
-    'targeted_shot': '#FF8844',   // 밝은 오렌지레드
-    'burst_shot': '#FFDD44',      // 밝은 골드
-    'windmill_shot': '#FFFFFF',   // 흰색
-    'gear_shot': '#44FFAA',       // 밝은 청녹색
-    'heart_shot': '#FF88CC',      // 밝은 핫핑크
-    'star_shot': '#FFAA44',       // 밝은 오렌지
-    'flower_shot': '#FF44AA',     // 밝은 딥핑크
-    'firework_shot': '#FF6644',   // 밝은 토마토색
-    'chaos_shot': '#FF8888',      // 더 밝은 빨간색
-    'ice_shot': '#44AAFF',        // 밝은 하늘색
-    'dragon_shot': '#FF8844',     // 밝은 주황색
-    'lightning_shot': '#FFFF44',   // 밝은 노란색
-    'crystal_shot': '#44FFFF',     // 밝은 청록색
-    'cloud_shot': '#CCCCFF',      // 밝은 연보라색
-    'gear_shot': '#FFFFFF',       // 하얀색
-    'arrow_shot': '#FF8888',      // 더 밝은 빨간색
-    'shield_shot': '#44AAFF',     // 밝은 파란색
-    'crown_shot': '#FFDD44',      // 밝은 금색
-    'moon_shot': '#CCCCFF',       // 밝은 연보라색
-    'snowflake_shot': '#FFFFFF',  // 흰색 눈 결정체 (더 잘 보이도록)
-    'triangle_shot': '#FF4444'    // 밝은 빨간색 삼각형
+    'basic': '#FF8888',
+    'cross_shot': '#44FFFF',
+    'spiral_shot': '#FFFF44',
+    'wave_shot': '#88FF88',
+    'diamond_shot': '#44FFFF',
+    'random_spread': '#44FF88',
+    'windmill_shot': '#FFFFFF',
+    'gear_shot': '#44FFAA',
+    'heart_shot': '#FF88CC',
+    'star_shot': '#FFAA44',
+    'flower_shot': '#FF44AA',
+    'ice_shot': '#44AAFF',
+    'snowflake_shot': '#FFFFFF',
+    'lightning_shot': '#FFFF44',
+    'moon_shot': '#CCCCFF',
+    'triangle_shot': '#FF4444'
 };
 
 // 키보드 입력 상태
